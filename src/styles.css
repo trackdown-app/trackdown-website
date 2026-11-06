@@ -7,42 +7,127 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
-@custom-variant dark (&:is(.dark *));
+/*
+ * Barlow and Barlow Condensed, self-hosted from `@fontsource`: Vite bundles
+ * the font files, so the site never asks Google Fonts. Each file covers the
+ * Latin, Latin Extended and Vietnamese subsets by `unicode-range`; a browser
+ * downloads only the subsets a page uses. Only the weights the design sets.
+ */
+@import "@fontsource/barlow/400.css";
+@import "@fontsource/barlow/500.css";
+@import "@fontsource/barlow/600.css";
+@import "@fontsource/barlow/700.css";
+@import "@fontsource/barlow/800.css";
+@import "@fontsource/barlow-condensed/700.css";
+@import "@fontsource/barlow-condensed/800.css";
+
+/* Dark mode follows the operating system; the site has no theme toggle. */
+@custom-variant dark (@media (prefers-color-scheme: dark));
 
 /*
- * shadcn/ui's neutral theme, until the design's tokens replace the colours.
- * `--radius` is 12px, so the scale below gives the design's corners:
+ * The design canvas's tokens (Web · Playing, its `t` object), light first.
+ * `--td-*` are the design's names; the shadcn/ui roles below map onto them.
+ * See docs/design-system.md, and `src/lib/theme-contrast.test.ts` for the
+ * contrast check that reads these values.
+ *
+ * `--radius` is 12px, so the scale in `@theme` gives the design's corners:
  * 8px (`rounded-sm`), 10px for buttons and list options (`rounded-md`),
  * 12px (`rounded-lg`) and 16px for the input and plates (`rounded-xl`).
  * Pills (the network picker) take `rounded-full`.
  */
 :root {
+    color-scheme: light;
+
+    --td-bg: #f6f7f5;
+    --td-surface: #ffffff;
+    --td-rule: #d9ddda;
+    --td-ink: #15181c;
+    --td-muted: #4c535a;
+    --td-soft: #eef0ee;
+    --td-empty: #c4c9c5;
+    --td-grid: #e1e5e2;
+    --td-line-1: #2f45d8;
+    --td-line-2: #b8236f;
+    --td-line-3: #0b7f5a;
+    --td-on-line: #ffffff;
+    --td-action: #15181c;
+    --td-on-action: #ffffff;
+    --td-shadow: rgb(21 24 28 / 0.14);
+    /* Not drawn by the design: an error red that passes 4.5:1 on bg, surface and soft. */
+    --td-danger: #b42318;
+
     --radius: 0.75rem;
-    --background: oklch(1 0 0);
-    --foreground: oklch(0.145 0 0);
-    --card: oklch(1 0 0);
-    --card-foreground: oklch(0.145 0 0);
-    --popover: oklch(1 0 0);
-    --popover-foreground: oklch(0.145 0 0);
-    --primary: oklch(0.205 0 0);
-    --primary-foreground: oklch(0.985 0 0);
-    --secondary: oklch(0.97 0 0);
-    --secondary-foreground: oklch(0.205 0 0);
-    --muted: oklch(0.97 0 0);
-    --muted-foreground: oklch(0.556 0 0);
-    --accent: oklch(0.97 0 0);
-    --accent-foreground: oklch(0.205 0 0);
-    --destructive: oklch(0.577 0.245 27.325);
-    --border: oklch(0.922 0 0);
-    --input: oklch(0.922 0 0);
-    --ring: oklch(0.708 0 0);
+    --background: var(--td-bg);
+    --foreground: var(--td-ink);
+    --card: var(--td-surface);
+    --card-foreground: var(--td-ink);
+    --popover: var(--td-surface);
+    --popover-foreground: var(--td-ink);
+    --primary: var(--td-action);
+    --primary-foreground: var(--td-on-action);
+    --secondary: var(--td-soft);
+    --secondary-foreground: var(--td-ink);
+    --muted: var(--td-soft);
+    --muted-foreground: var(--td-muted);
+    --accent: var(--td-soft);
+    --accent-foreground: var(--td-ink);
+    --destructive: var(--td-danger);
+    --border: var(--td-rule);
+    /* The design draws the guess input and the network picker with an ink border. */
+    --input: var(--td-ink);
+    /* Not drawn by the design: focus takes line 1, the brand sheet's link colour. */
+    --ring: var(--td-line-1);
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        color-scheme: dark;
+
+        --td-bg: #14181d;
+        --td-surface: #1d2329;
+        --td-rule: #2e363e;
+        --td-ink: #eef1ee;
+        --td-muted: #a3abb3;
+        --td-soft: #262d35;
+        --td-empty: #4a535c;
+        --td-grid: #262d35;
+        --td-line-1: #8394ff;
+        --td-line-2: #f27ab6;
+        --td-line-3: #4fd3a0;
+        --td-on-line: #14181d;
+        --td-action: #eef1ee;
+        --td-on-action: #14181d;
+        --td-shadow: rgb(0 0 0 / 0.5);
+        --td-danger: #ff8a7a;
+    }
 }
 
 @theme inline {
+    --font-sans: "Barlow", ui-sans-serif, system-ui, sans-serif;
+    --font-condensed: "Barlow Condensed", "Barlow", ui-sans-serif, system-ui, sans-serif;
+
     --radius-sm: calc(var(--radius) - 4px);
     --radius-md: calc(var(--radius) - 2px);
     --radius-lg: var(--radius);
     --radius-xl: calc(var(--radius) + 4px);
+
+    /* The suggestion list's shadow. */
+    --shadow-popover: 0 16px 40px var(--td-shadow);
+
+    /* The design's own colours, for what the shadcn roles do not name. */
+    --color-surface: var(--td-surface);
+    --color-rule: var(--td-rule);
+    --color-ink: var(--td-ink);
+    --color-soft: var(--td-soft);
+    --color-empty: var(--td-empty);
+    --color-grid: var(--td-grid);
+    --color-line-1: var(--td-line-1);
+    --color-line-2: var(--td-line-2);
+    --color-line-3: var(--td-line-3);
+    --color-on-line: var(--td-on-line);
+    --color-action: var(--td-action);
+    --color-on-action: var(--td-on-action);
+
     --color-background: var(--background);
     --color-foreground: var(--foreground);
     --color-card: var(--card);
@@ -68,6 +153,7 @@
         @apply border-border outline-ring/50;
     }
     body {
-        @apply bg-background text-foreground antialiased;
+        /* The design sets every figure in tabular numbers, so times line up. */
+        @apply bg-background font-sans text-foreground tabular-nums antialiased;
     }
 }

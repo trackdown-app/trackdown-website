@@ -53,7 +53,7 @@ bun run build
 
 - **Style `base-vega`.** Base UI primitives, which have the combobox the station search needs. Vega draws rounded rectangles at a comfortable size (36px inputs, 40px large buttons), the closest to the design's 10 to 16px corners and 44 to 52px controls. Mira, SkoonHome's style, is built for dense screens (28px inputs); Maia and Luma round inputs and buttons into pills, which the design keeps for the network picker only.
 - **Icons: Lucide** (`lucide-react`). The design's icons are 24px stroke icons, stroke width 2 with round caps, in Lucide's shapes (its chevron is Lucide's `ChevronDown`). The logo and the trip line are the design's own SVG, not icons.
-- **Base colour `neutral`** and `--radius: 0.75rem` in `src/styles.css`. The radius scale gives 8, 10, 12 and 16px (`rounded-sm` to `rounded-xl`). The colours are shadcn's neutral theme until the design's tokens and the Barlow fonts replace them.
+- **Base colour `neutral`** and `--radius: 0.75rem` in `src/styles.css`. The radius scale gives 8, 10, 12 and 16px (`rounded-sm` to `rounded-xl`). The base colour only matters to the CLI: `src/styles.css` maps every shadcn colour role onto the design's tokens, and the fonts are Barlow and Barlow Condensed. See [design-system.md](design-system.md).
 
 The design is taller than any style's defaults: its main buttons, input and list options are 52px, its icon buttons 44px. A component added with `bunx shadcn add` gets those sizes as variants when a page needs them, not by changing the style.
 
@@ -61,7 +61,7 @@ The design is taller than any style's defaults: its main buttons, input and list
 
 - TanStack Start, Router and Query (React 19) on Vite 8, with Nitro (`nitro/vite`, default preset) bundling the server into `.output/`.
 - Every page renders on the server; the placeholder home page is `src/routes/index.tsx`.
-- Tailwind CSS 4 (`src/styles.css`) and shadcn/ui (`components.json`). `cn` lives in `src/lib/utils.ts`. See [shadcn/ui](#shadcnui).
+- Tailwind CSS 4 (`src/styles.css`) and shadcn/ui (`components.json`). `cn` lives in `src/lib/utils.ts`. See [shadcn/ui](#shadcnui) and [design-system.md](design-system.md) for the tokens and fonts.
 - Strict TypeScript (`tsconfig.json`) with the `@/*` alias for `src/*`.
 - ESLint and Prettier (`eslint.config.mts`, `.prettierrc`), Vitest (`vitest.config.ts`).
 - Data loading through server functions and TanStack Query. See [data-loading.md](data-loading.md).

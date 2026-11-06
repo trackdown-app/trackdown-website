@@ -30,6 +30,7 @@
 - Which doc owns what:
   - `docs/getting-started.md`: prerequisites, scripts, the verify loop, generated code, the stack.
   - `docs/data-loading.md`: server functions and TanStack Query, the query client in `src/router.tsx`, the `*.queries.ts` factories, how a route loads and reads them.
+  - `docs/design-system.md`: the design's colour tokens in light and dark, the Barlow fonts, shape, the contrast test, defaults for what the design does not draw.
   - `docs/i18n.md`: Paraglide, locale routing (`/` Dutch, `/en` English), the language switch, messages and their compile step.
 - A new feature area gets its own `docs/<feature>.md`, an entry in the README's documentation list and a line in the list above.
 
