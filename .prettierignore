@@ -1,5 +1,7 @@
 # Nitro server build output (see vite.config.ts)
 .output/
 .nitro/
+# Paraglide JS compiler output (see paraglide.config.ts)
+src/paraglide/
 # TanStack Router generated route tree
 src/routeTree.gen.ts

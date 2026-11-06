@@ -14,11 +14,12 @@ See the table in the [README](../README.md#scripts).
 - `bun run typecheck` runs the TypeScript 7 compiler (`typescript-7`, installed as an alias of `typescript@7`) with `--noEmit`. The `typescript` package stays at 6 for ESLint's parser and editors.
 - `bun run lint` runs ESLint with the flat config in `eslint.config.mts`, Prettier included as a rule.
 - `bun run test` runs Vitest once.
+- `typecheck`, `lint` and `test` each run `bun run paraglide:compile` first, which compiles the messages into `src/paraglide/` (skipped when nothing changed). See [i18n.md](i18n.md#compiling).
 - `bun run format` writes Prettier's formatting; `bun run check` only reports files that differ.
 
 ## Unit tests
 
-Vitest (`vitest.config.ts`) runs the tests in `src/**/*.test.{ts,tsx}`. The config uses only the `@/` alias (`resolve.tsconfigPaths`), not the Start and Nitro plugins: the tests never load a route or the server entry. Stubbed environment variables, globals and spies are restored after every test. A component test renders with `renderToString` from `react-dom/server`, as `src/components/home/home-page.test.tsx` does.
+Vitest (`vitest.config.ts`) runs the tests in `src/**/*.test.{ts,tsx}`. The config uses only the `@/` alias (`resolve.tsconfigPaths`), not the Start and Nitro plugins: the tests never load a route or the server entry. Stubbed environment variables, globals and spies are restored after every test. A component test renders on the server with `react-dom/server`; one that reads the location renders inside a memory router with `renderAt` (`src/test/render-at.tsx`), as `src/components/home/home-page.test.tsx` does. `src/test/setup.ts` puts the base locale back after every test ([i18n.md](i18n.md#tests)).
 
 ## The verify loop
 
@@ -44,6 +45,7 @@ bun run build
 ## Generated code
 
 - `src/routeTree.gen.ts` is written by the TanStack Router plugin whenever Vite runs (`dev` or `build`). It is committed, so a fresh clone type-checks before its first build. Add or rename a route, run `bun run build` or `bun run dev`, and commit the regenerated file with the route.
+- `src/paraglide/` is written by Paraglide from `messages/` (the Vite plugin, and `bun run paraglide:compile` on `postinstall` and before `typecheck`, `lint` and `test`). It is not committed. See [i18n.md](i18n.md).
 
 ## shadcn/ui
 
@@ -63,3 +65,4 @@ The design is taller than any style's defaults: its main buttons, input and list
 - Strict TypeScript (`tsconfig.json`) with the `@/*` alias for `src/*`.
 - ESLint and Prettier (`eslint.config.mts`, `.prettierrc`), Vitest (`vitest.config.ts`).
 - Data loading through server functions and TanStack Query. See [data-loading.md](data-loading.md).
+- Paraglide JS for Dutch (base, at `/`) and English (under `/en`). See [i18n.md](i18n.md).

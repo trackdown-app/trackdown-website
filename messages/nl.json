@@ -1,0 +1,14 @@
+{
+    "$schema": "https://inlang.com/schema/inlang-message-format",
+    "site": {
+        "name": "Trackdown"
+    },
+    "home": {
+        "comingSoon": "Binnenkort beschikbaar."
+    },
+    "language": {
+        "label": "Taal",
+        "nl": "Nederlands",
+        "en": "Engels"
+    }
+}

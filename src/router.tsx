@@ -1,6 +1,7 @@
 import { QueryClient } from "@tanstack/react-query";
 import { createRouter as createTanStackRouter } from "@tanstack/react-router";
 import { setupRouterSsrQueryIntegration } from "@tanstack/react-router-ssr-query";
+import { deLocalizeUrl, localizeUrl } from "@/paraglide/runtime";
 import { routeTree } from "./routeTree.gen";
 
 /**
@@ -34,6 +35,15 @@ export function getRouter() {
         // server is asked again.
         defaultPreload: "intent",
         defaultPreloadStaleTime: 0,
+        // Routes are declared once, without a locale. The rewrite strips the
+        // `/en` prefix from an incoming URL before matching and puts the
+        // current locale's prefix back on every link the router renders, so
+        // `/en` matches `/` and a `<Link to="/">` on an English page points
+        // at `/en`. See docs/i18n.md.
+        rewrite: {
+            input: ({ url }) => deLocalizeUrl(url),
+            output: ({ url }) => localizeUrl(url),
+        },
     });
 
     // Sends the queries the server render filled to the browser, so the

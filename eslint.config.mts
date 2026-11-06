@@ -32,6 +32,8 @@ export default defineConfig([
             // Nitro server build output (see vite.config.ts)
             ".output/**",
             ".nitro/**",
+            // Paraglide JS compiler output (see paraglide.config.ts)
+            "src/paraglide/**",
             // TanStack Router generated route tree (owned by the tanstackStart()
             // Vite plugin; it ships its own eslint-disable and @ts-nocheck)
             "src/routeTree.gen.ts",
@@ -174,6 +176,33 @@ export default defineConfig([
                 },
             ],
             "no-restricted-exports": "off",
+            // A message looked up by a computed key keeps every message, in
+            // both languages, in the browser's entry script, and so does `m`
+            // handed on as a value, renamed or imported as a namespace, since
+            // the bundler can no longer see which messages are read
+            // (docs/i18n.md#messages).
+            "no-restricted-syntax": [
+                "error",
+                ...[
+                    // m[key], m[a + b]
+                    "MemberExpression[computed=true][object.name='m'][property.type!='Literal'][property.type!='TemplateLiteral']",
+                    // m[`language.${locale}`]; a template without `${}` is a literal
+                    "MemberExpression[computed=true][object.name='m'] > TemplateLiteral.property[expressions.length>0]",
+                    // const messages = m; messages = m; read(m); [...m]; { messages: m }
+                    "VariableDeclarator > Identifier.init[name='m']",
+                    "AssignmentExpression > Identifier.right[name='m']",
+                    "CallExpression > Identifier.arguments[name='m']",
+                    "SpreadElement > Identifier.argument[name='m']",
+                    "ObjectExpression > Property > Identifier.value[name='m']",
+                    // import { m as messages }; import * as messages
+                    "ImportDeclaration[source.value=/paraglide\\/messages/] > ImportSpecifier[imported.name='m'][local.name!='m']",
+                    "ImportDeclaration[source.value=/paraglide\\/messages/] > ImportNamespaceSpecifier",
+                ].map((selector) => ({
+                    selector,
+                    message:
+                        'Read each message straight from m with a string literal, m["section.key"], so the build leaves out the messages a page does not use.',
+                })),
+            ],
             "no-param-reassign": [
                 "error",
                 {
