@@ -1,0 +1,34 @@
+### macOS
+.DS_Store
+._*
+
+### Node
+# Dependencies
+node_modules/
+
+# Logs
+*.log
+
+# Coverage
+coverage/
+
+# Build output
+dist/
+
+# Nitro server build output and cache
+.output/
+.nitro/
+
+# TypeScript cache
+*.tsbuildinfo
+
+# dotenv environment variable files
+.env*
+!.env.example
+
+# TanStack Router generator temp dir
+.tanstack/
+
+# Claude Code worktrees and local launch config
+.claude/worktrees/
+.claude/launch.json

@@ -1,0 +1,5 @@
+# Nitro server build output (see vite.config.ts)
+.output/
+.nitro/
+# TanStack Router generated route tree
+src/routeTree.gen.ts
