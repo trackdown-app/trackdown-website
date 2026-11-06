@@ -1,17 +1,17 @@
 import { m } from "@/paraglide/messages";
-import { LanguageSwitch } from "@/components/language/language-switch";
+import { cn } from "@/lib/utils";
+import { shellContainer } from "@/components/layout/shell-container";
 
-/** Placeholder home page until the real one is designed. */
+/** Placeholder home page until the game lands. */
 export function HomePage() {
     return (
-        <main className="mx-auto flex min-h-svh max-w-2xl flex-col justify-center gap-4 px-6">
-            <div className="self-end">
-                <LanguageSwitch />
-            </div>
-            <h1 className="text-4xl font-semibold tracking-tight">
+        <main className={cn(shellContainer, "flex flex-col gap-4 pt-10 pb-16")}>
+            <h1 className="font-condensed text-[clamp(44px,7vw,72px)] leading-[0.95] font-extrabold tracking-[-0.01em]">
                 {m["site.name"]()}
             </h1>
-            <p className="text-muted-foreground">{m["home.comingSoon"]()}</p>
+            <p className="text-[19px] text-muted-foreground">
+                {m["home.comingSoon"]()}
+            </p>
         </main>
     );
 }

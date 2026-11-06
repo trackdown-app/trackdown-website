@@ -3,7 +3,8 @@ import { defineConfig } from "vitest/config";
 // Vitest prefers this file over `vite.config.ts`. The unit tests need only the
 // `@/` alias: `tanstackStart()` and `nitro()` together make Vite evaluate the
 // bundled server entry when the test server boots, which the tests never
-// load, so neither plugin belongs here. Translations come from
+// load (`src/router.test.tsx` renders through the router's own request
+// handler instead), so neither plugin belongs here. Translations come from
 // `paraglide:compile`, which `bun run test` runs first.
 const config = defineConfig({
     resolve: { tsconfigPaths: true },

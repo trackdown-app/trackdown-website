@@ -19,7 +19,7 @@ See the table in the [README](../README.md#scripts).
 
 ## Unit tests
 
-Vitest (`vitest.config.ts`) runs the tests in `src/**/*.test.{ts,tsx}`. The config uses only the `@/` alias (`resolve.tsconfigPaths`), not the Start and Nitro plugins: the tests never load a route or the server entry. Stubbed environment variables, globals and spies are restored after every test. A component test renders on the server with `react-dom/server`; one that reads the location renders inside a memory router with `renderAt` (`src/test/render-at.tsx`), as `src/components/home/home-page.test.tsx` does. `src/test/setup.ts` puts the base locale back after every test ([i18n.md](i18n.md#tests)).
+Vitest (`vitest.config.ts`) runs the tests in `src/**/*.test.{ts,tsx}`. The config uses only the `@/` alias (`resolve.tsconfigPaths`), not the Start and Nitro plugins: the tests never load the server entry. `src/router.test.tsx` loads the route tree through `getRouter` and renders requests with the router's own SSR request handler, to check the status codes ([site-shell.md](site-shell.md#not-found-and-error-pages)). Stubbed environment variables, globals and spies are restored after every test. A component test renders on the server with `react-dom/server`; one that reads the location renders inside a memory router with `renderAt` (`src/test/render-at.tsx`), as `src/components/home/home-page.test.tsx` does. `src/test/setup.ts` puts the base locale back after every test ([i18n.md](i18n.md#tests)).
 
 ## The verify loop
 
@@ -60,7 +60,7 @@ The design is taller than any style's defaults: its main buttons, input and list
 ## Stack
 
 - TanStack Start, Router and Query (React 19) on Vite 8, with Nitro (`nitro/vite`, default preset) bundling the server into `.output/`.
-- Every page renders on the server; the placeholder home page is `src/routes/index.tsx`.
+- Every page renders on the server; the placeholder home page is `src/routes/index.tsx`. Every page sits inside the site shell: skip link, header and footer, with not-found and error pages ([site-shell.md](site-shell.md)).
 - Tailwind CSS 4 (`src/styles.css`) and shadcn/ui (`components.json`). `cn` lives in `src/lib/utils.ts`. See [shadcn/ui](#shadcnui) and [design-system.md](design-system.md) for the tokens and fonts.
 - Strict TypeScript (`tsconfig.json`) with the `@/*` alias for `src/*`.
 - ESLint and Prettier (`eslint.config.mts`, `.prettierrc`), Vitest (`vitest.config.ts`).
