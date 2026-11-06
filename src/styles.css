@@ -9,9 +9,15 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* shadcn/ui's neutral theme, until the design sets its own tokens. */
+/*
+ * shadcn/ui's neutral theme, until the design's tokens replace the colours.
+ * `--radius` is 12px, so the scale below gives the design's corners:
+ * 8px (`rounded-sm`), 10px for buttons and list options (`rounded-md`),
+ * 12px (`rounded-lg`) and 16px for the input and plates (`rounded-xl`).
+ * Pills (the network picker) take `rounded-full`.
+ */
 :root {
-    --radius: 0.625rem;
+    --radius: 0.75rem;
     --background: oklch(1 0 0);
     --foreground: oklch(0.145 0 0);
     --card: oklch(1 0 0);
