@@ -31,6 +31,16 @@ bun run test
 bun run build
 ```
 
+## Continuous integration
+
+`.github/workflows/pr.yml` runs the verify loop on every pull request, as five checks: Install, Typecheck, Lint, Test and Build.
+
+- Install runs `bun install --frozen-lockfile` and caches `node_modules`, keyed on `bun.lock`. The other four jobs restore that cache and fail if it is missing; they install only the Bun binary, at the version in `.bun-version`.
+- Every action is pinned to a commit SHA, with its release in a trailing comment.
+- The jobs read only this repository. The build needs no private data, so CI holds no token or secret for another repository.
+
+`.github/dependabot.yml` proposes weekly updates for the packages (the `bun` ecosystem, which updates `bun.lock`, with a three-day cooldown like `bunfig.toml`) and for the pinned actions.
+
 ## Generated code
 
 - `src/routeTree.gen.ts` is written by the TanStack Router plugin whenever Vite runs (`dev` or `build`). It is committed, so a fresh clone type-checks before its first build. Add or rename a route, run `bun run build` or `bun run dev`, and commit the regenerated file with the route.
