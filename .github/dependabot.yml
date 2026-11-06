@@ -1,0 +1,17 @@
+version: 2
+updates:
+  # The npm packages in package.json. The `bun` ecosystem reads and updates
+  # bun.lock, which the `npm` ecosystem does not.
+  - package-ecosystem: bun
+    directory: /
+    schedule:
+      interval: weekly
+    # Matches bunfig.toml: no version younger than three days.
+    cooldown:
+      default-days: 3
+
+  # Keeps the SHA-pinned actions in .github/workflows/ current.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
