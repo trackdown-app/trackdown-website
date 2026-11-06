@@ -7,11 +7,13 @@
     "build": "vite build",
     "start": "node --env-file-if-exists=.env --env-file-if-exists=.env.local .output/server/index.mjs",
     "preview": "vite preview",
-    "test": "vitest run",
-    "lint": "eslint",
+    "test": "bun run paraglide:compile && vitest run",
+    "lint": "bun run paraglide:compile && eslint",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx}\"",
     "check": "prettier --check \"**/*.{ts,tsx,js,jsx}\"",
-    "typecheck": "node_modules/typescript-7/bin/tsc --noEmit"
+    "typecheck": "bun run paraglide:compile && node_modules/typescript-7/bin/tsc --noEmit",
+    "paraglide:compile": "bun run scripts/compile-paraglide.ts",
+    "postinstall": "bun run paraglide:compile --force"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",
@@ -36,6 +38,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@inlang/paraglide-js": "^2.25.4",
     "@tanstack/devtools-vite": "^0.8.5",
     "@tanstack/eslint-plugin-query": "^5.104.0",
     "@types/eslint-plugin-jsx-a11y": "^6.10.1",

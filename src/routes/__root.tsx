@@ -7,8 +7,10 @@ import {
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { TanStackDevtools } from "@tanstack/react-devtools";
-import appCss from "../styles.css?url";
 import type { ReactNode } from "react";
+import { m } from "@/paraglide/messages";
+import { getLocale } from "@/paraglide/runtime";
+import appCss from "../styles.css?url";
 
 /** What every route's loader gets in `context`; built in `src/router.tsx`. */
 export interface RouterContext {
@@ -27,7 +29,7 @@ export const Route = createRootRouteWithContext<RouterContext>()({
                 content: "width=device-width, initial-scale=1",
             },
             {
-                title: "Trackdown",
+                title: m["site.name"](),
             },
         ],
         links: [
@@ -42,7 +44,9 @@ export const Route = createRootRouteWithContext<RouterContext>()({
 
 function RootDocument({ children }: { children: ReactNode }) {
     return (
-        <html lang="en">
+        // The request's locale on the server (`src/server.ts`), the URL's in
+        // the browser.
+        <html lang={getLocale()}>
             <head>
                 <HeadContent />
             </head>
