@@ -156,4 +156,13 @@
         /* The design sets every figure in tabular numbers, so times line up. */
         @apply bg-background font-sans text-foreground tabular-nums antialiased;
     }
+    /*
+     * One focus ring for every control: 3px of `ring` (line 1), 3px off the
+     * element, for the keyboard only. Components never remove it without a
+     * visible replacement (docs/site-shell.md#focus-ring).
+     */
+    :focus-visible {
+        outline: 3px solid var(--ring);
+        outline-offset: 3px;
+    }
 }

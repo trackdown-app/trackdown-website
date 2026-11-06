@@ -10,5 +10,36 @@
         "label": "Language",
         "nl": "Dutch",
         "en": "English"
+    },
+    "header": {
+        "skipToContent": "Skip to content",
+        "home": "Trackdown, to today's puzzle",
+        "nav": "Main",
+        "archive": "Archive",
+        "howToPlay": "How to play",
+        "statistics": "Statistics",
+        "network": "Network",
+        "networkNl": "Netherlands"
+    },
+    "footer": {
+        "tagline": "Trackdown, a hobby project by Bram Gussekloo",
+        "nav": "About the site",
+        "about": "About",
+        "privacy": "Privacy",
+        "terms": "Terms",
+        "cookieSettings": "Cookie settings"
+    },
+    "notFound": {
+        "label": "Error 404",
+        "title": "This page doesn't exist",
+        "lead": "The address is wrong, or the page has moved. Today's puzzle is still waiting for you.",
+        "home": "Go to today's puzzle"
+    },
+    "error": {
+        "label": "Error 500",
+        "title": "Something went wrong",
+        "lead": "The page couldn't load. Try again, or go back to today's puzzle.",
+        "retry": "Try again",
+        "home": "Go to today's puzzle"
     }
 }
