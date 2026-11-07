@@ -1,4 +1,4 @@
-import { ShareIcon } from "lucide-react";
+import { Share } from "lucide-react";
 import { useState } from "react";
 import { m } from "@/paraglide/messages";
 import { Button } from "@/components/ui/button";
@@ -24,8 +24,9 @@ function outcomeMessage(outcome: ShareOutcome | null): string {
 
 /**
  * The design's Share result button (docs/share.md#sharing): opens the
- * device's share sheet, or copies the text where there is none, and says
- * so under it.
+ * device's share sheet, or copies the text where there is none. Made for a
+ * wrapping row of buttons: its status line takes a row of its own under
+ * them, and is only there once it has something to say.
  */
 export function ShareButton({ text, target }: ShareButtonProps) {
     const [outcome, setOutcome] = useState<ShareOutcome | null>(null);
@@ -40,24 +41,24 @@ export function ShareButton({ text, target }: ShareButtonProps) {
     }
 
     return (
-        <div className="flex flex-col gap-3">
+        <>
             <Button
                 size="lg"
-                className="self-start rounded-xl"
+                className="rounded-lg"
                 disabled={isSharing}
                 onClick={() => {
                     void share();
                 }}
             >
-                <ShareIcon aria-hidden="true" className="size-4.5" />
-                {m["share.button"]()}
+                <Share aria-hidden="true" className="size-[18px]" />
+                {m["gameOver.share"]()}
             </Button>
             <p
                 role="status"
-                className="text-base text-muted-foreground empty:hidden"
+                className="order-last basis-full text-base text-muted-foreground empty:hidden"
             >
                 {outcomeMessage(outcome)}
             </p>
-        </div>
+        </>
     );
 }

@@ -1,6 +1,6 @@
 # Sharing a result
 
-Once a game is over the game page ([game.md](game.md)) offers to share it, after the design's Web · Solved board: a **Share result** button under the line saying how it went, and **What you'll share** under the guesses, showing the text exactly as it will go out. The text draws how the player closed in without ever naming a station, so it never gives the answer away.
+Once a game is over the solved or missed screen ([game.md](game.md#solved-and-missed)) offers to share it, after the design's Web · Solved board: the **Share result** button beside "Play an older puzzle" under the answer plate, and **What you'll share** under "How you got there", showing the text exactly as it will go out. `GameOver` writes the text from the kept guesses, so it is there before the reveal answers. The text draws how the player closed in without ever naming a station, so it never gives the answer away.
 
 ## The text
 
@@ -26,7 +26,7 @@ The correct guess has no trip, so it has no line; the score and footer count it.
 `ShareButton` (`src/components/game/share-button.tsx`) hands the text to `shareResult` (`src/lib/game/share-result.ts`):
 
 - **Web Share API.** Where `navigator.share` exists and `navigator.canShare({ text })` allows it, the device's share sheet opens with the text. A player closing the sheet (`AbortError`) is left alone. Any other refusal falls through to the clipboard.
-- **Clipboard.** Otherwise `navigator.clipboard.writeText` copies it, and a status line under the button says "Copied. Paste it wherever you like."
+- **Clipboard.** Otherwise `navigator.clipboard.writeText` copies it, and a status line on its own row under the buttons says "Copied. Paste it wherever you like." / "Gekopieerd. Plak het waar je maar wilt."
 - **Neither.** Without a clipboard (an insecure context) or when copying is refused, the status line asks the player to select the text in the preview and copy it themselves.
 
 The status line is a `role="status"` region, so screen readers announce it. The button is disabled while a share is under way.

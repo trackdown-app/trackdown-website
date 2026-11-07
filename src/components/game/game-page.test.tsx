@@ -1,14 +1,19 @@
 // @vitest-environment happy-dom
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { cleanup, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { overwriteGetLocale } from "@/paraglide/runtime";
 import { GamePage } from "@/components/game/game-page";
 import { gameStorageKey, serializeGame } from "@/lib/game/game-state";
 import { createGameStore } from "@/lib/game/game-store";
 import type { GameStore } from "@/lib/game/game-store";
-import type { GuessInput, GuessOutput } from "@/lib/game/schemas";
+import type {
+    GuessInput,
+    GuessOutput,
+    RevealInput,
+    RevealOutput,
+} from "@/lib/game/schemas";
 import type { ShareNavigator } from "@/lib/game/share-result";
 import type { ListedGuess } from "@/lib/game/trip-line";
 
@@ -16,6 +21,11 @@ const { submitGuessFn } = vi.hoisted(() => ({
     submitGuessFn: vi.fn<(options: { data: GuessInput }) => Promise<GuessOutput>>(),
 }));
 vi.mock("@/lib/game/guess.functions", () => ({ submitGuessFn }));
+const { revealAnswerFn } = vi.hoisted(() => ({
+    revealAnswerFn:
+        vi.fn<(options: { data: RevealInput }) => Promise<RevealOutput>>(),
+}));
+vi.mock("@/lib/game/reveal.functions", () => ({ revealAnswerFn }));
 
 const puzzle = {
     network: "nl" as const,
@@ -62,7 +72,10 @@ function answer(
 
 function renderGame(store: GameStore, shareTarget: ShareNavigator = {}) {
     const queryClient = new QueryClient({
-        defaultOptions: { mutations: { retry: false } },
+        defaultOptions: {
+            queries: { retry: false },
+            mutations: { retry: false },
+        },
     });
     render(
         <QueryClientProvider client={queryClient}>
@@ -90,8 +103,38 @@ function guessedNames(): string[] {
         .map((row) => row.querySelector(".font-condensed")?.textContent ?? "");
 }
 
+/**
+ * The reveal of a game at puzzle 142, whose mystery station is Zwolle: every
+ * miss changes at Utrecht Centraal, named now.
+ */
+function reveal(input: RevealInput): RevealOutput {
+    const station = "zl";
+    return {
+        network: input.network,
+        number: input.number,
+        station,
+        solved: input.guesses.at(-1) === station,
+        guesses: input.guesses.map((code) =>
+            code === station
+                ? { guess: code, correct: true, steps: [], totalMinutes: 0 }
+                : {
+                      guess: code,
+                      correct: false,
+                      steps: [
+                          { kind: "ride", train: "IC", minutes: 30 },
+                          { kind: "change", station: "ut", minutes: 5 },
+                          { kind: "ride", train: "IC", minutes: 40 },
+                      ],
+                      totalMinutes: 75,
+                  },
+        ),
+    };
+}
+
 beforeEach(() => {
     window.localStorage.clear();
+    revealAnswerFn.mockReset();
+    revealAnswerFn.mockImplementation(({ data }) => Promise.resolve(reveal(data)));
     overwriteGetLocale(() => "en");
 });
 
@@ -215,38 +258,123 @@ describe("GamePage", () => {
         expect(guessedNames()).toEqual([]);
     });
 
-    it("is won at a correct guess, and the search goes", async () => {
+    it("is won at a correct guess: the answer from the reveal, focused", async () => {
         window.localStorage.setItem(key, serializeGame([miss("hvs")]));
         submitGuessFn.mockImplementation(({ data }) =>
             Promise.resolve(answer(data, true)),
         );
         const user = renderGame(createGameStore(() => window.localStorage));
 
-        await guess(user, "Utrecht Centraal");
+        await guess(user, "Zwolle");
 
+        const heading = await screen.findByRole("heading", {
+            level: 1,
+            name: "Zwolle",
+        });
+        expect(document.activeElement).toBe(heading);
         expect(
-            await screen.findByText("You tracked it down in 2 of 6."),
+            screen.getByText("You tracked it down in 2 of 6 guesses"),
         ).toBeDefined();
         expect(screen.queryByRole("combobox")).toBeNull();
-        expect(screen.getByText("Found in 2 of 6, newest first")).toBeDefined();
+        expect(revealAnswerFn).toHaveBeenCalledTimes(1);
+        expect(revealAnswerFn).toHaveBeenCalledWith({
+            data: { network: "nl", number: 142, guesses: ["hvs", "zl"] },
+        });
+        expect(
+            screen.getByRole("heading", { level: 2, name: "How you got there" }),
+        ).toBeDefined();
+        expect(guessedNames()).toEqual(["Zwolle", "Hilversum"]);
+        expect(screen.getByText("1h 15m, change at Utrecht Centraal")).toBeDefined();
+        expect(screen.getByRole("button", { name: "Share result" })).toBeDefined();
+        expect(
+            screen
+                .getByRole("link", { name: "Play an older puzzle" })
+                .getAttribute("href"),
+        ).toBe("/en/archief");
     });
 
-    it("is lost after the sixth wrong guess", () => {
+    it("is missed after the sixth wrong guess, every change named", async () => {
+        const hidden: ListedGuess = {
+            guess: "asd",
+            correct: false,
+            steps: [
+                { kind: "ride", train: "IC", minutes: 30 },
+                { kind: "change", station: null, minutes: 5 },
+                { kind: "ride", train: "IC", minutes: 40 },
+            ],
+            totalMinutes: 75,
+        };
+        window.localStorage.setItem(
+            key,
+            serializeGame([
+                hidden,
+                ...["hvs", "mt", "hdr", "gn", "ut"].map((code) => miss(code)),
+            ]),
+        );
+        renderGame(createGameStore(() => window.localStorage));
+
+        expect(
+            await screen.findByRole("heading", { level: 1, name: "Zwolle" }),
+        ).toBeDefined();
+        expect(
+            screen.getByText("No guesses left. The mystery station was"),
+        ).toBeDefined();
+        expect(screen.queryByRole("combobox")).toBeNull();
+        expect(screen.queryByText(/hidden station/)).toBeNull();
+        expect(guessedNames()).toHaveLength(6);
+        // A kept game shown again does not steal focus.
+        expect(document.activeElement).toBe(document.body);
+    });
+
+    it("never names the answer before the reveal answers", async () => {
+        // Kept as won: the reveal alone says which station it was.
+        window.localStorage.setItem(
+            key,
+            serializeGame([
+                miss("hvs"),
+                { guess: "zl", correct: true, steps: [], totalMinutes: 0 },
+            ]),
+        );
+        const pending: { answer?: (output: RevealOutput) => void } = {};
+        revealAnswerFn.mockImplementation(
+            () =>
+                new Promise((resolve) => {
+                    pending.answer = resolve;
+                }),
+        );
+        renderGame(createGameStore(() => window.localStorage));
+
+        const heading = await screen.findByRole("heading", { level: 1 });
+        expect(heading.textContent).toBe("Loading the answer");
+        expect(screen.queryByRole("list", { name: "Your guesses" })).toBeNull();
+
+        pending.answer?.(
+            reveal({ network: "nl", number: 142, guesses: ["hvs", "zl"] }),
+        );
+        expect(
+            await screen.findByRole("heading", { level: 1, name: "Zwolle" }),
+        ).toBeDefined();
+    });
+
+    it("says so when the reveal fails, and asks again", async () => {
         window.localStorage.setItem(
             key,
             serializeGame(
                 ["asd", "ut", "hvs", "mt", "hdr", "gn"].map((code) => miss(code)),
             ),
         );
-        renderGame(createGameStore(() => window.localStorage));
+        revealAnswerFn.mockRejectedValueOnce(new Error("rate_limited"));
+        const user = renderGame(createGameStore(() => window.localStorage));
+
+        const alert = await screen.findByRole("alert");
+        expect(alert.textContent).toContain("The answer didn't load.");
+
+        await user.click(within(alert).getByRole("button", { name: "Try again" }));
 
         expect(
-            screen.getByText(
-                "No guesses left. A new mystery station comes at midnight.",
-            ),
+            await screen.findByRole("heading", { level: 1, name: "Zwolle" }),
         ).toBeDefined();
-        expect(screen.queryByRole("combobox")).toBeNull();
-        expect(screen.getByText("All 6 guesses used, newest first")).toBeDefined();
+        expect(screen.queryByRole("alert")).toBeNull();
     });
 
     it("shows no share while the game is on", () => {

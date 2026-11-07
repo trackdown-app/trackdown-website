@@ -189,6 +189,46 @@ describe("GuessList", () => {
         expect(ring?.style.getPropertyValue("--ring-delay")).toMatch(/^\d+ms$/);
     });
 
+    it("heads a revealed list 'How you got there', with no grid and the found row on one line", () => {
+        overwriteGetLocale(() => "en");
+        const { container } = render(
+            <GuessList
+                guesses={[
+                    ...guesses,
+                    { guess: "amf", correct: true, steps: [], totalMinutes: 0 },
+                ]}
+                stations={[
+                    ...stations,
+                    { code: "amf", name: "Amersfoort Centraal" },
+                ]}
+                revealed
+            />,
+        );
+
+        expect(
+            screen.getByRole("heading", { level: 2, name: "How you got there" }),
+        ).toBeDefined();
+        expect(
+            screen.getByText("Newest first. Every change is revealed now."),
+        ).toBeDefined();
+        expect(container.textContent).not.toContain("Mystery station");
+        expect(container.textContent).not.toContain("30 min");
+        const [found] = rows();
+        expect(found?.textContent).toBe(
+            "Guess 5, Amersfoort Centraal: the mystery station.5Amersfoort CentraalYou're here",
+        );
+        // No time grid behind the tracks.
+        expect(
+            document.querySelector("[style*='repeating-linear-gradient']"),
+        ).toBeNull();
+    });
+
+    it("speaks Dutch in a revealed list", () => {
+        render(<GuessList guesses={guesses} stations={stations} revealed />);
+
+        expect(screen.getByRole("heading", { name: "Zo kwam je er" })).toBeDefined();
+    });
+
     it("renders nothing before the first guess", () => {
         const { container } = render(<GuessList guesses={[]} stations={stations} />);
 

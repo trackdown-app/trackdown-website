@@ -7,9 +7,17 @@
         "dateLine": "{date}, puzzle {number}",
         "title": "Which station is today's mystery?",
         "intro": "Guess any station. We draw the fastest train trip from there to the mystery station. The shorter the line, the closer you are.",
-        "won": "You tracked it down in {count} of {total}.",
-        "lost": "No guesses left. A new mystery station comes at midnight.",
         "guessFailed": "That guess didn't go through. Try again."
+    },
+    "gameOver": {
+        "label": "Today's answer",
+        "won": "You tracked it down in {count} of {total} guesses",
+        "lost": "No guesses left. The mystery station was",
+        "loading": "Loading the answer",
+        "failed": "The answer didn't load.",
+        "retry": "Try again",
+        "share": "Share result",
+        "olderPuzzle": "Play an older puzzle"
     },
     "progress": {
         "playing": "Guess {number} of {total}, newest first",
@@ -27,6 +35,8 @@
         "label": "Your guesses",
         "mysteryStation": "Mystery station",
         "found": "You're here",
+        "revealedTitle": "How you got there",
+        "revealedNote": "Newest first. Every change is revealed now.",
         "spokenGuess": "Guess {number}, {station}: {duration} to the mystery station. {steps}.",
         "spokenFound": "Guess {number}, {station}: the mystery station.",
         "grid30": "30 min",
@@ -56,7 +66,6 @@
         "lost": "Not tracked down",
         "minutes": "{minutes}m",
         "hoursMinutes": "{hours}h{minutes}",
-        "button": "Share result",
         "copied": "Copied. Paste it wherever you like.",
         "failed": "Couldn't copy. Select the text under “What you'll share” and copy it yourself.",
         "previewTitle": "What you'll share",

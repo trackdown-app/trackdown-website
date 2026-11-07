@@ -24,6 +24,11 @@ Where the design draws something, the site draws the same. The defaults further 
 | `on-line` | `#FFFFFF` | `#14181D` | `text-on-line` | Ride times inside a line |
 | `action` | `#15181C` | `#EEF1EE` | `bg-primary`, `bg-action` | The Guess button |
 | `on-action` | `#FFFFFF` | `#14181D` | `text-primary-foreground`, `text-on-action` | Its label |
+| `plate` | `#15181C` | `#EEF1EE` | `bg-plate` | The answer plate on the solved screen: the theme turned over |
+| `on-plate` | `#FFFFFF` | `#14181D` | `text-on-plate`, `fill-on-plate` | The answer, and the logo mark's dot and filled bar on the plate |
+| `plate-muted` | `#C9CED6` | `#3E454C` | `text-plate-muted` | The plate's line above the answer |
+| `plate-line-1` | `#8394FF` | `#2F45D8` | `stroke-plate-line-1` | The logo mark's first train on the plate, and the focus ring there |
+| `plate-line-2` | `#F27AB6` | `#B8236F` | `stroke-plate-line-2` | The logo mark's second train on the plate |
 
 The design's `muted` is a text colour, while shadcn's `muted` is a tint. So the design's `muted` is `text-muted-foreground`, and `bg-muted` is the design's `soft`. There is no `text-muted` for secondary text.
 
@@ -47,7 +52,7 @@ Dark mode follows the operating system (`prefers-color-scheme`). There is no the
 
 ### Contrast
 
-Every text colour passes 4.5:1 on every ground the design sets it on, in both modes. `src/lib/theme-contrast.test.ts` reads the values from `src/styles.css` and fails `bun run test` if a pair drops below that. The pairs are ink, muted, line 1 and the error red on bg, surface and soft, on-line on each line, on-action on action, and bg on ink (the `NL` chip and the mystery `?`). A new text colour, or a new ground for one, goes into that list.
+Every text colour passes 4.5:1 on every ground the design sets it on, in both modes. `src/lib/theme-contrast.test.ts` reads the values from `src/styles.css` and fails `bun run test` if a pair drops below that. The pairs are ink, muted, line 1 and the error red on bg, surface and soft, on-line on each line, on-action on action, bg on ink (the `NL` chip and the mystery `?`), and on-plate and plate-muted on plate. A new text colour, or a new ground for one, goes into that list.
 
 The lowest pairs are on-line on `line-3` in light (5.0:1) and line 1 on `soft` in dark (5.1:1).
 

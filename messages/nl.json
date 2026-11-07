@@ -7,9 +7,17 @@
         "dateLine": "{date}, puzzel {number}",
         "title": "Welk station is het mysterie van vandaag?",
         "intro": "Raad een station. Wij tekenen de snelste treinreis van daar naar het mysteriestation. Hoe korter de lijn, hoe dichter je bij bent.",
-        "won": "Je hebt hem gevonden in {count} van {total}.",
-        "lost": "Geen gokken meer. Om middernacht komt er een nieuw mysteriestation.",
         "guessFailed": "Die gok kwam niet door. Probeer het opnieuw."
+    },
+    "gameOver": {
+        "label": "Het antwoord van vandaag",
+        "won": "Je hebt hem gevonden in {count} van {total} gokken",
+        "lost": "Geen gokken meer. Het mysteriestation was",
+        "loading": "Het antwoord wordt geladen",
+        "failed": "Het antwoord kwam niet door.",
+        "retry": "Probeer het opnieuw",
+        "share": "Deel je resultaat",
+        "olderPuzzle": "Speel een eerdere puzzel"
     },
     "progress": {
         "playing": "Gok {number} van {total}, nieuwste eerst",
@@ -27,6 +35,8 @@
         "label": "Je gokken",
         "mysteryStation": "Mysteriestation",
         "found": "Hier ben je",
+        "revealedTitle": "Zo kwam je er",
+        "revealedNote": "Nieuwste eerst. Elke overstap is nu onthuld.",
         "spokenGuess": "Gok {number}, {station}: {duration} naar het mysteriestation. {steps}.",
         "spokenFound": "Gok {number}, {station}: het mysteriestation.",
         "grid30": "30 min",
@@ -56,7 +66,6 @@
         "lost": "Niet gevonden",
         "minutes": "{minutes}m",
         "hoursMinutes": "{hours}u{minutes}",
-        "button": "Deel resultaat",
         "copied": "Gekopieerd. Plak het waar je maar wilt.",
         "failed": "Kopiëren lukte niet. Selecteer de tekst onder „Wat je deelt” en kopieer hem zelf.",
         "previewTitle": "Wat je deelt",

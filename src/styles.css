@@ -53,6 +53,12 @@
     --td-action: #15181c;
     --td-on-action: #ffffff;
     --td-shadow: rgb(21 24 28 / 0.14);
+    /* The answer plate (Web · Solved): the theme turned over, ink as its ground. */
+    --td-plate: #15181c;
+    --td-on-plate: #ffffff;
+    --td-plate-muted: #c9ced6;
+    --td-plate-line-1: #8394ff;
+    --td-plate-line-2: #f27ab6;
     /* Not drawn by the design: an error red that passes 4.5:1 on bg, surface and soft. */
     --td-danger: #b42318;
 
@@ -98,6 +104,11 @@
         --td-action: #eef1ee;
         --td-on-action: #14181d;
         --td-shadow: rgb(0 0 0 / 0.5);
+        --td-plate: #eef1ee;
+        --td-on-plate: #14181d;
+        --td-plate-muted: #3e454c;
+        --td-plate-line-1: #2f45d8;
+        --td-plate-line-2: #b8236f;
         --td-danger: #ff8a7a;
     }
 }
@@ -128,6 +139,11 @@
     --color-on-line: var(--td-on-line);
     --color-action: var(--td-action);
     --color-on-action: var(--td-on-action);
+    --color-plate: var(--td-plate);
+    --color-on-plate: var(--td-on-plate);
+    --color-plate-muted: var(--td-plate-muted);
+    --color-plate-line-1: var(--td-plate-line-1);
+    --color-plate-line-2: var(--td-plate-line-2);
 
     --color-background: var(--background);
     --color-foreground: var(--foreground);
