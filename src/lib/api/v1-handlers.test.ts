@@ -125,6 +125,18 @@ describe("GET /api/v1/{network}/puzzles/today", () => {
         expect(JSON.stringify(json)).not.toContain("ech");
     });
 
+    it("is kept by the CDN and a client until the next puzzle starts", async () => {
+        const response = await call(todayPuzzleHandlers.GET, path, "GET", {
+            network: "nl",
+        });
+
+        // 12:00Z to 22:00Z, Amsterdam's midnight in summer time.
+        expect(response.headers.get("Cache-Control")).toBe("public, max-age=36000");
+        expect(response.headers.get("Vercel-CDN-Cache-Control")).toBe(
+            "public, max-age=36000",
+        );
+    });
+
     it("answers 400 invalid_input for a network the game has no data for", async () => {
         const response = await call(
             todayPuzzleHandlers.GET,
@@ -160,6 +172,7 @@ describe("GET /api/v1/{network}/puzzles/today", () => {
         });
 
         expect(response.status).toBe(404);
+        expect(response.headers.get("Cache-Control")).toBe("no-store");
         expect(apiErrorBodySchema.parse(await response.json()).error.code).toBe(
             "not_found",
         );
@@ -444,6 +457,119 @@ describe("GET /api/v1/{network}/stations", () => {
 
         expect(response.status).toBe(405);
         expect(response.headers.get("Allow")).toBe("GET");
+    });
+});
+
+describe("the rate limit on a guess and the reveal", () => {
+    /** A POST of a guess at puzzle 2 from `ip`. */
+    function guessFrom(ip: string): Promise<Response> {
+        return guessHandlers.POST({
+            request: new Request("http://localhost/api/v1/nl/puzzles/2/guesses", {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "x-real-ip": ip },
+                body: JSON.stringify({ guess: "dlt" }),
+            }),
+            params: { network: "nl", number: "2" },
+        });
+    }
+
+    it("answers 429 rate_limited with Retry-After past the limit, and logs it once", async () => {
+        const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+        for (let hit = 0; hit < 60; hit += 1) {
+            expect((await guessFrom("203.0.113.1")).status).toBe(200);
+        }
+
+        const refused = await guessFrom("203.0.113.1");
+        const again = await guessFrom("203.0.113.1");
+
+        expect(refused.status).toBe(429);
+        expect(apiErrorBodySchema.parse(await refused.json()).error.code).toBe(
+            "rate_limited",
+        );
+        expect(Number(refused.headers.get("Retry-After"))).toBeGreaterThan(0);
+        expect(refused.headers.get("Cache-Control")).toBe("no-store");
+        expect(again.status).toBe(429);
+        expect(warn).toHaveBeenCalledTimes(1);
+        expect(warn.mock.calls[0]?.[1]).toMatchObject({ ip: "203.0.113.1" });
+    });
+
+    it("counts each IP on its own", async () => {
+        vi.spyOn(console, "warn").mockImplementation(() => {});
+        for (let hit = 0; hit < 61; hit += 1) {
+            await guessFrom("203.0.113.2");
+        }
+
+        expect((await guessFrom("203.0.113.3")).status).toBe(200);
+    });
+
+    it("shares one limit between a guess and the reveal", async () => {
+        vi.spyOn(console, "warn").mockImplementation(() => {});
+        for (let hit = 0; hit < 60; hit += 1) {
+            await guessFrom("203.0.113.4");
+        }
+
+        const response = await revealHandlers.POST({
+            request: new Request("http://localhost/api/v1/nl/puzzles/2/reveal", {
+                method: "POST",
+                headers: { "x-real-ip": "203.0.113.4" },
+                body: JSON.stringify({ guesses: ["ech"] }),
+            }),
+            params: { network: "nl", number: "2" },
+        });
+
+        expect(response.status).toBe(429);
+    });
+});
+
+describe("a cross-origin browser call", () => {
+    /** A GET of the stations with `headers`. */
+    function stations(headers: Record<string, string>): Promise<Response> {
+        return stationsHandlers.GET({
+            request: new Request("http://localhost/api/v1/nl/stations", { headers }),
+            params: { network: "nl" },
+        });
+    }
+
+    it("answers 403 cross_origin, without CORS headers, for another origin", async () => {
+        vi.spyOn(console, "warn").mockImplementation(() => {});
+
+        const response = await stations({ Origin: "https://scraper.example" });
+
+        expect(response.status).toBe(403);
+        expect(apiErrorBodySchema.parse(await response.json()).error.code).toBe(
+            "cross_origin",
+        );
+        expect(response.headers.get("Access-Control-Allow-Origin")).toBeNull();
+        expect(response.headers.get("Cache-Control")).toBe("no-store");
+    });
+
+    it("refuses a preflight from another origin", async () => {
+        vi.spyOn(console, "warn").mockImplementation(() => {});
+
+        const response = await guessHandlers.ANY({
+            request: new Request("http://localhost/api/v1/nl/puzzles/2/guesses", {
+                method: "OPTIONS",
+                headers: {
+                    Origin: "https://scraper.example",
+                    "Access-Control-Request-Method": "POST",
+                },
+            }),
+            params: { network: "nl", number: "2" },
+        });
+
+        expect(response.status).toBe(403);
+        expect(response.headers.get("Access-Control-Allow-Origin")).toBeNull();
+    });
+
+    it("refuses an Origin of null", async () => {
+        vi.spyOn(console, "warn").mockImplementation(() => {});
+
+        expect((await stations({ Origin: "null" })).status).toBe(403);
+    });
+
+    it("answers the site's own origin and a call without Origin, such as iOS", async () => {
+        expect((await stations({ Origin: "http://localhost" })).status).toBe(200);
+        expect((await stations({})).status).toBe(200);
     });
 });
 

@@ -7,8 +7,10 @@ import { z } from "zod";
 export const apiErrorCodeSchema = z.enum([
     "invalid_input",
     "game_not_over",
+    "cross_origin",
     "not_found",
     "method_not_allowed",
+    "rate_limited",
     "internal_error",
 ]);
 
@@ -17,8 +19,10 @@ export type ApiErrorCode = z.infer<typeof apiErrorCodeSchema>;
 export const apiErrorStatus: Record<ApiErrorCode, number> = {
     invalid_input: 400,
     game_not_over: 403,
+    cross_origin: 403,
     not_found: 404,
     method_not_allowed: 405,
+    rate_limited: 429,
     internal_error: 500,
 };
 
