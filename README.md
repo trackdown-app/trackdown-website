@@ -46,3 +46,4 @@ The site runs on http://localhost:3000.
 - [Archive](docs/archive.md)
 - [Deploy](docs/deploy.md)
 - [Server logs and traces](docs/logging.md)
+- [Analytics and cookie consent](docs/analytics.md)

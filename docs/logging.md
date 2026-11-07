@@ -47,6 +47,8 @@ Allowed operational fields are method, route template, status, duration, known s
 
 Never log a mystery station, guessed station, station list, trip, game file, request or response body, query string, token, client key, IP address, user agent, cookie, player identifier or session identifier. Exception messages, names, stacks, causes and custom properties are discarded: even a schema-validation error can contain private game data. The only error detail retained is an application's fixed `ApiError` code, otherwise `internal_error`.
 
+The consent reader `getConsentFn` and route `/consent` are registered names. Their logs and spans contain only operational metadata; the consent choice and cookie record never enter telemetry ([analytics.md](analytics.md)).
+
 The console bridge replaces `console.warn` and `console.error` with fixed messages and suppresses every original argument in both destinations. Framework and third-party errors therefore reach PostHog without their possibly sensitive payloads. Application code uses `createLogger`; it must never write raw data with other console methods or directly through the OpenTelemetry API.
 
 ## Verification

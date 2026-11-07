@@ -1,6 +1,6 @@
 # Site shell
 
-The parts every page shares: the skip link, the header and the footer, and the not-found and error pages. `RootDocument` (`src/components/layout/root-document.tsx`), the root route's `shellComponent` in `src/routes/__root.tsx`, renders them around each page, the not-found and error pages included. The page itself sits in `<div id="content">` between the header and the footer.
+The parts every page shares: the skip link, the header and the footer, the cookie consent banner, and the not-found and error pages. `RootDocument` (`src/components/layout/root-document.tsx`), the root route's `shellComponent` in `src/routes/__root.tsx`, renders them around each page, the not-found and error pages included. The page itself sits in `<div id="content">` between the header and the footer. The root loader reads consent for the server-rendered banner or status. Pages are private and uncacheable ([analytics.md](analytics.md)).
 
 The design draws the shell on the Trackdown design canvas's Web · Playing board (header and footer with the legend) and Web · Privacy policy board (footer with the tagline). The header, the footer and every page's `main` share one column, `shellContainer` (`src/components/layout/shell-container.ts`): 1080px at most, centred, 24px on each side.
 
@@ -32,9 +32,9 @@ Both halves of the header wrap. At phone width the network pill drops below the 
 `SiteFooter` (`src/components/layout/site-footer.tsx`) sits below a hairline (`rule`) in muted 15px text and holds:
 
 - **The legend slot.** A route that names a component in `staticData.footerLegend` gets it here, such as the game page's `PlayingFooterLegend`: the line legend (`GameLegend`, [guess-list.md](guess-list.md#legend)) and, opposite it, the countdown to the next station (`NextPuzzleCountdown`, [game.md](game.md#countdown)). A legend may be a fragment of several parts; each is an item of the footer's wrapping row. The footer takes the deepest matched route's legend, so a child route can name its own. Without one, the footer shows the tagline (`footer.tagline`), as on the privacy board. With a legend, the links take a row of their own, as on the playing board. The type lives with the router's `Register` in `src/router.tsx`.
-- **The links**: About, Privacy, Terms and Cookie settings, in a `<nav>` named `footer.nav`. The current page carries `aria-current="page"` and shows in ink, semibold. Each link is 44px high.
+- **The links**: About, Privacy and Terms, plus a Cookie settings button, in a `<nav>` named `footer.nav`. The current page link carries `aria-current="page"` and shows in ink, semibold. Each control is at least 44px high.
 
-"Cookie settings" links to the privacy policy's part on cookies (`/privacy#cookies`, `cookieSettingsLink`) until the cookie banner exists; the banner's own button, which opens it again, then replaces the link.
+"Cookie settings" submits a GET to the current localized page with `cookie-settings=open#cookie-title`, reopening the banner even without JavaScript ([analytics.md](analytics.md#banner-and-settings)). Footer padding leaves room for the fixed consent status.
 
 ```ts
 export const Route = createFileRoute("/")({

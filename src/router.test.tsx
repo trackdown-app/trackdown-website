@@ -4,12 +4,21 @@ import {
     createRequestHandler,
     defaultRenderHandler,
 } from "@tanstack/react-router/ssr/server";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { getConsentFn } from "@/lib/analytics/consent.functions";
 import { ErrorPage } from "@/components/errors/error-page";
 import { NotFoundPage } from "@/components/errors/not-found-page";
 import { RootDocument } from "@/components/layout/root-document";
 import { getRouter } from "@/router";
 import { themeInitScript } from "@/lib/theme";
+
+vi.mock("@/lib/analytics/consent.functions", () => ({
+    getConsentFn: vi.fn(() => Promise.resolve(null)),
+}));
+
+beforeEach(() => {
+    vi.mocked(getConsentFn).mockResolvedValue(null);
+});
 
 // The home page's loader calls server functions, which need the Start server
 // these tests render without. They answer with a made-up puzzle instead.
@@ -100,6 +109,42 @@ function siteRouterWithFailingPage(): AnyRouter {
 }
 
 describe("the site's router", () => {
+    it("server-renders the unanswered banner without setting any cookie", async () => {
+        const handler = createRequestHandler({
+            request: new Request("http://localhost/hoe-te-spelen"),
+            createRouter: getRouter,
+        });
+        const response = await handler(defaultRenderHandler);
+        const html = await response.text();
+        expect(html).toContain('action="/consent"');
+        expect(html).toContain("Cookies, alleen als jij het goed vindt");
+        expect(response.headers.get("set-cookie")).toBeNull();
+        expect(response.headers.get("cache-control")).toContain("no-store");
+    });
+
+    it.each([true, false])(
+        "server-renders only the status for analytics = %s",
+        async (analytics) => {
+            vi.mocked(getConsentFn).mockResolvedValue({ analytics });
+            const { html } = await respondAt(getRouter, "/hoe-te-spelen");
+            expect(html).not.toContain('action="/consent"');
+            expect(html).toContain('id="cookie-status"');
+            expect(html).toContain(
+                analytics ? "Analytische cookie aan" : "Geen analytische cookie",
+            );
+        },
+    );
+
+    it("reopens an answered banner through the footer's native GET", async () => {
+        vi.mocked(getConsentFn).mockResolvedValue({ analytics: true });
+        const { html } = await respondAt(
+            getRouter,
+            "/hoe-te-spelen?cookie-settings=open",
+        );
+        expect(html).toContain('action="/consent"');
+        expect(html).toContain('name="return" value="/hoe-te-spelen"');
+    });
+
     it("answers the home page with today's game, inside the header and footer", async () => {
         const { status, html } = await respondAt(getRouter, "/");
 
