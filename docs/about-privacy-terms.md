@@ -20,7 +20,7 @@ Every paragraph is a message. A sentence that holds a link is split into a part 
 
 ## About
 
-What Trackdown is, how trips are worked out, and the attribution the data licences ask for: OVapi GTFS-NL (NDOV open data, CC0 1.0) and PDOK Bestuurlijke Gebieden (© Kadaster, CC BY 4.0), each licence linked. It says Trackdown is not linked to NS or any other railway, and gives the contact address.
+What Trackdown is, how trips are worked out, and the attribution the data licences ask for: for the Netherlands OVapi GTFS-NL (NDOV open data, CC0 1.0) and PDOK Bestuurlijke Gebieden (© Kadaster, CC BY 4.0); for Great Britain, whose data is shared under CC BY-SA 4.0 (trackdown-data's `gb/LICENSE.md`), Network Rail SCHEDULE data (Network Rail Infrastructure Ltd, CC BY-SA 4.0), NaPTAN (Department for Transport, OGL v3.0) and the ONS's ITL1 boundaries (OGL v3.0, with "Contains OS data © Crown copyright and database right"). Each licence is linked. The terms' "not a journey planner" section names the same sources. When a network's data adds a source, its line goes here in the same change. It says Trackdown is not linked to NS, Network Rail or any other railway, and gives the contact address.
 
 ## Privacy policy
 

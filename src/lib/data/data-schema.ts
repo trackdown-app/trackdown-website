@@ -97,8 +97,13 @@ export const metaFileSchema = z.object({
 
 export type Meta = z.infer<typeof metaFileSchema>;
 
-/** The train types a ride can be (trackdown-data README, "Trip format"). */
+/**
+ * What a ride is labelled with (trackdown-data README, "Trip format"): in
+ * `nl` the train type, in `gb` the train operator's code, which `gb`'s
+ * `operators.json` names. The two lists do not overlap.
+ */
 export const trainTypeSchema = z.enum([
+    // nl: train types.
     "IC",
     "ICD",
     "SPR",
@@ -106,6 +111,35 @@ export const trainTypeSchema = z.enum([
     "SNT",
     "ICE",
     "EC",
+    // gb: train operator codes.
+    "AW",
+    "CC",
+    "CH",
+    "EM",
+    "GC",
+    "GN",
+    "GR",
+    "GW",
+    "GX",
+    "HT",
+    "HX",
+    "IL",
+    "LD",
+    "LE",
+    "LF",
+    "LM",
+    "LO",
+    "ME",
+    "NT",
+    "SE",
+    "SN",
+    "SR",
+    "SW",
+    "TL",
+    "TP",
+    "VT",
+    "XC",
+    "XR",
 ]);
 
 export type TrainType = z.infer<typeof trainTypeSchema>;

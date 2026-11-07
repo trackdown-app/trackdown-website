@@ -25,7 +25,8 @@
               "default": "nl",
               "type": "string",
               "enum": [
-                "nl"
+                "nl",
+                "gb"
               ]
             }
           }
@@ -634,7 +635,8 @@
       "NetworkId": {
         "type": "string",
         "enum": [
-          "nl"
+          "nl",
+          "gb"
         ]
       },
       "PuzzleArchive": {
@@ -853,7 +855,35 @@
           "ST",
           "SNT",
           "ICE",
-          "EC"
+          "EC",
+          "AW",
+          "CC",
+          "CH",
+          "EM",
+          "GC",
+          "GN",
+          "GR",
+          "GW",
+          "GX",
+          "HT",
+          "HX",
+          "IL",
+          "LD",
+          "LE",
+          "LF",
+          "LM",
+          "LO",
+          "ME",
+          "NT",
+          "SE",
+          "SN",
+          "SR",
+          "SW",
+          "TL",
+          "TP",
+          "VT",
+          "XC",
+          "XR"
         ]
       }
     },

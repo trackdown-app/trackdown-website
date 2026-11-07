@@ -62,4 +62,22 @@ describe("AboutPage", () => {
         expect(html).toContain('href="/hoe-te-spelen"');
         expect(html).toContain('href="mailto:info@trackdown.nl"');
     });
+
+    it("credits Great Britain's data under CC BY-SA 4.0 and the OGL", async () => {
+        const html = await renderAt(AboutPage, "/over");
+
+        expect(html).toContain(
+            "Network Rail SCHEDULE-data, Network Rail Infrastructure Ltd",
+        );
+        expect(html).toContain("NaPTAN, Department for Transport");
+        expect(html).toContain(
+            "contains OS data © Crown copyright and database right",
+        );
+        expect(html).toContain(
+            'href="https://creativecommons.org/licenses/by-sa/4.0/"',
+        );
+        expect(html).toContain(
+            'href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"',
+        );
+    });
 });
