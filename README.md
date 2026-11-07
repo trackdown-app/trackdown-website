@@ -40,4 +40,5 @@ The site runs on http://localhost:3000.
 - [Station search](docs/station-search.md)
 - [Guess list](docs/guess-list.md)
 - [Game page](docs/game.md)
+- [Sharing a result](docs/share.md)
 - [Deploy](docs/deploy.md)

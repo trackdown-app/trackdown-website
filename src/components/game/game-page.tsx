@@ -9,6 +9,7 @@ import { GuessList } from "@/components/game/guess-list";
 import { StationSearch } from "@/components/game/station-search";
 import { puzzleDateLabel } from "@/lib/game/puzzle-date-label";
 import type { GameStore } from "@/lib/game/game-store";
+import type { ShareNavigator } from "@/lib/game/share-result";
 import type { StationOption } from "@/lib/game/station-search";
 import type { TodayPuzzleOutput } from "@/lib/game/schemas";
 import { spokenGuess } from "@/lib/game/trip-text";
@@ -21,6 +22,8 @@ type GamePageProps = {
     stations: readonly StationOption[];
     /** Where the game is kept; the page's `localStorage` store unless a test hands its own. */
     store?: GameStore;
+    /** Where a result is shared; the browser's `navigator` unless a test hands its own. */
+    shareTarget?: ShareNavigator;
 };
 
 /**
@@ -28,9 +31,9 @@ type GamePageProps = {
  * puzzle's day, the question, the station search, the progress dots and the
  * guesses so far, newest first. The guesses survive a reload on the same
  * device. Once the game is over the page becomes the Web · Solved board:
- * the answer and how the player got there (`GameOver`).
+ * the answer, how the player got there and the result to share (`GameOver`).
  */
-export function GamePage({ puzzle, stations, store }: GamePageProps) {
+export function GamePage({ puzzle, stations, store, shareTarget }: GamePageProps) {
     const game = useGame(puzzle, store);
     const names = useMemo(
         () => new Map(stations.map((station) => [station.code, station.name])),
@@ -110,6 +113,7 @@ export function GamePage({ puzzle, stations, store }: GamePageProps) {
                     guesses={game.guesses}
                     status={game.status}
                     enteringGuess={game.lastAnswer?.guess}
+                    shareTarget={shareTarget}
                 />
             )}
             {/* Reads out each guess made on this page, not the kept ones a

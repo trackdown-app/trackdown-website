@@ -14,6 +14,7 @@ import type {
     RevealInput,
     RevealOutput,
 } from "@/lib/game/schemas";
+import type { ShareNavigator } from "@/lib/game/share-result";
 import type { ListedGuess } from "@/lib/game/trip-line";
 
 const { submitGuessFn } = vi.hoisted(() => ({
@@ -69,7 +70,7 @@ function answer(
     };
 }
 
-function renderGame(store: GameStore) {
+function renderGame(store: GameStore, shareTarget: ShareNavigator = {}) {
     const queryClient = new QueryClient({
         defaultOptions: {
             queries: { retry: false },
@@ -78,7 +79,12 @@ function renderGame(store: GameStore) {
     });
     render(
         <QueryClientProvider client={queryClient}>
-            <GamePage puzzle={puzzle} stations={stations} store={store} />
+            <GamePage
+                puzzle={puzzle}
+                stations={stations}
+                store={store}
+                shareTarget={shareTarget}
+            />
         </QueryClientProvider>,
     );
     return userEvent.setup();
@@ -369,6 +375,111 @@ describe("GamePage", () => {
             await screen.findByRole("heading", { level: 1, name: "Zwolle" }),
         ).toBeDefined();
         expect(screen.queryByRole("alert")).toBeNull();
+    });
+
+    it("shows no share while the game is on", () => {
+        window.localStorage.setItem(key, serializeGame([miss("hvs")]));
+        renderGame(createGameStore(() => window.localStorage));
+
+        expect(screen.queryByRole("button", { name: "Share result" })).toBeNull();
+        expect(screen.queryByText("What you'll share")).toBeNull();
+    });
+
+    it("previews the result, without station names, once the game is won", () => {
+        window.localStorage.setItem(
+            key,
+            serializeGame([
+                miss("mt", 145),
+                miss("hvs", 13),
+                { guess: "ut", correct: true, steps: [], totalMinutes: 0 },
+            ]),
+        );
+        renderGame(createGameStore(() => window.localStorage));
+
+        const preview = document.querySelector("pre")?.textContent ?? "";
+        expect(preview).toBe(
+            [
+                "Trackdown NL 142, 3/6",
+                "●━━━━━━━━━━  2h25",
+                "●━           13m",
+                "Tracked down in 3",
+                "https://trackdown.nl/en",
+            ].join("\n"),
+        );
+        for (const station of stations) {
+            expect(preview).not.toContain(station.name);
+        }
+    });
+
+    it("hands the result to the share sheet", async () => {
+        window.localStorage.setItem(
+            key,
+            serializeGame(
+                ["asd", "ut", "hvs", "mt", "hdr", "gn"].map((code) => miss(code)),
+            ),
+        );
+        const share = vi.fn(() => Promise.resolve());
+        renderGame(
+            createGameStore(() => window.localStorage),
+            { share },
+        );
+        const user = userEvent.setup();
+
+        await user.click(screen.getByRole("button", { name: "Share result" }));
+
+        expect(share).toHaveBeenCalledWith({
+            text: document.querySelector("pre")?.textContent,
+        });
+        expect(screen.getByRole("status").textContent).toBe("");
+    });
+
+    it("copies the result without the Web Share API, and says so", async () => {
+        window.localStorage.setItem(
+            key,
+            serializeGame([
+                miss("hvs"),
+                { guess: "ut", correct: true, steps: [], totalMinutes: 0 },
+            ]),
+        );
+        const writeText = vi.fn(() => Promise.resolve());
+        renderGame(
+            createGameStore(() => window.localStorage),
+            {
+                clipboard: { writeText },
+            },
+        );
+        const user = userEvent.setup();
+
+        await user.click(screen.getByRole("button", { name: "Share result" }));
+
+        expect(writeText).toHaveBeenCalledWith(
+            "Trackdown NL 142, 2/6\n●━  17m\nTracked down in 2\nhttps://trackdown.nl/en",
+        );
+        expect((await screen.findByRole("status")).textContent).toBe(
+            "Copied. Paste it wherever you like.",
+        );
+    });
+
+    it("says so when the result cannot be copied", async () => {
+        window.localStorage.setItem(
+            key,
+            serializeGame([
+                { guess: "ut", correct: true, steps: [], totalMinutes: 0 },
+            ]),
+        );
+        renderGame(
+            createGameStore(() => window.localStorage),
+            {},
+        );
+        const user = userEvent.setup();
+
+        await user.click(screen.getByRole("button", { name: "Share result" }));
+
+        expect(
+            await screen.findByText(
+                "Couldn't copy. Select the text under “What you'll share” and copy it yourself.",
+            ),
+        ).toBeDefined();
     });
 
     it("says so when a guess does not go through, and keeps nothing", async () => {

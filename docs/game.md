@@ -22,10 +22,11 @@ Once the game is over the question, the search and the progress give way to the 
 `GameOver` (`src/components/game/game-over.tsx`) is the finished game, after the design's Web · Solved board, in the same column:
 
 - **The answer plate.** `AnswerPlate` (`src/components/game/answer-plate.tsx`): a 16px-cornered plate in `plate`, the theme turned over ([design-system.md](design-system.md#colour)). The logo mark in its plate colours, its bar filled, beside how it went in `plate-muted` 18px: "You tracked it down in 5 of 6 guesses" / "Je hebt hem gevonden in 5 van 6 gokken", or when missed "No guesses left. The mystery station was" / "Geen gokken meer. Het mysteriestation was". Below it the mystery station as the page's `h1`, Barlow Condensed 800, 52px to 112px with the width. The plate is a section named "Today's answer" / "Het antwoord van vandaag".
-- **The buttons.** "Share result" / "Deel je resultaat", the ink main button with a share icon, and "Play an older puzzle" / "Speel een eerdere puzzel", an outlined link to the archive (`/archief`). Both 52px, 12px corners. Sharing and the archive page come with their own features: until then the share button does nothing and the link shows the not-found page.
+- **The buttons.** "Share result" / "Deel je resultaat", the ink main button with a share icon, and "Play an older puzzle" / "Speel een eerdere puzzel", an outlined link to the archive (`/archief`). Both 52px, 12px corners. The share button shares the result ([share.md](share.md#sharing)), and a status line under the buttons says when it was copied instead. The archive page comes with its own feature: until then the link shows the not-found page.
 - **How you got there.** `GuessList` in its revealed form ([guess-list.md](guess-list.md#revealed)): every guess, newest first, every change named.
+- **What you'll share.** `SharePreview` ([share.md](share.md#the-preview)): the exact text the share button hands on, without station names.
 
-The design's record and "What you'll share" below them come with statistics and sharing.
+The design's record beside "What you'll share" comes with statistics.
 
 ### The answer comes from the reveal
 
@@ -46,7 +47,7 @@ Beside the dots, in 16px semibold: "Guess 5 of 6, newest first". The page shows 
 
 ## Countdown
 
-`NextPuzzleCountdown` (`src/components/game/next-puzzle-countdown.tsx`) is the footer's "Next station in 13:42:08" / "Volgend station over 13:42:08", from the design's Web · Playing board: muted text, the time in ink and bold. It sits opposite the line legend while playing and after the game is over. The design's Web · Solved board also sets it under "What you'll share"; it moves there with sharing.
+`NextPuzzleCountdown` (`src/components/game/next-puzzle-countdown.tsx`) is the footer's "Next station in 13:42:08" / "Volgend station over 13:42:08", from the design's Web · Playing board: muted text, the time in ink and bold. It sits opposite the line legend while playing and after the game is over. The design's Web · Solved board also sets it under "What you'll share" ([share.md](share.md)); it is not there yet.
 
 - **The time left** is from now to today's puzzle's `nextPuzzleAt`, the next midnight in Europe/Amsterdam ([api.md](api.md#todays-puzzle)), read from the `todayPuzzle` query the route's loader filled. `secondsUntil` and `countdownClock` (`src/lib/game/countdown.ts`) turn it into `hh:mm:ss`. Both ends are instants, so the day the clocks change counts its real 23 or 25 hours: just after midnight on the last Sunday of October it shows `24:59:59`. The time is a `<time>` whose `dateTime` is the same as an ISO 8601 duration (`PT13H42M8S`).
 - **Ticking.** `useNow` (`src/lib/use-now.ts`) is a clock for `useSyncExternalStore` that ticks at the start of every second, aimed at the next whole second so a throttled timer does not drift.
@@ -75,7 +76,7 @@ A game is kept in `localStorage` under `trackdown:game:v1:{network}:{number}`, o
 ## Tests
 
 - `src/lib/game/game-state.test.ts` covers the key, writing and reading back a game, broken entries, the status, and the store with storage and without.
-- `src/components/game/game-page.test.tsx` renders the page in `happy-dom` with `submitGuessFn` mocked: the day line, kept guesses and progress, a guess sent with the earlier ones and kept over a reload, a hidden change on an earlier trip named once it is guessed, a game without storage, a guess that fails, Dutch. With `revealAnswerFn` mocked too: winning (the reveal asked once with the guesses, the answer as the focused heading, the revealed list, the buttons), missing (every change named, focus left alone), no answer before the reveal answers, and a reveal that fails and is asked again.
+- `src/components/game/game-page.test.tsx` renders the page in `happy-dom` with `submitGuessFn` mocked: the day line, kept guesses and progress, a guess sent with the earlier ones and kept over a reload, a hidden change on an earlier trip named once it is guessed, a game without storage, a guess that fails, Dutch. With `revealAnswerFn` mocked too: winning (the reveal asked once with the guesses, the answer as the focused heading, the revealed list, the buttons), missing (every change named, focus left alone), no answer before the reveal answers, and a reveal that fails and is asked again; sharing the result ([share.md](share.md#tests)).
 - `src/lib/game/countdown.test.ts` covers the clock and the duration, midnight in Amsterdam rather than UTC, and the 23- and 25-hour days the clocks change.
 - `src/components/game/next-puzzle-countdown.test.tsx` renders the countdown in `happy-dom` with fake timers and `getTodayPuzzleFn` mocked: the text in both languages, ticking, reading the puzzle again at zero, asking again while the server still answers the old one, and hydrating over a server render two seconds older without an error.
 - `src/router.test.tsx` renders `/` through the router with the server functions mocked, the countdown in its footer.
