@@ -3,6 +3,15 @@
     "site": {
         "name": "Trackdown"
     },
+    "seo": {
+        "description": "Raad elke dag het mysteriestation. Bij elke gok tekenen we de snelste treinreis naar het mysterie: hoe korter de lijn, hoe dichterbij.",
+        "gameTitle": "Trackdown {network} · Puzzel {number}",
+        "gameDescription": "Puzzel {number}: welk station is het mysterie van vandaag? Raad een station en volg de snelste treinreis ernaartoe.",
+        "archiveDescription": "Elke Trackdown-puzzel tot nu toe, nieuwste eerst. Haal in wat je hebt gemist.",
+        "archivePuzzleDescription": "Speel Trackdown-puzzel {number} uit het archief: welk station was het mysterie?",
+        "howToPlayDescription": "Zo speel je Trackdown: raad een station, volg de snelste treinreis en vind het mysteriestation.",
+        "imageAlt": "Het Trackdown-logo: een treinlijn met een overstap naar een station, met het woord Trackdown eronder."
+    },
     "game": {
         "dateLine": "{date}, puzzel {number}",
         "title": "Welk station is het mysterie van vandaag?",

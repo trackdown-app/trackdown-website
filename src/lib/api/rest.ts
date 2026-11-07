@@ -55,7 +55,12 @@ export function jsonResponse(
     status = 200,
     cache: RestCache = "none",
 ): Response {
-    return Response.json(body, { status, headers: cacheHeaders(cache) });
+    return Response.json(body, {
+        status,
+        // Keeps every API answer out of search results, even one a crawler
+        // reached despite `robots.txt` (docs/seo.md#robotstxt).
+        headers: { ...cacheHeaders(cache), "X-Robots-Tag": "noindex" },
+    });
 }
 
 /** `error` in the API's error format, with its status. */

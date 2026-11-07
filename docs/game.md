@@ -6,6 +6,8 @@ A network's game, `/{network}` (`/en/{network}` in English, `/nl` for the Dutch 
 
 The loader fills two queries ([data-loading.md](data-loading.md)): `todayPuzzleQueryOptions(network)` and `stationsQueryOptions(network, locale)`, `network` from the route's context ([network-picker.md](network-picker.md#routes)). The component reads both with `useSuspenseQuery` and hands them to `GamePage`. The route names `PlayingFooterLegend` (`src/components/game/playing-footer-legend.tsx`) as its footer legend ([site-shell.md](site-shell.md#footer)): the line legend and the [countdown](#countdown). The countdown reads the network from the page (`useCurrentNetwork`).
 
+The loader returns today's puzzle number, which the route's `head()` puts in the title and link preview, "Trackdown NL · Puzzel 142", never the station ([seo.md](seo.md#a-pages-tags)).
+
 ## The page
 
 Top to bottom, in the shell's 1080px column:

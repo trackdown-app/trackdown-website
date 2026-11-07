@@ -7,6 +7,7 @@ import { GamePage } from "@/components/game/game-page";
 import { puzzleArchiveQueryOptions } from "@/lib/game/puzzle-archive.queries";
 import { puzzleDate } from "@/lib/game/puzzle-day";
 import { maxGuesses } from "@/lib/game/rules";
+import { seo } from "@/lib/seo";
 import { stationsQueryOptions } from "@/lib/game/stations.queries";
 
 export const Route = createFileRoute("/$network/archief/$number")({
@@ -32,9 +33,14 @@ export const Route = createFileRoute("/$network/archief/$number")({
         return { puzzle: { network, ...puzzle, maxGuesses } };
     },
     // After the loader, so the loader's data keeps its type.
-    head: ({ params }) => ({
-        meta: [{ title: m["archive.puzzlePageTitle"]({ number: params.number }) }],
-    }),
+    head: ({ match, params }) =>
+        seo({
+            title: m["archive.puzzlePageTitle"]({ number: params.number }),
+            description: m["seo.archivePuzzleDescription"]({
+                number: params.number,
+            }),
+            path: match.pathname,
+        }),
     staticData: { footerLegend: GameLegend },
     component: ArchiveGame,
 });

@@ -171,6 +171,7 @@ describe(`GET ${openApiPath}`, () => {
         expect(response.headers.get("Vercel-CDN-Cache-Control")).toBe(
             "public, max-age=31536000",
         );
+        expect(response.headers.get("X-Robots-Tag")).toBe("noindex");
         expect(await response.json()).toEqual(openApiDocument);
     });
 });
