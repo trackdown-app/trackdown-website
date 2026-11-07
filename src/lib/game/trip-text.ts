@@ -13,24 +13,55 @@ function nameOf(code: string, names: StationNames): string {
     return names.get(code) ?? code;
 }
 
-/** A train type's name in words, for a player who does not know the code: `SPR` is "Sprinter". */
+/**
+ * Each ride label's message: a train type in `nl`, a train operator in `gb`.
+ * A `Record`, so a label added to `trainTypeSchema` fails the typecheck
+ * until it has a name.
+ */
+const trainNames: Record<TrainType, () => string> = {
+    IC: m["trains.IC"],
+    ICD: m["trains.ICD"],
+    SPR: m["trains.SPR"],
+    ST: m["trains.ST"],
+    SNT: m["trains.SNT"],
+    ICE: m["trains.ICE"],
+    EC: m["trains.EC"],
+    AW: m["trains.AW"],
+    CC: m["trains.CC"],
+    CH: m["trains.CH"],
+    EM: m["trains.EM"],
+    GC: m["trains.GC"],
+    GN: m["trains.GN"],
+    GR: m["trains.GR"],
+    GW: m["trains.GW"],
+    GX: m["trains.GX"],
+    HT: m["trains.HT"],
+    HX: m["trains.HX"],
+    IL: m["trains.IL"],
+    LD: m["trains.LD"],
+    LE: m["trains.LE"],
+    LF: m["trains.LF"],
+    LM: m["trains.LM"],
+    LO: m["trains.LO"],
+    ME: m["trains.ME"],
+    NT: m["trains.NT"],
+    SE: m["trains.SE"],
+    SN: m["trains.SN"],
+    SR: m["trains.SR"],
+    SW: m["trains.SW"],
+    TL: m["trains.TL"],
+    TP: m["trains.TP"],
+    VT: m["trains.VT"],
+    XC: m["trains.XC"],
+    XR: m["trains.XR"],
+};
+
+/**
+ * A ride label in words, for a player who does not know the code: `SPR` is
+ * "Sprinter", `GR` is "LNER".
+ */
 export function trainName(train: TrainType): string {
-    switch (train) {
-        case "IC":
-            return m["trains.IC"]();
-        case "ICD":
-            return m["trains.ICD"]();
-        case "SPR":
-            return m["trains.SPR"]();
-        case "ST":
-            return m["trains.ST"]();
-        case "SNT":
-            return m["trains.SNT"]();
-        case "ICE":
-            return m["trains.ICE"]();
-        case "EC":
-            return m["trains.EC"]();
-    }
+    return trainNames[train]();
 }
 
 /** A time as the list shows it: `2h 05m`, or `17m` under an hour. */
