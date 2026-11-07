@@ -64,6 +64,11 @@ jobs:
           bun-version-file: .bun-version
       - run: bun install --frozen-lockfile
 
+      # Fails the deploy before it builds when the data does not match the
+      # loader's schemas (docs/data.md#checking-the-data).
+      - name: Check the data
+        run: bun run data:check "$GITHUB_WORKSPACE/.trackdown-data/data"
+
       # The Vercel CLI is the `vercel` dev dependency in `package.json`.
       - name: Pull the Vercel environment
         env:

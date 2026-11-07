@@ -33,7 +33,7 @@ Two build-time variables, read by `vite.config.ts` (from the environment, or `.e
 | `TRACKDOWN_DATA_DIR` | The `data/` folder of a trackdown-data checkout, relative or absolute. Unset, the build carries no data. |
 | `TRACKDOWN_DATA_REF` | The trackdown-data commit the build is made from. Unset, it is `local`. |
 
-- **The data.** `TRACKDOWN_DATA_DIR` becomes Nitro's `assets:trackdown-data` storage mount (`serverAssets` in the `nitro()` options), read on the server with `useStorage("assets:trackdown-data")`. In development Nitro reads the files from disk. In a build every file becomes a lazy import inside the server function, so it is loaded only when asked for and is never a static file. Nitro bundles them only once server code calls `useStorage()`; until then the build holds no data.
+- **The data.** `TRACKDOWN_DATA_DIR` becomes Nitro's `assets:trackdown-data` storage mount (`serverAssets` in the `nitro()` options), read on the server with `useStorage("assets:trackdown-data")`. In development Nitro reads the files from disk. In a build every file becomes a lazy import inside the server function, so it is loaded only when asked for and is never a static file. Nitro bundles them only once server code calls `useStorage()`, which the loader in `src/lib/data/trackdown-data.ts` does ([data.md](data.md)); while no server function reads it, the build holds no data.
 - **The data ref.** `define` writes `TRACKDOWN_DATA_REF` into the build as `import.meta.env.TRACKDOWN_DATA_REF`, for `/api/v1/meta`. It only lands in a bundle whose code reads it. Unit tests run without `vite.config.ts`, so a test that reads it stubs it with `vi.stubEnv`.
 - **Locally.** Copy `.env.example` to `.env.local`. It points `TRACKDOWN_DATA_DIR` at `../TrackdownData/data`, a trackdown-data clone next to this repository.
 
@@ -43,7 +43,7 @@ Two build-time variables, read by `vite.config.ts` (from the environment, or `.e
 
 1. Checks out this repository, then trackdown-data's `main` into `.trackdown-data/` (Git-ignored, outside `public/`), only its `data/` folder. Both checkouts use `persist-credentials: false`, so no token is left in a `.git/config`.
 2. Pins the deploy to that commit: its SHA becomes `TRACKDOWN_DATA_REF`. The step summary names it next to the deployment URL.
-3. `bun install`, then `vercel pull`, `vercel build` (with `TRACKDOWN_DATA_DIR` and `TRACKDOWN_DATA_REF`) and `vercel deploy --prebuilt`, with `--prod` on `main`. The Vercel CLI is the `vercel` dev dependency. Only `.vercel/output/` is uploaded.
+3. `bun install`, then `bun run data:check` on the checkout, which fails the deploy when a data file does not match the loader's schemas ([data.md](data.md#checking-the-data)), then `vercel pull`, `vercel build` (with `TRACKDOWN_DATA_DIR` and `TRACKDOWN_DATA_REF`) and `vercel deploy --prebuilt`, with `--prod` on `main`. The Vercel CLI is the `vercel` dev dependency. Only `.vercel/output/` is uploaded.
 4. The job runs in the GitHub environment `Preview` or `Production`, whose URL is the deployment, so a pull request links its preview.
 
 It uses `pull_request`, never `pull_request_target`: a pull request from a fork gets no secrets, and neither does one from Dependabot. The job skips those instead of failing, so code from outside the repository never runs next to a secret. They still get the CI checks (`pr.yml`), which need no data.

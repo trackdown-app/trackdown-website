@@ -1,0 +1,37 @@
+[
+    {
+        "code": "alf",
+        "name": "Alfastad Centraal",
+        "province": "Westmark",
+        "lat": 52.1,
+        "lon": 5.1
+    },
+    {
+        "code": "brv",
+        "name": "Bravodorp",
+        "province": "Westmark",
+        "lat": 52.3,
+        "lon": 4.9
+    },
+    {
+        "code": "chr",
+        "name": "Charlieveen",
+        "province": "Oostmark",
+        "lat": 52.0,
+        "lon": 5.4
+    },
+    {
+        "code": "dlt",
+        "name": "Deltahaven",
+        "province": "Oostmark",
+        "lat": 51.9,
+        "lon": 5.6
+    },
+    {
+        "code": "ech",
+        "name": "Echoburg",
+        "province": "Zuidmark",
+        "lat": 51.6,
+        "lon": 5.0
+    }
+]

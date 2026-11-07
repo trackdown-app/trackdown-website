@@ -23,12 +23,14 @@ The site runs on http://localhost:3000.
 | `bun run lint` | Compiles messages, then runs ESLint (with Prettier) |
 | `bun run test` | Compiles messages, then runs Vitest |
 | `bun run paraglide:compile` | Compiles `messages/` into `src/paraglide/` (also on `postinstall`) |
+| `bun run data:check [dir]` | Checks a trackdown-data `data/` folder (default `TRACKDOWN_DATA_DIR`) against the loader's schemas |
 | `bun run format` / `check` | Formats / checks formatting with Prettier |
 
 ## Documentation
 
 - [Getting started](docs/getting-started.md)
 - [Data loading](docs/data-loading.md)
+- [Game data](docs/data.md)
 - [Internationalisation](docs/i18n.md)
 - [Design system](docs/design-system.md)
 - [Site shell](docs/site-shell.md)
