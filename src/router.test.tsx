@@ -9,6 +9,7 @@ import { ErrorPage } from "@/components/errors/error-page";
 import { NotFoundPage } from "@/components/errors/not-found-page";
 import { RootDocument } from "@/components/layout/root-document";
 import { getRouter } from "@/router";
+import { themeInitScript } from "@/lib/theme";
 
 // The home page's loader calls server functions, which need the Start server
 // these tests render without. They answer with a made-up puzzle instead.
@@ -116,6 +117,16 @@ describe("the site's router", () => {
         expect(html).toContain('href="#content"');
     });
 
+    it("sends the theme initializer in the head before the stylesheet and body", async () => {
+        const { html } = await respondAt(getRouter, "/");
+        const script = html.indexOf(themeInitScript);
+
+        expect(script).toBeGreaterThan(html.indexOf("<head>"));
+        expect(script).toBeLessThan(html.indexOf('rel="stylesheet"'));
+        expect(script).toBeLessThan(html.indexOf("<body"));
+        expect(html).toContain('aria-label="Donkere modus"');
+    });
+
     it("answers how to play with its page, inside the header and footer", async () => {
         const { status, html } = await respondAt(getRouter, "/hoe-te-spelen");
 
@@ -198,7 +209,8 @@ describe("the site's router", () => {
 
         // What the page shows. The router's hydration data, in a script
         // after it, still carries the error for the browser's error page.
-        const page = html.slice(0, html.indexOf("<script"));
+        const body = html.slice(html.indexOf("<body"));
+        const page = body.slice(0, body.indexOf("<script"));
 
         expect(status).toBe(500);
         expect(page).toContain("Er ging iets mis");
