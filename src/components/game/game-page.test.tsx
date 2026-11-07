@@ -331,8 +331,8 @@ describe("GamePage", () => {
         expect(screen.getByRole("region", { name: "The answer" })).toBeDefined();
     });
 
-    it("names a hidden change on an earlier trip once the player guesses it", async () => {
-        // The design's case: Amsterdam changes at a hidden station, which
+    it("names an unknown change on an earlier trip once the player guesses it", async () => {
+        // The design's case: Amsterdam changes at an unknown station, which
         // the next guess, Utrecht Centraal, turns out to be.
         const hidden: ListedGuess = {
             guess: "asd",
@@ -360,7 +360,9 @@ describe("GamePage", () => {
             ),
         );
         const user = renderGame(createGameStore(() => window.localStorage));
-        expect(screen.getByText("1h 00m, change at a hidden station")).toBeDefined();
+        expect(
+            screen.getByText("1h 00m, change at an unknown station"),
+        ).toBeDefined();
 
         await guess(user, "Utrecht Centraal");
 
@@ -471,7 +473,7 @@ describe("GamePage", () => {
             screen.getByText("No guesses left. The mystery station was"),
         ).toBeDefined();
         expect(screen.queryByRole("combobox")).toBeNull();
-        expect(screen.queryByText(/hidden station/)).toBeNull();
+        expect(screen.queryByText(/unknown station/)).toBeNull();
         expect(guessedNames()).toHaveLength(6);
         // A kept game shown again does not steal focus.
         expect(document.activeElement).toBe(document.body);

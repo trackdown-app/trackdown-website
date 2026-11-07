@@ -86,11 +86,11 @@
         "direct": "direct",
         "changes": "{count} changes",
         "changeAt": "change at {station}",
-        "changeHidden": "change at a hidden station",
+        "changeUnknown": "change at an unknown station",
         "summary": "{duration}, {changes}",
         "spokenRide": "{train}, {duration}",
         "spokenChangeAt": "change at {station}, {duration}",
-        "spokenChangeHidden": "change at a hidden station, {duration}"
+        "spokenChangeUnknown": "change at an unknown station, {duration}"
     },
     "share": {
         "header": "Trackdown {network} {number}, {score}/{total}",
@@ -109,7 +109,7 @@
         "guess": "Your guess",
         "ride": "Train and ride time",
         "changeKnown": "Change, station known",
-        "changeHidden": "Change, guess it to reveal"
+        "changeUnknown": "Change, station unknown"
     },
     "countdown": {
         "nextStation": "Next station in"

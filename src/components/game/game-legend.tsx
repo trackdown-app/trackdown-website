@@ -33,7 +33,7 @@ export function GameLegend() {
                 >
                     ?
                 </span>
-                {m["legend.changeHidden"]()}
+                {m["legend.changeUnknown"]()}
             </li>
         </ul>
     );

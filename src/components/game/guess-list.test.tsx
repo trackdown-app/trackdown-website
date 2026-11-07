@@ -68,7 +68,7 @@ describe("GuessList", () => {
         );
         expect(texts).toEqual([
             "Guess 4, Maastricht: 2 hours 25 minutes to the mystery station. IC, 2 hours 2 minutes, change at Utrecht Centraal, 6 minutes, IC, 17 minutes.",
-            "Guess 3, Den Helder: 1 hour 57 minutes to the mystery station. IC, 1 hour 12 minutes, change at a hidden station, 9 minutes, IC, 36 minutes.",
+            "Guess 3, Den Helder: 1 hour 57 minutes to the mystery station. IC, 1 hour 12 minutes, change at an unknown station, 9 minutes, IC, 36 minutes.",
             "Guess 2, Utrecht Centraal: 17 minutes to the mystery station. IC, 17 minutes.",
             "Guess 1, Hilversum: 13 minutes to the mystery station. IC, 13 minutes.",
         ]);
@@ -89,7 +89,7 @@ describe("GuessList", () => {
         }
     });
 
-    it("shows the summary, the ride labels that fit and a ? for a hidden change", () => {
+    it("shows the summary, the ride labels that fit and a ? for an unknown change", () => {
         overwriteGetLocale(() => "en");
         render(<GuessList guesses={guesses} stations={stations} />);
 

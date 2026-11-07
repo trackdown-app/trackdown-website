@@ -5,7 +5,7 @@ import type { ListedGuess } from "@/lib/game/trip-line";
 /**
  * The example from the design's iOS · How to play board: a guess of
  * Maastricht, 2h 25m from the mystery station, an IC for 2h 02m, a change
- * at a hidden station and a last ride of 17 minutes.
+ * at an unknown station and a last ride of 17 minutes.
  */
 const exampleGuess: ListedGuess = {
     guess: "mt",

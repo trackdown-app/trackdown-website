@@ -86,11 +86,11 @@
         "direct": "rechtstreeks",
         "changes": "{count} overstappen",
         "changeAt": "overstap in {station}",
-        "changeHidden": "overstap op een verborgen station",
+        "changeUnknown": "overstap op een onbekend station",
         "summary": "{duration}, {changes}",
         "spokenRide": "{train}, {duration}",
         "spokenChangeAt": "overstap in {station}, {duration}",
-        "spokenChangeHidden": "overstap op een verborgen station, {duration}"
+        "spokenChangeUnknown": "overstap op een onbekend station, {duration}"
     },
     "share": {
         "header": "Trackdown {network} {number}, {score}/{total}",
@@ -109,7 +109,7 @@
         "guess": "Jouw gok",
         "ride": "Trein en reistijd",
         "changeKnown": "Overstap, station bekend",
-        "changeHidden": "Overstap, raad hem om te onthullen"
+        "changeUnknown": "Overstap, station onbekend"
     },
     "countdown": {
         "nextStation": "Volgend station over"
