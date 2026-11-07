@@ -82,7 +82,11 @@ The project is `trackdown-website` in Bram's personal Vercel scope, `bram-gussek
 
 - **Git builds are off.** `vercel.json` sets `git.deploymentEnabled` to `false`, so a push does not make Vercel build. The repository stays connected to the project, which only labels deploys with their commit. Deploys come from the deploy workflow (above), which builds with `vercel build` and uploads the result with `vercel deploy --prebuilt`.
 - **Deployment protection.** Vercel Authentication guards every deploy except those on a custom domain, so `trackdown-website.vercel.app` asks for a Vercel login until the site gets its own domain.
-- **Environments.** Preview (every deploy without `--prod`) and Production (`--prod`). The server reads no runtime environment variables yet: the data and its ref are built in (above). A variable the server needs at runtime is added to both in the project's settings (or with `vercel env add <name> <environment>`) and listed here.
+- **Environments.** Preview (every deploy without `--prod`) and Production (`--prod`). The data and its ref are built in (above). A variable the server needs at runtime is added to both in the project's settings (or with `vercel env add <name> <environment>`) and listed here; a changed value reaches only the deploys made after it:
+
+  | Variable | Value |
+  | --- | --- |
+  | `TRACKDOWN_CLIENT_KEYS` | The client keys the REST API accepts, comma-separated, read at runtime ([api.md](api.md#client-identification), where [Rotating a key](api.md#rotating-a-key) says how to change it). Sensitive. Unset, every REST call but `openapi.json` is refused. |
 - **Region.** The function region comes from the build (see above), because a prebuilt deploy carries its own function config. `regions` in `vercel.json` sets the project's default to `fra1` as well, so the deploy's own region matches.
 
 ## A manual deploy

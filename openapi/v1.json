@@ -3,8 +3,14 @@
   "info": {
     "title": "Trackdown API",
     "version": "1",
-    "description": "The API the Trackdown iOS app plays the daily puzzle through. Every error answers `ApiError` with the status of its code. See docs/api.md in trackdown-website."
+    "description": "The API the Trackdown iOS app plays the daily puzzle through. Every call but this document's names the app's client key and version in two headers (`ClientKey`, `AppVersion`), else it answers `unknown_client` (401). Every error answers `ApiError` with the status of its code. See docs/api.md in trackdown-website."
   },
+  "security": [
+    {
+      "ClientKey": [],
+      "AppVersion": []
+    }
+  ],
   "paths": {
     "/api/v1/meta": {
       "get": {
@@ -37,6 +43,9 @@
           },
           "400": {
             "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
           },
           "403": {
             "$ref": "#/components/responses/Forbidden"
@@ -74,6 +83,9 @@
           },
           "400": {
             "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
           },
           "403": {
             "$ref": "#/components/responses/Forbidden"
@@ -114,6 +126,9 @@
           },
           "400": {
             "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
           },
           "403": {
             "$ref": "#/components/responses/Forbidden"
@@ -170,6 +185,9 @@
           },
           "400": {
             "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
           },
           "403": {
             "$ref": "#/components/responses/Forbidden"
@@ -233,6 +251,9 @@
           "400": {
             "$ref": "#/components/responses/BadRequest"
           },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
           "403": {
             "$ref": "#/components/responses/Forbidden"
           },
@@ -289,6 +310,9 @@
           "400": {
             "$ref": "#/components/responses/BadRequest"
           },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
           "403": {
             "$ref": "#/components/responses/Forbidden"
           },
@@ -302,6 +326,7 @@
       "get": {
         "operationId": "getOpenApiDocument",
         "summary": "This document",
+        "security": [],
         "responses": {
           "200": {
             "description": "The OpenAPI document of `/api/v1`. Kept by clients for a day and by the CDN until the next deploy.",
@@ -352,6 +377,7 @@
         "type": "string",
         "enum": [
           "invalid_input",
+          "unknown_client",
           "game_not_over",
           "cross_origin",
           "not_found",
@@ -802,6 +828,16 @@
           }
         }
       },
+      "Unauthorized": {
+        "description": "`unknown_client`: a call without an accepted `Trackdown-Client-Key` or a valid `Trackdown-App-Version`.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ApiError"
+            }
+          }
+        }
+      },
       "Forbidden": {
         "description": "`game_not_over`: a reveal before the game is over. `cross_origin`: a browser call from another origin.",
         "content": {
@@ -861,6 +897,20 @@
             }
           }
         }
+      }
+    },
+    "securitySchemes": {
+      "ClientKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Trackdown-Client-Key",
+        "description": "The app's client key, one the server accepts. It names the client, it is not a secret: a key is rotated or cut off on the server (docs/api.md#client-identification)."
+      },
+      "AppVersion": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Trackdown-App-Version",
+        "description": "The app's version, `major.minor` or `major.minor.patch`, such as `1.4.2`."
       }
     }
   }

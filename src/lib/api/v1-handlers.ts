@@ -4,6 +4,7 @@ import { ApiError } from "@/lib/api/api-error";
 import { openApiDocument, openApiInputSchema } from "@/lib/api/openapi";
 import {
     errorResponse,
+    guarded,
     rateLimited,
     restGet,
     restHandlers,
@@ -99,22 +100,28 @@ export const stationsHandlers = restHandlers({
 /**
  * `/api/v1/openapi.json`: the OpenAPI document the iOS app generates its
  * client from (docs/api.md#the-openapi-document). It only changes with a
- * deploy, so the CDN keeps it.
+ * deploy, so the CDN keeps it. It is the one route anyone may call without
+ * a client key (docs/api.md#client-identification): it holds no game data,
+ * and tooling such as the app's client generator reads it.
  */
-export const openApiHandlers = restHandlers({
-    GET: restGet(
-        openApiInputSchema,
-        () => Promise.resolve(openApiDocument),
-        "deploy",
-    ),
-});
+export const openApiHandlers = restHandlers(
+    {
+        GET: restGet(
+            openApiInputSchema,
+            () => Promise.resolve(openApiDocument),
+            "deploy",
+        ),
+    },
+    "anyone",
+);
 
 /**
  * Every path under `/api/v1` without an operation of its own: 404 in the
- * API's error format, not the site's not-found page.
+ * API's error format, not the site's not-found page. Guarded like an
+ * operation, so a call without a client key cannot tell which paths exist.
  */
 export const unknownOperationHandlers: { ANY: RestHandler } = {
-    ANY: ({ request }) =>
+    ANY: guarded(({ request }) =>
         Promise.resolve(
             errorResponse(
                 new ApiError(
@@ -123,4 +130,5 @@ export const unknownOperationHandlers: { ANY: RestHandler } = {
                 ),
             ),
         ),
+    ),
 };

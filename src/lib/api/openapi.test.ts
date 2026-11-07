@@ -1,7 +1,7 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
 import { Validator } from "@seriousme/openapi-schema-validator";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { apiErrorCodeSchema } from "@/lib/api/api-error";
 import {
     buildOpenApiDocument,
@@ -118,6 +118,30 @@ describe("the OpenAPI document", () => {
             ["get", "responses", "403", "$ref"],
             "#/components/responses/Forbidden",
         );
+        expect(pathItem("/api/v1/meta")).toHaveProperty(
+            ["get", "responses", "401", "$ref"],
+            "#/components/responses/Unauthorized",
+        );
+        expect(pathItem(openApiPath)).not.toHaveProperty([
+            "get",
+            "responses",
+            "401",
+        ]);
+    });
+
+    it("asks every operation but the document's for the client's two headers", () => {
+        expect(openApiDocument["security"]).toEqual([
+            { ClientKey: [], AppVersion: [] },
+        ]);
+        expect(openApiDocument).toHaveProperty(
+            ["components", "securitySchemes", "ClientKey", "name"],
+            "Trackdown-Client-Key",
+        );
+        expect(openApiDocument).toHaveProperty(
+            ["components", "securitySchemes", "AppVersion", "name"],
+            "Trackdown-App-Version",
+        );
+        expect(pathItem(openApiPath)).toHaveProperty(["get", "security"], []);
     });
 
     it("lets a client take a new field: no schema forbids extra properties", () => {
@@ -134,7 +158,9 @@ describe("the OpenAPI document", () => {
 });
 
 describe(`GET ${openApiPath}`, () => {
-    it("answers the document, kept until the next deploy", async () => {
+    it("answers the document without a client key, kept until the next deploy", async () => {
+        vi.stubEnv("TRACKDOWN_CLIENT_KEYS", undefined);
+
         const response = await openApiHandlers.GET({
             request: new Request(new URL(openApiPath, "http://localhost")),
             params: {},

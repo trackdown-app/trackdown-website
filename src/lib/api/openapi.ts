@@ -5,6 +5,7 @@ import {
     apiErrorStatus,
 } from "@/lib/api/api-error";
 import type { ApiErrorCode } from "@/lib/api/api-error";
+import { appVersionHeader, clientKeyHeader } from "@/lib/api/client-headers";
 import { trainTypeSchema } from "@/lib/data/data-schema";
 import { networkIdSchema } from "@/lib/data/networks";
 import {
@@ -237,7 +238,7 @@ type Operation = {
     cache: keyof typeof cacheDescription;
     /**
      * The errors of the operation itself; every operation can also answer
-     * `cross_origin` and `internal_error` (`commonErrors`).
+     * `unknown_client`, `cross_origin` and `internal_error` (`commonErrors`).
      */
     errors: ReadonlyArray<ApiErrorCode>;
 };
@@ -325,6 +326,7 @@ const operations: ReadonlyArray<Operation> = [
 
 const errorDescription: Record<ApiErrorCode, string> = {
     invalid_input: "the input does not match the operation's schema",
+    unknown_client: `a call without an accepted \`${clientKeyHeader}\` or a valid \`${appVersionHeader}\``,
     game_not_over: "a reveal before the game is over",
     cross_origin: "a browser call from another origin",
     not_found: "a puzzle that does not exist, or one after today's",
@@ -337,6 +339,7 @@ const errorDescription: Record<ApiErrorCode, string> = {
 /** The response component of each error status: several codes may share one. */
 const errorResponseName: Readonly<Record<number, string>> = {
     400: "BadRequest",
+    401: "Unauthorized",
     403: "Forbidden",
     404: "NotFound",
     405: "MethodNotAllowed",
@@ -493,7 +496,7 @@ function operationObject(operation: Operation): {
             description: cacheDescription[operation.cache],
             content: jsonContent({ $ref: componentRef(outputId(operation.output)) }),
         },
-        ...errorResponsesFor(operation.errors),
+        ...errorResponsesFor([...operation.errors, "unknown_client"]),
     };
 
     const object: JsonObject = {
@@ -542,6 +545,8 @@ export function buildOpenApiDocument(): JsonObject {
         get: {
             operationId: "getOpenApiDocument",
             summary: "This document",
+            // The one route anyone may call, without the client's headers.
+            security: [],
             responses: {
                 "200": {
                     description: `The OpenAPI document of \`/api/v1\`. ${cacheDescription.deploy.replace("The answer. ", "")}`,
@@ -558,14 +563,32 @@ export function buildOpenApiDocument(): JsonObject {
             title: "Trackdown API",
             version: "1",
             description:
-                "The API the Trackdown iOS app plays the daily puzzle through. Every error answers `ApiError` with the status of its code. See docs/api.md in trackdown-website.",
+                "The API the Trackdown iOS app plays the daily puzzle through. Every call but this document's names the app's client key and version in two headers (`ClientKey`, `AppVersion`), else it answers `unknown_client` (401). Every error answers `ApiError` with the status of its code. See docs/api.md in trackdown-website.",
         },
+        // Both headers on every operation; the document's own opts out.
+        security: [{ ClientKey: [], AppVersion: [] }],
         paths,
         components: {
             schemas: Object.fromEntries(
                 Object.entries(components).sort(([a], [b]) => a.localeCompare(b)),
             ),
             responses: errorResponses(),
+            securitySchemes: {
+                ClientKey: {
+                    type: "apiKey",
+                    in: "header",
+                    name: clientKeyHeader,
+                    description:
+                        "The app's client key, one the server accepts. It names the client, it is not a secret: a key is rotated or cut off on the server (docs/api.md#client-identification).",
+                },
+                AppVersion: {
+                    type: "apiKey",
+                    in: "header",
+                    name: appVersionHeader,
+                    description:
+                        "The app's version, `major.minor` or `major.minor.patch`, such as `1.4.2`.",
+                },
+            },
         },
     };
 }
