@@ -80,6 +80,11 @@ const changeMinPx = 30;
 const changeOverlapPx = 3;
 /** Half the mystery bar, which covers the end of the last ride. */
 const barHalfPx = 13;
+/**
+ * The least of a ride that shows between two changes, or between a change
+ * and the dot or the bar, so short rides never vanish under the rings.
+ */
+const minRideShowPx = 6;
 /** A label's width: Barlow bold at 13px, about 7.2px a character, plus padding. */
 const labelCharPx = 7.2;
 const labelPaddingPx = 10;
@@ -142,6 +147,11 @@ export type TripLineLayout = {
 
 const lines = [1, 2, 3] as const;
 
+/** The line colour of a trip's ride by its place, from 0: the three in turn. */
+export function rideLine(rideIndex: number): TripLineRide["line"] {
+    return lines[rideIndex % lines.length] ?? 1;
+}
+
 function labelPx(text: string): number {
     return text.length * labelCharPx + labelPaddingPx;
 }
@@ -192,7 +202,8 @@ export function tripLineLayout(
     trackPx: number = narrowTrackPx,
     scaleMinutes: number = trackMinutes,
 ): TripLineLayout {
-    const widthPercent = Math.min(
+    // The line's width by its minutes, before the changes are kept apart.
+    const scaledPercent = Math.min(
         100,
         Math.max(
             (minLinePx / trackPx) * 100,
@@ -201,8 +212,15 @@ export function tripLineLayout(
     );
     function percentOf(minutes: number): number {
         return guess.totalMinutes > 0
-            ? (minutes / guess.totalMinutes) * widthPercent
+            ? (minutes / guess.totalMinutes) * scaledPercent
             : 0;
+    }
+
+    function pxOf(percent: number): number {
+        return (percent / 100) * trackPx;
+    }
+    function percentOfPx(px: number): number {
+        return (px / trackPx) * 100;
     }
 
     // Minutes still to go to the mystery station, from the guess.
@@ -213,49 +231,80 @@ export function tripLineLayout(
         const startPercent = percentOf(remaining);
         remaining -= step.minutes;
         const endPercent = percentOf(remaining);
-        const previous = parts.at(-1);
 
         if (step.kind === "change") {
             const spanPercent = startPercent - endPercent;
             const widthPx = Math.max(
                 changeMinPx,
-                (spanPercent / 100) * trackPx + 2 * changeOverlapPx,
+                pxOf(spanPercent) + 2 * changeOverlapPx,
             );
-            // Its right end 3px over the next ride, its centre half its
-            // width back from there.
-            const atPercent =
-                endPercent + ((widthPx / 2 - changeOverlapPx) / trackPx) * 100;
-            // The ride before runs on under the pill to its centre.
-            if (previous?.kind === "ride") {
-                previous.drawEndPercent = atPercent;
-                previous.insetEndPx = widthPx / 2;
-            }
             parts.push({
                 kind: "change",
                 known: step.station != null,
-                atPercent,
+                // Its right end 3px over the next ride, its centre half its
+                // width back from there.
+                atPercent: endPercent + percentOfPx(widthPx / 2 - changeOverlapPx),
                 widthPx,
                 spanPercent,
             });
             continue;
         }
 
-        const after = previous?.kind === "change" ? previous : null;
         parts.push({
             kind: "ride",
             train: step.train,
             minutes: step.minutes,
-            line: lines[rideIndex % lines.length] ?? 1,
+            line: rideLine(rideIndex),
             startPercent,
             endPercent,
-            // It starts under the pill of the change before it, at its centre.
-            drawStartPercent: after?.atPercent ?? startPercent,
+            drawStartPercent: startPercent,
             drawEndPercent: endPercent,
-            insetStartPx: after == null ? dotHalfPx : after.widthPx / 2,
+            insetStartPx: dotHalfPx,
             insetEndPx: barHalfPx,
             label: null,
         });
         rideIndex += 1;
+    }
+
+    // Keep every change clear of the mystery bar and of the change after it,
+    // so a short ride between two changes still shows a bit of its colour
+    // and no ring hides another. Worked from the bar outwards: a change that
+    // would overlap moves away from the bar, and the guess dot moves past the
+    // farthest change. Only these short rides leave the scale.
+    let clearPx = barHalfPx + minRideShowPx;
+    for (const part of [...parts].reverse()) {
+        if (part.kind !== "change") {
+            continue;
+        }
+        const halfPx = part.widthPx / 2;
+        const atPx = Math.max(pxOf(part.atPercent), clearPx + halfPx);
+        part.atPercent = percentOfPx(atPx);
+        clearPx = atPx + halfPx + minRideShowPx;
+    }
+    const widthPercent = Math.min(
+        100,
+        Math.max(scaledPercent, percentOfPx(clearPx + dotHalfPx)),
+    );
+
+    // Each ride runs from the dot, or from under the pill of the change
+    // before it, to its centre, on to under the pill of the change after
+    // it, so the pills' rounded ends always cover the joins.
+    for (const [index, part] of parts.entries()) {
+        if (part.kind !== "ride") {
+            continue;
+        }
+        const before = parts[index - 1];
+        const after = parts[index + 1];
+        if (before?.kind === "change") {
+            part.drawStartPercent = before.atPercent;
+            part.insetStartPx = before.widthPx / 2;
+        } else {
+            part.drawStartPercent = widthPercent;
+        }
+        if (after?.kind === "change") {
+            part.drawEndPercent = after.atPercent;
+            part.insetEndPx = after.widthPx / 2;
+        }
     }
 
     for (const part of parts) {

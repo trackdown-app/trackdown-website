@@ -246,6 +246,50 @@ describe("tripLineLayout", () => {
         ]);
     });
 
+    it("keeps close changes apart, a bit of each short ride showing, and the dot past them", () => {
+        const trackPx = 1000;
+        // Thames Ditton's shape: four changes within a few minutes of each other.
+        const layout = tripLineLayout(
+            trip(
+                ride(2),
+                change("a", 2),
+                ride(3),
+                change("b", 2),
+                ride(1),
+                change("c", 3),
+                ride(8),
+                change("d", 4),
+                ride(72),
+            ),
+            format,
+            trackPx,
+            600,
+        );
+        function px(percent: number): number {
+            return (percent / 100) * trackPx;
+        }
+        const changes = layout.parts.filter((part) => part.kind === "change");
+
+        // From the bar outwards, each ring starts at least 6px past the one before.
+        let clearPx = 13;
+        for (const ring of [...changes].reverse()) {
+            expect(px(ring.atPercent) - ring.widthPx / 2).toBeGreaterThanOrEqual(
+                clearPx + 6 - 1e-9,
+            );
+            clearPx = px(ring.atPercent) + ring.widthPx / 2;
+        }
+        // The dot sits clear of the farthest ring, and every ride is drawn
+        // from its start to its end, never a negative width.
+        expect(px(layout.widthPercent) - 11).toBeGreaterThanOrEqual(
+            clearPx + 6 - 1e-9,
+        );
+        for (const part of layout.parts) {
+            if (part.kind === "ride") {
+                expect(part.drawStartPercent).toBeGreaterThan(part.drawEndPercent);
+            }
+        }
+    });
+
     it("marks a change hidden when its station is not named", () => {
         const parts = tripLineLayout(
             trip(ride(40), change(null, 5), ride(20)),

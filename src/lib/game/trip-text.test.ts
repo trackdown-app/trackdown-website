@@ -1,10 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { overwriteGetLocale } from "@/paraglide/runtime";
+import type { getLocale } from "@/paraglide/runtime";
+import type { TrainType } from "@/lib/data/data-schema";
 import type { ListedGuess } from "@/lib/game/trip-line";
 import {
     formatMinutes,
     spokenGuess,
     spokenMinutes,
+    trainName,
     tripSummary,
 } from "@/lib/game/trip-text";
 
@@ -23,6 +26,28 @@ const maastricht: ListedGuess = {
     ],
     totalMinutes: 145,
 };
+
+describe("trainName", () => {
+    it("names a Dutch train type in the page's language", () => {
+        overwriteGetLocale(() => "en");
+        expect(trainName("ST")).toBe("Stopping train");
+        overwriteGetLocale(() => "nl");
+        expect(trainName("ST")).toBe("Stoptrein");
+    });
+
+    it("names a British operator by its brand, in either language", () => {
+        const codes: TrainType[] = ["GR", "LD", "TL"];
+        const locales: ReturnType<typeof getLocale>[] = ["en", "nl"];
+        for (const locale of locales) {
+            overwriteGetLocale(() => locale);
+            expect(codes.map((code) => trainName(code))).toEqual([
+                "LNER",
+                "Lumo",
+                "Thameslink",
+            ]);
+        }
+    });
+});
 
 describe("formatMinutes", () => {
     it("writes hours and padded minutes, or minutes alone", () => {
