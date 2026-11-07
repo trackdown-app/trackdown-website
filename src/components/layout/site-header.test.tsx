@@ -42,6 +42,12 @@ describe("SiteHeader", () => {
         ]);
     });
 
+    it("marks the archive as the current page on one of its puzzles", async () => {
+        expect(currentPaths(await renderAt(SiteHeader, "/archief/3"))).toEqual([
+            "/archief",
+        ]);
+    });
+
     it("marks how to play as the current page on its route, in English too", async () => {
         overwriteGetLocale(() => "en");
 

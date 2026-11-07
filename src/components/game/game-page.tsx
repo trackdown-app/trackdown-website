@@ -16,8 +16,16 @@ import { spokenGuess } from "@/lib/game/trip-text";
 import { useGame } from "@/lib/game/use-game";
 
 type GamePageProps = {
-    /** The puzzle to play: the `todayPuzzle` operation's answer. */
-    puzzle: TodayPuzzleOutput;
+    /**
+     * The puzzle to play: the `todayPuzzle` operation's answer, or a puzzle
+     * of the archive with the rules' `maxGuesses`.
+     */
+    puzzle: Pick<TodayPuzzleOutput, "network" | "number" | "date" | "maxGuesses">;
+    /**
+     * Played from the archive, after the puzzle's own day: the question is
+     * in the past tense and the kept game does not count for the streak.
+     */
+    archive?: boolean;
     /** Every station a player can guess: the `stations` operation's answer. */
     stations: readonly StationOption[];
     /** Where the game is kept; the page's `localStorage` store unless a test hands its own. */
@@ -33,8 +41,14 @@ type GamePageProps = {
  * device. Once the game is over the page becomes the Web · Solved board:
  * the answer, how the player got there and the result to share (`GameOver`).
  */
-export function GamePage({ puzzle, stations, store, shareTarget }: GamePageProps) {
-    const game = useGame(puzzle, store);
+export function GamePage({
+    puzzle,
+    stations,
+    archive = false,
+    store,
+    shareTarget,
+}: GamePageProps) {
+    const game = useGame(puzzle, store, archive);
     const names = useMemo(
         () => new Map(stations.map((station) => [station.code, station.name])),
         [stations],
@@ -67,7 +81,7 @@ export function GamePage({ puzzle, stations, store, shareTarget }: GamePageProps
             {game.status === "playing" ? (
                 <>
                     <h1 className="max-w-[12em] font-condensed text-[clamp(44px,7vw,72px)] leading-[0.95] font-extrabold tracking-[-0.01em]">
-                        {m["game.title"]()}
+                        {archive ? m["game.archiveTitle"]() : m["game.title"]()}
                     </h1>
                     <p className="mt-5 max-w-[36em] text-[19px] leading-normal text-muted-foreground">
                         {m["game.intro"]()}
@@ -109,6 +123,7 @@ export function GamePage({ puzzle, stations, store, shareTarget }: GamePageProps
             ) : (
                 <GameOver
                     puzzle={puzzle}
+                    archive={archive}
                     stations={stations}
                     guesses={game.guesses}
                     status={game.status}

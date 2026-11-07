@@ -23,6 +23,8 @@ type GameOverProps = {
     guesses: readonly ListedGuess[];
     /** Found the station, or ran out of guesses. */
     status: "won" | "lost";
+    /** A puzzle of the archive: the plate is not "today's" answer. */
+    archive?: boolean;
     /** The guess that ended the game, when it was made on this page. */
     enteringGuess?: string | undefined;
     /** Where the result is shared; the browser's `navigator` unless a test hands its own. */
@@ -42,6 +44,7 @@ export function GameOver({
     stations,
     guesses,
     status,
+    archive = false,
     enteringGuess,
     shareTarget,
 }: GameOverProps) {
@@ -85,7 +88,9 @@ export function GameOver({
     return (
         <div className="flex flex-col gap-14">
             <section
-                aria-label={m["gameOver.label"]()}
+                aria-label={
+                    archive ? m["gameOver.archiveLabel"]() : m["gameOver.label"]()
+                }
                 className="flex flex-col gap-5"
             >
                 <AnswerPlate
