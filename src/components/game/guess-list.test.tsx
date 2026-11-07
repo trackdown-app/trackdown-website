@@ -142,7 +142,7 @@ describe("GuessList", () => {
             "ICIntercity1h 12m",
             "?Unknown station9m to change",
             "ICIntercity36m",
-            "?Mystery station",
+            "Mystery station",
         ]);
 
         fireEvent.click(button);

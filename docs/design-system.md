@@ -58,7 +58,7 @@ The `dark:` variant uses `data-theme="dark"`; a component rarely needs it becaus
 
 ### Contrast
 
-Every text colour passes 4.5:1 on every ground the design sets it on, in both modes. `src/lib/theme-contrast.test.ts` reads the values from `src/styles.css` and fails `bun run test` if a pair drops below that. The pairs are ink, muted, line 1 and the error red on bg, surface and soft, on-line on each line, on-action on action, bg on ink (the `NL` chip and the mystery `?`), and on-plate and plate-muted on plate. A new text colour, or a new ground for one, goes into that list.
+Every text colour passes 4.5:1 on every ground the design sets it on, in both modes. `src/lib/theme-contrast.test.ts` reads the values from `src/styles.css` and fails `bun run test` if a pair drops below that. The pairs are ink, muted, line 1 and the error red on bg, surface and soft, on-line on each line, on-action on action, bg on ink (the `NL` chip), and on-plate and plate-muted on plate. A new text colour, or a new ground for one, goes into that list.
 
 The lowest pairs are on-line on `line-3` in light (5.0:1) and line 1 on `soft` in dark (5.1:1).
 
