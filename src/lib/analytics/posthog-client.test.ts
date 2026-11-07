@@ -65,6 +65,40 @@ afterEach(async () => {
 
 describe("PostHog browser analytics with the real SDK", () => {
     it.each([null, { analytics: false }, { analytics: true }])(
+        "applies consent and privacy properties to explicit game events for %s",
+        async (consent) => {
+            const { posthog, events } = start(consent);
+            const properties = { network: "nl", puzzle_number: 142, archive: true };
+            posthog.capture("puzzle_started", properties);
+            posthog.capture("archive_puzzle_played", properties);
+            posthog.capture("guess_made", { ...properties, guess_number: 2 });
+            posthog.capture("puzzle_solved", { ...properties, guesses_used: 2 });
+            posthog.capture("puzzle_missed", { ...properties, guesses_used: 6 });
+            posthog.capture("result_shared", { ...properties, method: "copied" });
+            await vi.advanceTimersByTimeAsync(300);
+
+            const gameEvents = events.filter(
+                (event) => !event.event.startsWith("$"),
+            );
+            expect(gameEvents).toHaveLength(6);
+            for (const event of gameEvents) {
+                expect(event.properties).toMatchObject({
+                    ...properties,
+                    consent_analytics: consent?.analytics ?? null,
+                    consent_marketing: false,
+                    consent_version: CONSENT_TEXT_VERSION,
+                    $ip: null,
+                });
+            }
+            if (consent?.analytics !== true) {
+                expect(document.cookie).toBe("");
+                expect(localStorage.length).toBe(0);
+                expect(sessionStorage.length).toBe(0);
+            }
+        },
+    );
+
+    it.each([null, { analytics: false }, { analytics: true }])(
         "automatically captures clicks, form changes, submissions and pageleave for %s",
         async (consent) => {
             const { events } = start(consent);

@@ -1,6 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { useMemo, useSyncExternalStore } from "react";
 import type { StationCode } from "@/lib/data/data-schema";
+import { trackEvent } from "@/lib/analytics/posthog-client";
 import { submitGuessFn } from "@/lib/game/guess.functions";
 import {
     gameStatus,
@@ -54,6 +55,9 @@ export function useGame(
             if (current.guesses.some((kept) => kept.guess === answer.guess)) {
                 return;
             }
+            if (gameStatus(current.guesses, puzzle.maxGuesses) !== "playing") {
+                return;
+            }
             // The earlier trips again: a change this guess named shows on
             // them too.
             const again = new Map(
@@ -64,10 +68,31 @@ export function useGame(
                 return steps == null ? kept : { ...kept, steps };
             });
             // Once played in the archive, always an archive game.
-            store.write(
-                key,
-                serializeGame([...updated, answer], current.archive || archive),
-            );
+            const next = [...updated, answer];
+            store.write(key, serializeGame(next, current.archive || archive));
+
+            const properties = {
+                network: puzzle.network,
+                puzzle_number: puzzle.number,
+                archive: current.archive || archive,
+            };
+            if (current.guesses.length === 0) {
+                trackEvent("puzzle_started", properties);
+            }
+            if (archive && !current.archive) {
+                trackEvent("archive_puzzle_played", properties);
+            }
+            trackEvent("guess_made", {
+                ...properties,
+                guess_number: next.length,
+            });
+            const nextStatus = gameStatus(next, puzzle.maxGuesses);
+            if (nextStatus !== "playing") {
+                trackEvent(
+                    nextStatus === "won" ? "puzzle_solved" : "puzzle_missed",
+                    { ...properties, guesses_used: next.length },
+                );
+            }
         },
     });
 
