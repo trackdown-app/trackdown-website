@@ -28,6 +28,11 @@ type GuessRowProps = {
     scaleMinutes: number;
     /** A guess just made on this page: the row plays its arrival (docs/guess-list.md#a-new-guess). */
     entering?: boolean;
+    /**
+     * The finished game's list (Web · Solved): a tighter row without the time
+     * grid, and the correct guess on one line with "You're here" at the right.
+     */
+    revealed?: boolean;
 };
 
 /**
@@ -41,8 +46,35 @@ export function GuessRow({
     names,
     scaleMinutes,
     entering = false,
+    revealed = false,
 }: GuessRowProps) {
     const name = names.get(guess.guess) ?? guess.guess;
+    const spoken = (
+        <span className="sr-only">{spokenGuess(guess, number, names)}</span>
+    );
+    const numberLabel = (
+        <span className="w-3.5 flex-none text-[15px] font-semibold text-muted-foreground">
+            {number}
+        </span>
+    );
+
+    if (revealed && guess.correct) {
+        return (
+            <li className="flex min-h-20 items-center justify-between gap-4 border-b border-rule pr-10">
+                {spoken}
+                <div aria-hidden="true" className="flex items-baseline gap-3">
+                    {numberLabel}
+                    <span className="font-condensed text-[30px] leading-none font-bold">
+                        {name}
+                    </span>
+                </div>
+                <span aria-hidden="true" className="text-[15px] font-semibold">
+                    {m["guessList.found"]()}
+                </span>
+            </li>
+        );
+    }
+
     const summary = guess.correct
         ? m["guessList.found"]()
         : tripSummary(guess, names);
@@ -50,20 +82,27 @@ export function GuessRow({
     return (
         <li
             className={cn(
-                "flex min-h-[104px] flex-wrap gap-x-4 border-b border-rule",
+                "flex flex-wrap gap-x-4 border-b border-rule",
+                revealed ? "min-h-24" : "min-h-[104px]",
                 entering && "guess-enter",
             )}
         >
-            <span className="sr-only">{spokenGuess(guess, number, names)}</span>
+            {spoken}
             <div
                 aria-hidden="true"
-                className="flex max-w-[240px] flex-[1_1_240px] items-baseline gap-3 py-4"
+                className={cn(
+                    "flex max-w-[240px] flex-[1_1_240px] items-baseline gap-3",
+                    revealed ? "py-3.5" : "py-4",
+                )}
             >
-                <span className="w-3.5 flex-none text-[15px] font-semibold text-muted-foreground">
-                    {number}
-                </span>
+                {numberLabel}
                 <div className="min-w-0">
-                    <div className="font-condensed text-[30px] leading-none font-bold">
+                    <div
+                        className={cn(
+                            "font-condensed leading-none font-bold",
+                            revealed ? "text-[28px]" : "text-[30px]",
+                        )}
+                    >
                         {name}
                     </div>
                     <div className="mt-1.5 text-[15px] leading-[1.35] text-muted-foreground">
@@ -73,8 +112,11 @@ export function GuessRow({
             </div>
             <div
                 aria-hidden="true"
-                className="flex min-h-[72px] min-w-0 flex-[999_1_320px] items-center justify-end bg-clip-content bg-origin-content pr-3"
-                style={gridBackground(scaleMinutes)}
+                className={cn(
+                    "flex min-w-0 flex-[999_1_320px] items-center justify-end bg-clip-content bg-origin-content pr-3",
+                    revealed ? "min-h-16" : "min-h-[72px]",
+                )}
+                style={revealed ? undefined : gridBackground(scaleMinutes)}
             >
                 {!guess.correct && (
                     <TripLine guess={guess} scaleMinutes={scaleMinutes} />

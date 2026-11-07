@@ -1,6 +1,29 @@
 import { cn } from "@/lib/utils";
 
+/**
+ * The mark's colours: on the page, or on the answer plate, where the theme
+ * is turned over and the mystery station's bar is filled, found.
+ */
+const tones = {
+    page: {
+        line1: "stroke-line-1",
+        line2: "stroke-line-2",
+        dot: "fill-ink",
+        change: "fill-background stroke-ink",
+        bar: "fill-background stroke-ink",
+    },
+    plate: {
+        line1: "stroke-plate-line-1",
+        line2: "stroke-plate-line-2",
+        dot: "fill-on-plate",
+        change: "fill-plate stroke-on-plate",
+        bar: "fill-on-plate",
+    },
+};
+
 type LogoMarkProps = {
+    /** Where the mark sits: the page (the default) or the answer plate. */
+    tone?: keyof typeof tones;
     className?: string;
 };
 
@@ -10,7 +33,8 @@ type LogoMarkProps = {
  * the mystery station's bar. Drawn in the theme's tokens, so it follows dark
  * mode. Decorative: the wordmark beside it names the link.
  */
-export function LogoMark({ className }: LogoMarkProps) {
+export function LogoMark({ tone = "page", className }: LogoMarkProps) {
+    const colours = tones[tone];
     return (
         <svg
             viewBox="0 0 96 48"
@@ -20,17 +44,17 @@ export function LogoMark({ className }: LogoMarkProps) {
         >
             <path
                 d="M10 24 H44"
-                className="stroke-line-1"
+                className={colours.line1}
                 strokeWidth="8"
                 strokeLinecap="round"
             />
-            <path d="M52 24 H80" className="stroke-line-2" strokeWidth="8" />
-            <circle cx="10" cy="24" r="8" className="fill-ink" />
+            <path d="M52 24 H80" className={colours.line2} strokeWidth="8" />
+            <circle cx="10" cy="24" r="8" className={colours.dot} />
             <circle
                 cx="48"
                 cy="24"
                 r="8"
-                className="fill-background stroke-ink"
+                className={colours.change}
                 strokeWidth="4"
             />
             <rect
@@ -39,7 +63,7 @@ export function LogoMark({ className }: LogoMarkProps) {
                 width="16"
                 height="36"
                 rx="8"
-                className="fill-background stroke-ink"
+                className={colours.bar}
                 strokeWidth="4"
             />
         </svg>

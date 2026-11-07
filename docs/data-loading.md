@@ -23,7 +23,7 @@ function TracksIndex() {
 }
 ```
 
-The home page, the game, loads today's puzzle and the stations this way and sends each guess through a mutation ([game.md](game.md)). The game's operations (`metaQueryOptions`, `todayPuzzleQueryOptions`, `puzzleArchiveQueryOptions` and `stationsQueryOptions` so far) live in `src/lib/game/`, each with a service the server function calls ([api.md](api.md#the-pieces)).
+The home page, the game, loads today's puzzle and the stations this way, sends each guess through a mutation and reads the finished game's answer through a query ([game.md](game.md)). The game's operations (`metaQueryOptions`, `todayPuzzleQueryOptions`, `puzzleArchiveQueryOptions`, `stationsQueryOptions` and `revealQueryOptions` so far) live in `src/lib/game/`, each with a service the server function calls ([api.md](api.md#the-pieces)).
 
 ## The query client
 
@@ -44,6 +44,10 @@ The router keeps no loader data of its own after a preload (`defaultPreloadStale
 ## Changing data
 
 A server function that changes something is a `POST`, and the component calls it through a `useMutation` whose `mutationFn` calls the server function. The mutation holds the call's state (`isPending`, `isError`, `data`), so the component keeps none of its own. After it, the component invalidates the queries whose data the call changed.
+
+### A read sent as a POST
+
+The reveal (`revealAnswerFn`) is a `POST` only because a whole game's guesses travel in its body; it changes nothing. So it is read like any other read, through a factory, `revealQueryOptions` (`src/lib/game/reveal.queries.ts`), whose key holds the network, the puzzle and the guesses. The solved screen reads it with `useQuery` once the game is over ([game.md](game.md#solved-and-missed)); no loader fills it, because the server render has no game. The answer to the same game never changes, so it never goes stale.
 
 ## Devtools
 

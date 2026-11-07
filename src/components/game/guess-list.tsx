@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import type { ReactNode } from "react";
 import { m } from "@/paraglide/messages";
+import { cn } from "@/lib/utils";
 import { GuessRow } from "@/components/game/guess-row";
 import type { GuessableStation } from "@/lib/game/schemas";
 import { boardMinutes, gridMarks } from "@/lib/game/trip-line";
@@ -30,6 +31,12 @@ type GuessListProps = {
      * shows do not move.
      */
     enteringGuess?: string | undefined;
+    /**
+     * The finished game's list, from the design's Web · Solved board
+     * (docs/guess-list.md#revealed): headed "How you got there", every change
+     * named, the mystery bar filled and no time grid.
+     */
+    revealed?: boolean;
 };
 
 /**
@@ -43,6 +50,7 @@ export function GuessList({
     stations,
     progress,
     enteringGuess,
+    revealed = false,
 }: GuessListProps) {
     const names = useMemo(
         () => new Map(stations.map((station) => [station.code, station.name])),
@@ -59,22 +67,35 @@ export function GuessList({
     // One scale for every row: the same minutes, the same width.
     const scaleMinutes = boardMinutes(guesses);
 
+    const header = revealed ? (
+        <div className="flex flex-wrap items-baseline justify-between gap-4 pb-3">
+            <h2 className="font-condensed text-[32px] leading-tight font-bold">
+                {m["guessList.revealedTitle"]()}
+            </h2>
+            <p className="text-[15px] text-muted-foreground">
+                {m["guessList.revealedNote"]()}
+            </p>
+        </div>
+    ) : (
+        <div className="flex flex-wrap items-center justify-between gap-4 pb-2.5">
+            {progress}
+            <div className="ml-auto flex items-center gap-2.5">
+                <span className="text-[15px] font-semibold">
+                    {m["guessList.mysteryStation"]()}
+                </span>
+                <span
+                    aria-hidden="true"
+                    className="flex size-6 items-center justify-center rounded-full bg-ink text-[15px] font-extrabold text-background"
+                >
+                    ?
+                </span>
+            </div>
+        </div>
+    );
+
     return (
         <div className="flex flex-col">
-            <div className="flex flex-wrap items-center justify-between gap-4 pb-2.5">
-                {progress}
-                <div className="ml-auto flex items-center gap-2.5">
-                    <span className="text-[15px] font-semibold">
-                        {m["guessList.mysteryStation"]()}
-                    </span>
-                    <span
-                        aria-hidden="true"
-                        className="flex size-6 items-center justify-center rounded-full bg-ink text-[15px] font-extrabold text-background"
-                    >
-                        ?
-                    </span>
-                </div>
-            </div>
+            {header}
             <div className="relative">
                 <ol
                     aria-label={m["guessList.label"]()}
@@ -88,28 +109,37 @@ export function GuessList({
                             names={names}
                             scaleMinutes={scaleMinutes}
                             entering={guess.guess === enteringGuess}
+                            revealed={revealed}
                         />
                     ))}
                 </ol>
                 <span
                     aria-hidden="true"
-                    className="absolute top-[33px] right-0 bottom-[33px] z-2 w-[26px] rounded-[13px] border-4 border-ink bg-surface"
+                    className={cn(
+                        "absolute right-0 z-2 w-[26px] rounded-[13px]",
+                        // Found or missed, the mystery station is known: the bar fills.
+                        revealed
+                            ? "top-3.5 bottom-[30px] bg-ink"
+                            : "top-[33px] bottom-[33px] border-4 border-ink bg-surface",
+                    )}
                 />
             </div>
-            <div aria-hidden="true" className="flex flex-wrap gap-x-4">
-                <div className="max-w-[240px] flex-[1_1_240px]" />
-                <div className="relative mr-3 h-7 min-w-0 flex-[999_1_320px]">
-                    {gridMarks(scaleMinutes).map((mark) => (
-                        <span
-                            key={mark.minutes}
-                            className="absolute top-2 translate-x-1/2 text-[13px] text-muted-foreground transition-[right] duration-500 motion-reduce:transition-none"
-                            style={{ right: `${mark.percent}%` }}
-                        >
-                            {gridLabel(mark.minutes)}
-                        </span>
-                    ))}
+            {!revealed && (
+                <div aria-hidden="true" className="flex flex-wrap gap-x-4">
+                    <div className="max-w-[240px] flex-[1_1_240px]" />
+                    <div className="relative mr-3 h-7 min-w-0 flex-[999_1_320px]">
+                        {gridMarks(scaleMinutes).map((mark) => (
+                            <span
+                                key={mark.minutes}
+                                className="absolute top-2 translate-x-1/2 text-[13px] text-muted-foreground transition-[right] duration-500 motion-reduce:transition-none"
+                                style={{ right: `${mark.percent}%` }}
+                            >
+                                {gridLabel(mark.minutes)}
+                            </span>
+                        ))}
+                    </div>
                 </div>
-            </div>
+            )}
         </div>
     );
 }
