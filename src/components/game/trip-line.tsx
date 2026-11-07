@@ -1,6 +1,8 @@
 import { useRef } from "react";
 import type { CSSProperties } from "react";
 import {
+    changeMinPx,
+    changeOverlapPx,
     narrowTrackPx,
     trainReachesMs,
     tripLineLayout,
@@ -28,10 +30,10 @@ const marker = `absolute top-1/2 z-1 -translate-y-1/2 translate-x-1/2 rounded-fu
 
 /**
  * One guess's trip as the design draws it (Web · Playing): the guess dot,
- * then each ride in its line colour with a ring at each change, every
- * minute as wide as on every other row. The rides run under the dot and the
- * rings, so the line is unbroken, and end at the right edge, under the
- * list's mystery bar. The labels are sized for the track as measured.
+ * then each ride in its line colour, every minute as wide as on every other
+ * row, and at each change a ring that stretches into a pill as long as the
+ * wait. The dot and the pills reach over the rides beside them, so the line
+ * is unbroken; it ends at the right edge, under the list's mystery bar. The labels are sized for the track as measured.
  * Drawn only: the row carries the trip in words for a screen reader.
  *
  * It carries the classes and timings of a new guess's animation
@@ -86,12 +88,16 @@ export function TripLine({
                 }
                 const ringStyle: CSSProperties & Record<`--${string}`, string> = {
                     right: `${part.atPercent}%`,
-                    "--ring-delay": `${trainReachesMs(layout.widthPercent, part.atPercent)}ms`,
+                    // As long as the wait, reaching a little over each ride,
+                    // and never smaller than the 30px ring.
+                    width: `max(${changeMinPx}px, calc(${part.spanPercent}% + ${2 * changeOverlapPx}px))`,
+                    // Drops in as the train arrives at the station.
+                    "--ring-delay": `${trainReachesMs(layout.widthPercent, part.atPercent + part.spanPercent / 2)}ms`,
                 };
                 return (
                     <span
                         key={index}
-                        className={`trip-ring ${marker} flex size-[30px] items-center justify-center border-4 border-ink bg-surface text-[14px] leading-none font-extrabold text-ink`}
+                        className={`trip-ring ${marker} flex h-[30px] items-center justify-center border-4 border-ink bg-surface text-[14px] leading-none font-extrabold text-ink`}
                         style={ringStyle}
                     >
                         {part.known ? null : "?"}

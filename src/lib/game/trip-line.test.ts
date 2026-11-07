@@ -83,12 +83,15 @@ describe("tripLineLayout", () => {
         expect(lastRide(direct)).toBeCloseTo((29 / 210) * 100);
     });
 
-    it("places each ride by its minutes, the wait at a change in the ride before", () => {
+    it("places each ride by its own minutes, and each change over its wait", () => {
+        // 117 minutes on 150: a minute is 2/3 of a percent.
         const layout = tripLineLayout(
             trip(ride(72), change("asd", 9), ride(36)),
             format,
         );
 
+        // The 9-minute wait is 6%, 20.4px on 340px: the 30px ring reaches
+        // 4.8px over each ride.
         expect(layout.parts).toEqual([
             {
                 kind: "ride",
@@ -96,24 +99,60 @@ describe("tripLineLayout", () => {
                 minutes: 72,
                 line: 1,
                 startPercent: 78,
-                endPercent: 24,
+                endPercent: expect.closeTo(30),
                 insetStartPx: 11,
-                insetEndPx: 15,
+                insetEndPx: expect.closeTo(4.8),
                 label: "IC 1h 12m",
             },
-            { kind: "change", known: true, atPercent: 24 },
+            {
+                kind: "change",
+                known: true,
+                atPercent: expect.closeTo(27),
+                spanPercent: expect.closeTo(6),
+            },
             {
                 kind: "ride",
                 train: "IC",
                 minutes: 36,
                 line: 2,
-                startPercent: 24,
+                startPercent: expect.closeTo(24),
                 endPercent: 0,
-                insetStartPx: 15,
+                insetStartPx: expect.closeTo(4.8),
                 insetEndPx: 13,
                 label: "IC 36m",
             },
         ]);
+    });
+
+    it("keeps a ride its own width whatever the wait after it", () => {
+        // The design review's case: IC 37m to Utrecht with a 3-minute wait
+        // (Rotterdam) and with a 17-minute one (Vlissingen).
+        function ic37(layout: ReturnType<typeof tripLineLayout>): number {
+            const part = layout.parts.find(
+                (candidate) => candidate.kind === "ride" && candidate.minutes === 37,
+            );
+            return part?.kind === "ride" ? part.startPercent - part.endPercent : 0;
+        }
+        const short = tripLineLayout(
+            trip(ride(37), change(null, 3), ride(29)),
+            format,
+            1000,
+            210,
+        );
+        const long = tripLineLayout(
+            trip(ride(88), change("rtd", 12), ride(37), change(null, 17), ride(29)),
+            format,
+            1000,
+            210,
+        );
+
+        expect(ic37(short)).toBeCloseTo((37 / 210) * 100);
+        expect(ic37(long)).toBeCloseTo((37 / 210) * 100);
+        // The long wait is a pill as long as its 17 minutes.
+        expect(long.parts[3]).toMatchObject({
+            kind: "change",
+            spanPercent: expect.closeTo((17 / 210) * 100),
+        });
     });
 
     it("draws the same minutes the same width, with a change before them or not", () => {

@@ -74,8 +74,10 @@ export function boardMinutes(
 export const narrowTrackPx = 340;
 /** Half the guess dot, which covers the start of the first ride. */
 const dotHalfPx = 11;
-/** Half a change ring, which covers the end of one ride and the start of the next. */
-const ringHalfPx = 15;
+/** A change's ring at its smallest, for a short wait. */
+export const changeMinPx = 30;
+/** How far a change's pill reaches over each ride beside it, at the least. */
+export const changeOverlapPx = 3;
 /** Half the mystery bar, which covers the end of the last ride. */
 const barHalfPx = 13;
 /** A label's width: Barlow bold at 13px, about 7.2px a character, plus padding. */
@@ -104,15 +106,23 @@ export type TripLineRide = {
 };
 
 /**
- * One change of the line: a ring where the next ride starts, empty when its
- * station is known.
+ * One change of the line: the station, drawn as a pill as long as the wait
+ * between the two rides, a 30px ring for a short one, as a metro map draws
+ * an interchange. Empty when its station is known.
  */
 export type TripLineChange = {
     kind: "change";
     known: boolean;
-    /** The ring's centre, in percent of the track from the right. */
+    /** The wait's middle, the pill's centre, in percent of the track from the right. */
     atPercent: number;
+    /** The wait's length, in percent of the track. */
+    spanPercent: number;
 };
+
+/** How far a change's pill covers each ride beside it, for a wait `waitPx` long. */
+function changeInsetPx(waitPx: number): number {
+    return Math.max(changeOverlapPx, (changeMinPx - waitPx) / 2);
+}
 
 export type TripLineLayout = {
     /** The line's width, and the guess dot's centre, in percent of the track from the right. */
@@ -160,8 +170,8 @@ export function trainReachesMs(widthPercent: number, atPercent: number): number 
  * `scaleMinutes` (the board's, `boardMinutes`). Every minute takes the same
  * width, so a ride is as wide as it is long on every row, and the grid
  * behind it reads true. The guess dot sits at the trip's total time; each
- * change ring sits where the next ride starts, the change's own minutes
- * drawn in the colour of the ride before it. Only a line shorter than 48px
+ * change is a pill over its own minutes, the wait, so a ride is only ever
+ * its own minutes long, whatever the wait after it. Only a line shorter than 48px
  * is stretched to that, so its dot shows beside the mystery bar.
  * `formatMinutes` writes a time the way the label shows it, such as
  * `2h 02m`.
@@ -196,15 +206,16 @@ export function tripLineLayout(
         const previous = parts.at(-1);
 
         if (step.kind === "change") {
-            // The wait at the change runs on in the ride before it.
+            const spanPercent = startPercent - endPercent;
+            // The pill reaches over the end of the ride before it.
             if (previous?.kind === "ride") {
-                previous.endPercent = endPercent;
-                previous.insetEndPx = ringHalfPx;
+                previous.insetEndPx = changeInsetPx((spanPercent / 100) * trackPx);
             }
             parts.push({
                 kind: "change",
                 known: step.station != null,
-                atPercent: endPercent,
+                atPercent: (startPercent + endPercent) / 2,
+                spanPercent,
             });
             continue;
         }
@@ -216,7 +227,10 @@ export function tripLineLayout(
             line: lines[rideIndex % lines.length] ?? 1,
             startPercent,
             endPercent,
-            insetStartPx: previous == null ? dotHalfPx : ringHalfPx,
+            insetStartPx:
+                previous?.kind === "change"
+                    ? changeInsetPx((previous.spanPercent / 100) * trackPx)
+                    : dotHalfPx,
             insetEndPx: barHalfPx,
             label: null,
         });
