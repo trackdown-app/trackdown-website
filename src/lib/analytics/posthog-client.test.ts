@@ -41,14 +41,16 @@ beforeEach(() => {
     request.mockClear();
     vi.useFakeTimers();
     vi.spyOn(document, "visibilityState", "get").mockReturnValue("visible");
+    vi.spyOn(navigator, "sendBeacon").mockReturnValue(true);
     window.history.replaceState({}, "", "/");
 });
 
-afterEach(() => {
-    vi.restoreAllMocks();
+afterEach(async () => {
     for (const posthog of instances.splice(0)) {
         posthog.set_config({ capture_pageview: false, disable_persistence: true });
+        await posthog.shutdown();
     }
+    vi.restoreAllMocks();
     // SDK history wrappers survive shutdown. Each test represents a new document.
     window.history.pushState = originalPushState;
     window.history.replaceState = originalReplaceState;
@@ -57,10 +59,59 @@ afterEach(() => {
         "trackdown-consent=; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Path=/";
     localStorage.clear();
     sessionStorage.clear();
+    document.body.replaceChildren();
     vi.useRealTimers();
 });
 
 describe("PostHog browser analytics with the real SDK", () => {
+    it.each([null, { analytics: false }, { analytics: true }])(
+        "automatically captures clicks, form changes, submissions and pageleave for %s",
+        async (consent) => {
+            const { events } = start(consent);
+            await vi.advanceTimersByTimeAsync(300);
+
+            const button = document.createElement("button");
+            button.textContent = "Open statistics";
+            const form = document.createElement("form");
+            const input = document.createElement("input");
+            input.value = "Private typed value";
+            form.append(input);
+            document.body.append(button, form);
+
+            button.click();
+            input.dispatchEvent(new Event("change", { bubbles: true }));
+            form.dispatchEvent(new Event("submit", { bubbles: true }));
+            window.dispatchEvent(new Event("pagehide"));
+            await vi.advanceTimersByTimeAsync(300);
+
+            const interactions = events.filter(
+                (event) => event.event === "$autocapture",
+            );
+            expect(
+                interactions.map((event) => event.properties["$event_type"]),
+            ).toEqual(["click", "change", "submit"]);
+            expect(events.some((event) => event.event === "$pageleave")).toBe(true);
+            for (const event of interactions) {
+                expect(event.properties).toMatchObject({
+                    consent_analytics: consent?.analytics ?? null,
+                    consent_marketing: false,
+                    consent_version: CONSENT_TEXT_VERSION,
+                });
+                expect(JSON.stringify(event)).not.toContain("Private typed value");
+            }
+            if (consent?.analytics !== true) {
+                expect(JSON.stringify(interactions)).not.toContain(
+                    "Open statistics",
+                );
+                expect(document.cookie).toBe("");
+                expect(localStorage.length).toBe(0);
+                expect(sessionStorage.length).toBe(0);
+            } else {
+                expect(JSON.stringify(interactions)).toContain("Open statistics");
+            }
+        },
+    );
+
     it.each([null, { analytics: false }])(
         "captures the initial and client navigation pageviews without persistence for %s",
         async (consent) => {

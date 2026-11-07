@@ -70,8 +70,8 @@ export function posthogOptions(
         cross_subdomain_cookie: false,
         person_profiles: "never",
         capture_pageview: "history_change",
-        capture_pageleave: false,
-        autocapture: false,
+        capture_pageleave: true,
+        autocapture: true,
         capture_dead_clicks: false,
         capture_exceptions: false,
         capture_heatmaps: false,
@@ -87,10 +87,19 @@ export function posthogOptions(
                 ...result,
                 properties: {
                     ...Object.fromEntries(
-                        Object.entries(result.properties).map(([key, value]) => [
-                            key,
-                            sanitize(value),
-                        ]),
+                        Object.entries(result.properties)
+                            // Like SkoonHome, cookieless events omit DOM text,
+                            // attributes and element chains before consent.
+                            .filter(
+                                ([key]) =>
+                                    accepted ||
+                                    ![
+                                        "$elements",
+                                        "$elements_chain",
+                                        "$el_text",
+                                    ].includes(key),
+                            )
+                            .map(([key, value]) => [key, sanitize(value)]),
                     ),
                     environment: import.meta.env.MODE,
                     consent_analytics: consent?.analytics ?? null,
