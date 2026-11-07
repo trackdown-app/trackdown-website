@@ -6,13 +6,18 @@ import {
     operationAttributes,
 } from "@/lib/logging/attributes";
 import { withSpan } from "@/lib/logging/tracing";
+import { annotateRequest, requestLogContext } from "@/lib/logging/request-metadata";
 
 /** All server functions, including calls from SSR loaders; never record results. */
 export const serverFunctionSpan = createMiddleware({ type: "function" }).server(
     ({ next, serverFnMeta, data }) => {
         const parsed = functionNameSchema.safeParse(serverFnMeta.name);
         const name = parsed.success ? parsed.data : "unknown";
-        trace.getActiveSpan()?.setAttribute("code.function.name", name);
+        if (requestLogContext.getStore()?.["request.kind"] === "server-function") {
+            annotateRequest({ "code.function.name": name });
+            trace.getActiveSpan()?.setAttribute("code.function.name", name);
+        }
+        annotateRequest(operationAttributes(data));
         return withSpan(
             `server function ${name}`,
             {
@@ -30,6 +35,7 @@ export const serverFunctionSpan = createMiddleware({ type: "function" }).server(
                 } else {
                     if ("result" in result) {
                         span.setAttributes(operationAttributes(result.result));
+                        annotateRequest(operationAttributes(result.result));
                     }
                     span.setAttribute("trackdown.outcome", "ok");
                 }

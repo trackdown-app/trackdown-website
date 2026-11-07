@@ -1,6 +1,15 @@
 import { z } from "zod";
+import { AsyncLocalStorage } from "node:async_hooks";
 import { operationAttributes, routeSchema } from "@/lib/logging/attributes";
 import type { TelemetryAttributes } from "@/lib/logging/attributes";
+
+/** Safe metadata learned by REST handlers and SSR loaders in this request only. */
+export const requestLogContext = new AsyncLocalStorage<TelemetryAttributes>();
+
+export function annotateRequest(attributes: TelemetryAttributes): void {
+    const current = requestLogContext.getStore();
+    if (current != null) Object.assign(current, attributes);
+}
 
 /** Match only known routes; never keep the original URL or query string. */
 export function requestAttributes(request: Request): TelemetryAttributes {

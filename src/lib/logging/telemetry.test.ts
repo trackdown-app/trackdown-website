@@ -10,7 +10,7 @@ import {
     safeAttributes,
 } from "@/lib/logging/attributes";
 import { createLogger } from "@/lib/logging/logger";
-import { requestAttributes } from "@/lib/logging/request-metadata";
+import { annotateRequest, requestAttributes } from "@/lib/logging/request-metadata";
 import { traceRequest } from "@/lib/logging/request-span";
 import {
     posthogLogsEndpoint,
@@ -186,9 +186,77 @@ describe("request lifecycle", () => {
             records().find((record) => record.instrumentationScope.name === "api")
                 ?.spanContext?.spanId,
         ).toBe(child?.spanContext().spanId);
+        expect(
+            records().find((record) => record.instrumentationScope.name === "http")
+                ?.body,
+        ).toMatch(
+            /^POST \/api\/v1\/\{network\}\/puzzles\/\{number\}\/guesses 200 \(\d+ ms\) network=nl puzzle=42$/,
+        );
         expect(JSON.stringify({ spans: spans(), logs: records() })).not.toMatch(
             /secret|private response body|guess=/,
         );
+    });
+
+    it("isolates metadata and exports every concurrent request", async () => {
+        startTelemetry();
+        await Promise.all([
+            traceRequest(
+                new Request("https://trackdown.test/api/v1/meta"),
+                async () => {
+                    annotateRequest({
+                        "trackdown.network": "nl",
+                        "trackdown.puzzle.number": 7,
+                    });
+                    await Promise.resolve();
+                    return new Response(null, { status: 204 });
+                },
+            ),
+            traceRequest(new Request("https://trackdown.test/archief"), async () => {
+                annotateRequest({
+                    "trackdown.network": "nl",
+                    "trackdown.puzzle.number": 8,
+                });
+                await Promise.resolve();
+                return new Response(null, { status: 204 });
+            }),
+        ]);
+        await background();
+        const messages = records()
+            .filter((record) => record.instrumentationScope.name === "http")
+            .map((record) => record.body);
+        expect(messages).toEqual(
+            expect.arrayContaining([
+                expect.stringMatching(
+                    /^GET \/api\/v1\/meta 204 \(\d+ ms\) network=nl puzzle=7$/,
+                ),
+                expect.stringMatching(
+                    /^GET \/archief 204 \(\d+ ms\) network=nl puzzle=8$/,
+                ),
+            ]),
+        );
+    });
+
+    it("shows known function names and keeps payload fields out of the message", async () => {
+        startTelemetry();
+        createLogger("http").request(
+            "info",
+            safeAttributes({
+                "http.request.method": "POST",
+                "code.function.name": "submitGuessFn",
+                "http.response.status_code": 200,
+                "http.server.request.duration_ms": 12.4,
+                "trackdown.network": "nl",
+                "trackdown.puzzle.number": 42,
+                guess: "secret",
+                station: "Ut",
+            }),
+        );
+        await globalThis.trackdownTelemetry?.flush();
+        expect(
+            records().find((record) => record.instrumentationScope.name === "http")
+                ?.body,
+        ).toBe("POST submitGuessFn 200 (12 ms) network=nl puzzle=42");
+        expect(JSON.stringify(records())).not.toMatch(/secret|Ut/);
     });
 
     it("flushes a thrown failure and never records its message or data", async () => {

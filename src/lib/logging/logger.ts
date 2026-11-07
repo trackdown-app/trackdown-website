@@ -24,15 +24,17 @@ export function consoleOutput(): Output {
     return globalThis.trackdownConsoleOutput ?? console;
 }
 
-/** Fixed messages and approved metadata only, including on the local console. */
+/** Fixed application messages and approved request details, including on the console. */
 export function createLogger(scope: Scope) {
     function write(
         level: Level,
         message: Message,
         attributes: TelemetryAttributes = {},
+        request = false,
     ) {
         const approved = safeAttributes(attributes);
-        consoleOutput()[level](`[${scope}] ${message}`, approved);
+        const body = request ? requestMessage(approved) : message;
+        consoleOutput()[level](`[${scope}] ${body}`, approved);
         logs.getLogger(scope).emit({
             severityText: level,
             severityNumber: {
@@ -40,7 +42,7 @@ export function createLogger(scope: Scope) {
                 warn: SeverityNumber.WARN,
                 error: SeverityNumber.ERROR,
             }[level],
-            body: message,
+            body,
             attributes: approved,
         });
     }
@@ -51,7 +53,21 @@ export function createLogger(scope: Scope) {
             write("warn", message, attributes),
         error: (message: Message, attributes?: TelemetryAttributes) =>
             write("error", message, attributes),
+        request: (level: Level, attributes: TelemetryAttributes) =>
+            write(level, "Request completed", attributes, true),
     };
+}
+
+/** Only validated operational values enter the access-log message. */
+function requestMessage(attributes: TelemetryAttributes): string {
+    const method = attributes["http.request.method"] ?? "OTHER";
+    const target =
+        attributes["code.function.name"] ?? attributes["http.route"] ?? "unknown";
+    const status = attributes["http.response.status_code"] ?? "failed";
+    const duration = attributes["http.server.request.duration_ms"];
+    const network = attributes["trackdown.network"];
+    const number = attributes["trackdown.puzzle.number"];
+    return `${method} ${target} ${status}${duration == null ? "" : ` (${Math.round(duration)} ms)`}${network == null ? "" : ` network=${network}`}${number == null ? "" : ` puzzle=${number}`}`;
 }
 
 /** Framework errors can embed input or game files. Suppress all original arguments. */

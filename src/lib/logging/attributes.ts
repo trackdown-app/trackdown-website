@@ -53,7 +53,7 @@ const attributesSchema = z.object({
 export type TelemetryAttributes = z.output<typeof attributesSchema>;
 
 /** Last boundary before console output or the span batch; unknown fields disappear. */
-export function safeAttributes(attributes: Attributes): Attributes {
+export function safeAttributes(attributes: Attributes): TelemetryAttributes {
     const parsed = attributesSchema.safeParse(attributes);
     return parsed.success ? parsed.data : {};
 }

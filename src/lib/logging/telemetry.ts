@@ -129,15 +129,24 @@ export function startTelemetry(): Telemetry {
         requireParentforSpans: true,
     });
     instrumentation.setTracerProvider(tracerProvider);
-    globalThis.trackdownTelemetry = {
-        flush: async () => {
+    // The log processor skips forceFlush while another flush is running.
+    // Queue requests so each flush also drains records added during its predecessor.
+    let previousFlush = Promise.resolve();
+    function flush(): Promise<void> {
+        const current = previousFlush.then(async () => {
             await Promise.all([
                 loggerProvider.forceFlush(),
                 tracerProvider.forceFlush(),
             ]);
-        },
+        });
+        previousFlush = current.catch(() => {});
+        return current;
+    }
+    globalThis.trackdownTelemetry = {
+        flush,
         shutdown: async () => {
             instrumentation.disable();
+            await previousFlush;
             await Promise.all([
                 loggerProvider.shutdown(),
                 tracerProvider.shutdown(),
