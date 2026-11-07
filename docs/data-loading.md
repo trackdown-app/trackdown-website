@@ -1,6 +1,6 @@
 # Data loading
 
-Every read the site makes, from a route's loader or from the browser, and every change it sends goes through a server function and TanStack Query. The browser never calls an API of its own: no `fetch` to a URL, no server route that answers JSON.
+Every read the site makes, from a route's loader or from the browser, and every change it sends goes through a server function and TanStack Query. The browser never calls an API of its own: no `fetch` to a URL. The REST routes under `/api/v1` are for the iOS app; they call the same services as the server functions ([api.md](api.md)).
 
 ## The pieces
 
@@ -23,7 +23,7 @@ function TracksIndex() {
 }
 ```
 
-No route reads data yet; the home page is a placeholder.
+No page reads data yet; the home page is a placeholder. The game's operations (`metaQueryOptions` so far) live in `src/lib/game/`, each with a service the server function calls ([api.md](api.md#the-pieces)).
 
 ## The query client
 
