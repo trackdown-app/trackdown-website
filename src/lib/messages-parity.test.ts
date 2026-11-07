@@ -13,7 +13,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
     return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
-/** Flattens nested message objects to the dotted ids Paraglide compiles, e.g. `home.comingSoon`. */
+/** Flattens nested message objects to the dotted ids Paraglide compiles, e.g. `game.title`. */
 function collectMessagePaths(node: Record<string, unknown>, prefix = ""): string[] {
     return Object.entries(node).flatMap(([key, value]) => {
         const path = prefix === "" ? key : `${prefix}.${key}`;

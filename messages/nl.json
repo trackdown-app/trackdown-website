@@ -3,8 +3,18 @@
     "site": {
         "name": "Trackdown"
     },
-    "home": {
-        "comingSoon": "Binnenkort beschikbaar."
+    "game": {
+        "dateLine": "{date}, puzzel {number}",
+        "title": "Welk station is het mysterie van vandaag?",
+        "intro": "Raad een station. Wij tekenen de snelste treinreis van daar naar het mysteriestation. Hoe korter de lijn, hoe dichter je bij bent.",
+        "won": "Je hebt hem gevonden in {count} van {total}.",
+        "lost": "Geen gokken meer. Om middernacht komt er een nieuw mysteriestation.",
+        "guessFailed": "Die gok kwam niet door. Probeer het opnieuw."
+    },
+    "progress": {
+        "playing": "Gok {number} van {total}, nieuwste eerst",
+        "won": "Gevonden in {count} van {total}, nieuwste eerst",
+        "lost": "Alle {total} gokken gebruikt, nieuwste eerst"
     },
     "stationSearch": {
         "label": "Raad een station",

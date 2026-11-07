@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import type { ReactNode } from "react";
 import { m } from "@/paraglide/messages";
 import { GuessRow } from "@/components/game/guess-row";
 import type { GuessableStation } from "@/lib/game/schemas";
@@ -9,6 +10,8 @@ type GuessListProps = {
     guesses: readonly ListedGuess[];
     /** The network's stations, to name the guesses and the known changes. */
     stations: readonly Pick<GuessableStation, "code" | "name">[];
+    /** What the header row shows at the left, opposite "Mystery station": the game's progress. */
+    progress?: ReactNode;
 };
 
 /**
@@ -17,7 +20,7 @@ type GuessListProps = {
  * the mystery bar at the right, over a 30-minute time grid. Renders nothing
  * before the first guess.
  */
-export function GuessList({ guesses, stations }: GuessListProps) {
+export function GuessList({ guesses, stations, progress }: GuessListProps) {
     const names = useMemo(
         () => new Map(stations.map((station) => [station.code, station.name])),
         [stations],
@@ -40,16 +43,19 @@ export function GuessList({ guesses, stations }: GuessListProps) {
 
     return (
         <div className="flex flex-col">
-            <div className="flex items-center justify-end gap-2.5 pb-2.5">
-                <span className="text-[15px] font-semibold">
-                    {m["guessList.mysteryStation"]()}
-                </span>
-                <span
-                    aria-hidden="true"
-                    className="flex size-6 items-center justify-center rounded-full bg-ink text-[15px] font-extrabold text-background"
-                >
-                    ?
-                </span>
+            <div className="flex flex-wrap items-center justify-between gap-4 pb-2.5">
+                {progress}
+                <div className="ml-auto flex items-center gap-2.5">
+                    <span className="text-[15px] font-semibold">
+                        {m["guessList.mysteryStation"]()}
+                    </span>
+                    <span
+                        aria-hidden="true"
+                        className="flex size-6 items-center justify-center rounded-full bg-ink text-[15px] font-extrabold text-background"
+                    >
+                        ?
+                    </span>
+                </div>
             </div>
             <div className="relative">
                 <ol

@@ -2,7 +2,7 @@
 
 `GuessList` (`src/components/game/guess-list.tsx`) is the list of guesses on the design's Web · Playing board: one row per guess, newest first, with the trip from the guessed station to the mystery station drawn as a line. The shorter the line, the closer the guess.
 
-No page shows it yet: the game page, still to come, mounts it with the game's state, and names `GameLegend` as its footer legend.
+The game page mounts it with the game's state, with the progress dots in its header row, and names `GameLegend` as its footer legend ([game.md](game.md)).
 
 ## Props
 
@@ -10,6 +10,7 @@ No page shows it yet: the game page, still to come, mounts it with the game's st
 | --- | --- |
 | `guesses` | The guesses so far, oldest first: each `guess` operation's answer ([api.md](api.md#a-guess)), or the `reveal` operation's guesses. Only `guess`, `correct`, `steps` and `totalMinutes` are read (`ListedGuess` in `src/lib/game/trip-line.ts`) |
 | `stations` | The network's stations (`code` and `name`), to name each guess and each known change. A code it does not know shows as the code |
+| `progress` | Optional. What the header row shows at the left, opposite "Mystery station": the game page's progress dots |
 
 Before the first guess the list renders nothing.
 

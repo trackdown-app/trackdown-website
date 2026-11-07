@@ -2,7 +2,7 @@
 
 `StationSearch` (`src/components/game/station-search.tsx`) is the guess input of the design's Web · Playing board: a search box with the Guess button, and below it the stations the typed text matches. A player types part of a name, picks a station from the list and guesses it.
 
-No page shows it yet: the game page, still to come, mounts it with the game's state.
+The game page mounts it with the game's state ([game.md](game.md)).
 
 ## Props
 
