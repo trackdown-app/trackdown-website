@@ -15,6 +15,8 @@ import type { GameStore } from "@/lib/game/game-store";
 import type {
     GuessInput,
     GuessOutput,
+    PuzzleArchiveInput,
+    PuzzleArchiveOutput,
     RevealInput,
     RevealOutput,
 } from "@/lib/game/schemas";
@@ -30,6 +32,13 @@ const { revealAnswerFn } = vi.hoisted(() => ({
         vi.fn<(options: { data: RevealInput }) => Promise<RevealOutput>>(),
 }));
 vi.mock("@/lib/game/reveal.functions", () => ({ revealAnswerFn }));
+const { getPuzzleArchiveFn } = vi.hoisted(() => ({
+    getPuzzleArchiveFn:
+        vi.fn<
+            (options: { data: PuzzleArchiveInput }) => Promise<PuzzleArchiveOutput>
+        >(),
+}));
+vi.mock("@/lib/game/puzzle-archive.functions", () => ({ getPuzzleArchiveFn }));
 
 const puzzle = {
     network: "nl" as const,
@@ -107,9 +116,15 @@ async function guess(user: ReturnType<typeof userEvent.setup>, name: string) {
 }
 
 function guessedNames(): string[] {
-    return screen
-        .queryAllByRole("listitem")
-        .map((row) => row.querySelector(".font-condensed")?.textContent ?? "");
+    return (
+        screen
+            .queryAllByRole("listitem")
+            // The record's guesses needed are list items too.
+            .filter(
+                (row) => row.closest("[aria-labelledby='statistics-title']") == null,
+            )
+            .map((row) => row.querySelector(".font-condensed")?.textContent ?? "")
+    );
 }
 
 /**
@@ -144,6 +159,16 @@ beforeEach(() => {
     window.localStorage.clear();
     revealAnswerFn.mockReset();
     revealAnswerFn.mockImplementation(({ data }) => Promise.resolve(reveal(data)));
+    getPuzzleArchiveFn.mockReset();
+    // Puzzles 140 to 142, today's last.
+    getPuzzleArchiveFn.mockResolvedValue({
+        network: "nl",
+        puzzles: [
+            { number: 140, date: "2026-11-04" },
+            { number: 141, date: "2026-11-05" },
+            { number: 142, date: "2026-11-06" },
+        ],
+    });
     overwriteGetLocale(() => "en");
 });
 
@@ -441,6 +466,85 @@ describe("GamePage", () => {
             await screen.findByRole("heading", { level: 1, name: "Zwolle" }),
         ).toBeDefined();
         expect(screen.queryByRole("alert")).toBeNull();
+    });
+
+    it("shows the record once the game is won, today's bar highlighted", async () => {
+        window.localStorage.setItem(
+            gameStorageKey("nl", 140),
+            serializeGame([
+                miss("hvs"),
+                miss("ut"),
+                miss("mt"),
+                miss("gn"),
+                miss("asd"),
+                miss("hdr"),
+            ]),
+        );
+        window.localStorage.setItem(
+            gameStorageKey("nl", 141),
+            serializeGame([
+                { guess: "ut", correct: true, steps: [], totalMinutes: 0 },
+            ]),
+        );
+        window.localStorage.setItem(key, serializeGame([miss("hvs")]));
+        submitGuessFn.mockImplementation(({ data }) =>
+            Promise.resolve(answer(data, true)),
+        );
+        const user = renderGame(createGameStore(() => window.localStorage));
+
+        await guess(user, "Zwolle");
+
+        const record = await screen.findByRole("region", {
+            name: "Your Netherlands record",
+        });
+        await within(record).findByText("Played");
+        const figures = Object.fromEntries(
+            [...record.querySelectorAll("dl > div")].map((pair) => [
+                pair.querySelector("dt")?.textContent,
+                pair.querySelector("dd")?.textContent,
+            ]),
+        );
+        expect(figures).toEqual({
+            Played: "3",
+            Won: "67%",
+            Streak: "2",
+            "Best streak": "2",
+        });
+        expect(
+            within(record)
+                .getAllByRole("listitem")
+                .map((row) => row.querySelector(".sr-only")?.textContent),
+        ).toEqual([
+            "1 guess: 1",
+            "2 guesses: 1, today's game",
+            "3 guesses: 0",
+            "4 guesses: 0",
+            "5 guesses: 0",
+            "6 guesses: 0",
+            "Missed: 1",
+        ]);
+        expect(record.querySelectorAll("[data-today]")).toHaveLength(1);
+    });
+
+    it("says so when the record does not load, and asks again", async () => {
+        window.localStorage.setItem(
+            key,
+            serializeGame([
+                { guess: "zl", correct: true, steps: [], totalMinutes: 0 },
+            ]),
+        );
+        getPuzzleArchiveFn.mockRejectedValueOnce(new Error("rate_limited"));
+        const user = renderGame(createGameStore(() => window.localStorage));
+
+        const record = await screen.findByRole("region", {
+            name: "Your Netherlands record",
+        });
+        const alert = await within(record).findByRole("alert");
+        expect(alert.textContent).toContain("Your record didn't load.");
+
+        await user.click(within(alert).getByRole("button", { name: "Try again" }));
+
+        expect(await within(record).findByText("Played")).toBeDefined();
     });
 
     it("shows no share while the game is on", () => {

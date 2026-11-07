@@ -129,6 +129,7 @@ export function GamePage({
                     status={game.status}
                     enteringGuess={game.lastAnswer?.guess}
                     shareTarget={shareTarget}
+                    store={store}
                 />
             )}
             {/* Reads out each guess made on this page, not the kept ones a

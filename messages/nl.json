@@ -21,6 +21,24 @@
         "share": "Deel je resultaat",
         "olderPuzzle": "Speel een eerdere puzzel"
     },
+    "statistics": {
+        "title": "Jouw record in {network}",
+        "played": "Gespeeld",
+        "won": "Gewonnen",
+        "winPercent": "{percent}%",
+        "streak": "Reeks",
+        "bestStreak": "Beste reeks",
+        "guessesNeeded": "Benodigde gokken",
+        "missed": "Gemist",
+        "rowOne": "1 gok: {count}",
+        "rowMany": "{guesses} gokken: {count}",
+        "rowMissed": "Gemist: {count}",
+        "rowToday": "{row}, het spel van vandaag",
+        "loading": "Je record wordt geladen",
+        "failed": "Je record kwam niet door.",
+        "retry": "Probeer het opnieuw",
+        "close": "Sluiten"
+    },
     "progress": {
         "playing": "Gok {number} van {total}, nieuwste eerst",
         "won": "Gevonden in {count} van {total}, nieuwste eerst",
