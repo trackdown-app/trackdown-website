@@ -3,6 +3,7 @@
 ## Prerequisites
 
 - Bun, at the version in `.bun-version`. `bunfig.toml` only installs package versions published at least three days ago.
+- For the game data: a clone of the private `trackdown-app/trackdown-data` next to this repository (`../TrackdownData`), and `.env.example` copied to `.env.local`. Without it the site runs without data ([deploy.md](deploy.md#the-game-data)).
 
 ## Scripts
 
@@ -38,7 +39,7 @@ bun run build
 
 - Install runs `bun install --frozen-lockfile` and caches `node_modules`, keyed on `bun.lock`. The other four jobs restore that cache and fail if it is missing; they install only the Bun binary, at the version in `.bun-version`.
 - Every action is pinned to a commit SHA, with its release in a trailing comment.
-- The jobs read only this repository. The build needs no private data, so CI holds no token or secret for another repository.
+- The jobs read only this repository. The build needs no private data, so CI holds no token or secret for another repository. Deploys, which do bring in the data, are a separate workflow ([deploy.md](deploy.md#the-deploy-workflow)).
 
 `.github/dependabot.yml` proposes weekly updates for the packages (the `bun` ecosystem, which updates `bun.lock`, with a three-day cooldown like `bunfig.toml`) and for the pinned actions.
 

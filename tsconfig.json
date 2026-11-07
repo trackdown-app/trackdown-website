@@ -5,7 +5,7 @@
     "eslint.config.mts",
     "vite.config.ts"
   ],
-  "exclude": ["node_modules", ".output", ".nitro"],
+  "exclude": ["node_modules", ".output", ".nitro", ".trackdown-data"],
   "compilerOptions": {
     "target": "ES2022",
     "jsx": "react-jsx",
