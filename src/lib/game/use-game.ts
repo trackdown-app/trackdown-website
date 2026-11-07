@@ -10,6 +10,7 @@ import {
 } from "@/lib/game/game-state";
 import { gameStore } from "@/lib/game/game-store";
 import type { GameStore } from "@/lib/game/game-store";
+import { puzzleDate } from "@/lib/game/puzzle-day";
 import type { TodayPuzzleOutput } from "@/lib/game/schemas";
 
 type GuessVariables = {
@@ -61,7 +62,14 @@ export function useGame(
                 const steps = again.get(kept.guess);
                 return steps == null ? kept : { ...kept, steps };
             });
-            store.write(key, serializeGame([...updated, answer]));
+            const next = [...updated, answer];
+            // The day the game ends, so a streak counts only puzzles
+            // finished on their own day (docs/statistics.md#streaks).
+            const finishedOn =
+                gameStatus(next, puzzle.maxGuesses) === "playing"
+                    ? null
+                    : puzzleDate(new Date());
+            store.write(key, serializeGame(next, finishedOn));
         },
     });
 

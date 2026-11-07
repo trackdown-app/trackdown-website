@@ -4,6 +4,7 @@ import {
     gameStatus,
     gameStorageKey,
     parseStoredGame,
+    readStoredGame,
     serializeGame,
 } from "@/lib/game/game-state";
 import { createGameStore } from "@/lib/game/game-store";
@@ -24,6 +25,18 @@ describe("game state", () => {
 
     it("reads back what it writes", () => {
         expect(parseStoredGame(serializeGame([miss, hit]))).toEqual([miss, hit]);
+    });
+
+    it("keeps the day a game ended, and reads an older game without one", () => {
+        expect(readStoredGame(serializeGame([miss, hit], "2026-11-06"))).toEqual({
+            guesses: [miss, hit],
+            finishedOn: "2026-11-06",
+        });
+        expect(readStoredGame(serializeGame([miss]))).toEqual({
+            guesses: [miss],
+            finishedOn: null,
+        });
+        expect(serializeGame([miss])).not.toContain("finishedOn");
     });
 
     it("reads nothing, broken JSON or another shape as no guesses", () => {

@@ -19,12 +19,12 @@ Every focusable element shows the site-wide `:focus-visible` outline from `src/s
 - **The logo**, linking home (a router `<Link to="/">`, so it points at `/en` on an English page): the line mark (`LogoMark`, `src/components/layout/logo-mark.tsx`, the Brand board's SVG drawn in the theme's tokens, so it follows dark mode) and the wordmark in Barlow Condensed 800. Its name starts with the visible "Trackdown" and says where it goes (`header.home`).
 - **The network pill** (`NetworkPill`): an ink-bordered pill with an `NL` chip and "Nederland". The Netherlands is the only network, so the pill is a label for now, not a control, and the design's chevron is left out. Screen readers hear "Netwerk: Nederland". The network picker turns it into the button that opens the picker.
 - **Archive and How to play** in a `<nav>` named `header.nav`. The current page carries `aria-current="page"` and shows underlined and semibold. How to play has its route ([how-to-play.md](how-to-play.md)), so it is a router `<Link>`; Archive is still a `PageLink` (see [Page paths](#page-paths)).
-- **The statistics button**, a 44px icon button (Lucide's `ChartNoAxesColumn`) named `header.statistics`. Statistics are not kept yet, so it has nothing to open: it is disabled with Base UI's `focusableWhenDisabled`, so it stays in the Tab order and is announced as unavailable (`aria-disabled="true"`). The statistics work gives it an `onClick` and drops `disabled`.
+- **The statistics button**, a 44px icon button (Lucide's `ChartNoAxesColumn`) named `header.statistics`. It opens the statistics dialog, the player's record at today's network (`StatisticsDialog`, [statistics.md](statistics.md#the-dialog)).
 - **The language switch** (`LanguageSwitch`, [i18n.md](i18n.md#language-switch)), which the design does not draw; it sits last.
 
 Both halves of the header wrap. At phone width the network pill drops below the logo and the language switch below the links, so nothing scrolls sideways down to 320px. Every control is at least 44px high.
 
-`src/components/layout/site-header.test.tsx` checks the links in both languages, `aria-current`, the pill's screen reader text, that the statistics button stays focusable and the language switch.
+`src/components/layout/site-header.test.tsx` checks the links in both languages, `aria-current`, the pill's screen reader text, that the statistics button is an enabled dialog trigger and the language switch.
 
 ## Footer
 

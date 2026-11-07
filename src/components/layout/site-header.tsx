@@ -1,14 +1,13 @@
 import { Link } from "@tanstack/react-router";
-import { ChartNoAxesColumn } from "lucide-react";
 import { m } from "@/paraglide/messages";
 import { sitePaths } from "@/lib/site-paths";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
 import { LanguageSwitch } from "@/components/language/language-switch";
 import { LogoMark } from "@/components/layout/logo-mark";
 import { NetworkPill } from "@/components/layout/network-pill";
 import { PageLink } from "@/components/layout/page-link";
 import { shellContainer } from "@/components/layout/shell-container";
+import { StatisticsDialog } from "@/components/layout/statistics-dialog";
 
 const navLinkClasses =
     "inline-flex min-h-11 items-center px-2 text-base font-medium text-foreground no-underline underline-offset-[0.3em] hover:underline aria-[current=page]:font-semibold aria-[current=page]:underline sm:px-3";
@@ -59,19 +58,7 @@ export function SiteHeader() {
                         </li>
                     </ul>
                 </nav>
-                {/* Statistics are not kept yet, so the button has nothing to
-                    open. It stays reachable by keyboard and is announced as
-                    unavailable (`aria-disabled`) until the statistics dialog
-                    gives it an `onClick` (docs/site-shell.md#header). */}
-                <Button
-                    variant="ghost"
-                    size="icon-lg"
-                    aria-label={m["header.statistics"]()}
-                    disabled
-                    focusableWhenDisabled
-                >
-                    <ChartNoAxesColumn aria-hidden="true" className="size-[22px]" />
-                </Button>
+                <StatisticsDialog />
                 <LanguageSwitch />
             </div>
         </header>

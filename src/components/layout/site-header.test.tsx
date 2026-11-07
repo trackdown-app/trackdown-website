@@ -57,13 +57,13 @@ describe("SiteHeader", () => {
         expect(html).toContain("Nederland");
     });
 
-    it("keeps the statistics button reachable by keyboard, announced as unavailable", async () => {
+    it("renders the statistics button as an enabled dialog trigger", async () => {
         const button = /<button [^>]*>/.exec(await renderAt(SiteHeader, "/"))?.[0];
 
         expect(button).toContain('aria-label="Statistieken"');
-        expect(button).toContain('aria-disabled="true"');
+        expect(button).toContain('aria-haspopup="dialog"');
+        expect(button).not.toContain("aria-disabled");
         expect(button).not.toMatch(/\sdisabled(=|\s|>)/);
-        expect(button).not.toContain('tabindex="-1"');
     });
 
     it("carries the language switch", async () => {

@@ -114,6 +114,7 @@ export function GamePage({ puzzle, stations, store, shareTarget }: GamePageProps
                     status={game.status}
                     enteringGuess={game.lastAnswer?.guess}
                     shareTarget={shareTarget}
+                    store={store}
                 />
             )}
             {/* Reads out each guess made on this page, not the kept ones a

@@ -8,6 +8,9 @@ import { AnswerPlate } from "@/components/game/answer-plate";
 import { GuessList } from "@/components/game/guess-list";
 import { ShareButton } from "@/components/game/share-button";
 import { SharePreview } from "@/components/game/share-preview";
+import { StatisticsRecord } from "@/components/game/statistics-record";
+import type { GameStore } from "@/lib/game/game-store";
+import { networkName } from "@/lib/game/network-name";
 import { buttonVariants } from "@/components/ui/button";
 import { revealQueryOptions } from "@/lib/game/reveal.queries";
 import type { ShareNavigator } from "@/lib/game/share-result";
@@ -27,13 +30,16 @@ type GameOverProps = {
     enteringGuess?: string | undefined;
     /** Where the result is shared; the browser's `navigator` unless a test hands its own. */
     shareTarget?: ShareNavigator | undefined;
+    /** Where the games are kept, for the record; the page's store unless a test hands its own. */
+    store?: GameStore | undefined;
 };
 
 /**
  * The finished game, after the design's Web · Solved board
  * (docs/game.md#solved-and-missed): the answer plate, the buttons to share
  * the result and play an older puzzle, "How you got there", every guess
- * with every change named, and "What you'll share" (docs/share.md). The
+ * with every change named, the player's record (docs/statistics.md) beside
+ * "What you'll share" (docs/share.md). The
  * answer only ever comes from the `reveal` operation, asked once the game is
  * over; the shared text never needs it.
  */
@@ -44,6 +50,7 @@ export function GameOver({
     status,
     enteringGuess,
     shareTarget,
+    store,
 }: GameOverProps) {
     const share = shareText({
         network: puzzle.network,
@@ -118,7 +125,25 @@ export function GameOver({
                     revealed
                 />
             )}
-            <SharePreview text={share} />
+            <div className="flex flex-wrap items-start gap-12">
+                <section
+                    aria-labelledby="statistics-title"
+                    className="flex min-w-0 flex-[1_1_420px] flex-col gap-7"
+                >
+                    <h2
+                        id="statistics-title"
+                        className="font-condensed text-[32px] leading-tight font-bold"
+                    >
+                        {m["statistics.title"]({
+                            network: networkName(puzzle.network),
+                        })}
+                    </h2>
+                    <StatisticsRecord network={puzzle.network} store={store} />
+                </section>
+                <div className="flex min-w-0 flex-[1_1_340px] flex-col">
+                    <SharePreview text={share} />
+                </div>
+            </div>
         </div>
     );
 }
