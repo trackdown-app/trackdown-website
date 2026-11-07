@@ -6,15 +6,10 @@ import {
     tripLineLayout,
     tripRunMs,
 } from "@/lib/game/trip-line";
-import type { ListedGuess, TripLineRide } from "@/lib/game/trip-line";
+import type { ListedGuess } from "@/lib/game/trip-line";
+import { lineBackgrounds } from "@/components/game/line-colours";
 import { formatMinutes } from "@/lib/game/trip-text";
 import { useElementWidth } from "@/lib/use-element-width";
-
-const lineColours: Record<TripLineRide["line"], string> = {
-    1: "bg-line-1",
-    2: "bg-line-2",
-    3: "bg-line-3",
-};
 
 /**
  * Glides a part to its new place when the board's scale changes, as when a
@@ -47,7 +42,7 @@ export function TripLine({
     /** The minutes the board's track spans, shared by every row (`boardMinutes`). */
     scaleMinutes: number;
 }) {
-    const trackRef = useRef<HTMLDivElement>(null);
+    const trackRef = useRef<HTMLSpanElement>(null);
     const trackPx = useElementWidth(trackRef, narrowTrackPx);
     const layout = tripLineLayout(guess, formatMinutes, trackPx, scaleMinutes);
     const timing: CSSProperties & Record<`--${string}`, string> = {
@@ -56,14 +51,21 @@ export function TripLine({
     };
 
     return (
-        <div ref={trackRef} className="relative h-[30px] w-full" style={timing}>
-            <div className="trip-rides absolute inset-0">
+        // Spans only, so the line can sit inside the button that opens its
+        // details (GuessTrack).
+        <span
+            ref={trackRef}
+            aria-hidden="true"
+            className="relative block h-[30px] w-full"
+            style={timing}
+        >
+            <span className="trip-rides absolute inset-0">
                 {layout.parts.map((part, index) =>
                     part.kind === "ride" ? (
                         <span
                             // The steps never reorder, so their place is their key.
                             key={index}
-                            className={`absolute top-1/2 flex h-[22px] -translate-y-1/2 items-center justify-center overflow-hidden text-on-line ${rescale} ${lineColours[part.line]}`}
+                            className={`absolute top-1/2 flex h-[22px] -translate-y-1/2 items-center justify-center overflow-hidden text-on-line ${rescale} ${lineBackgrounds[part.line]}`}
                             style={{
                                 right: `${part.drawEndPercent}%`,
                                 width: `${part.drawStartPercent - part.drawEndPercent}%`,
@@ -79,7 +81,7 @@ export function TripLine({
                         </span>
                     ) : null,
                 )}
-            </div>
+            </span>
             {layout.parts.map((part, index) => {
                 if (part.kind !== "change") {
                     return null;
@@ -104,6 +106,6 @@ export function TripLine({
                 className={`trip-dot ${marker} size-[22px] bg-ink shadow-[0_0_0_3px_var(--td-bg)]`}
                 style={{ right: `${layout.widthPercent}%` }}
             />
-        </div>
+        </span>
     );
 }
