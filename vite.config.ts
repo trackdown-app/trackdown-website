@@ -7,6 +7,7 @@ import { paraglideVitePlugin } from "@inlang/paraglide-js";
 import viteReact from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import { paraglideCompilerOptions } from "./paraglide.config.ts";
+import { staticSecurityHeaders } from "./src/lib/security-headers.ts";
 
 const config = defineConfig(({ mode }) => {
     // The private game data (docs/deploy.md#the-game-data). The deploy
@@ -38,9 +39,30 @@ const config = defineConfig(({ mode }) => {
             // (docs/deploy.md). Must directly follow `tanstackStart()`.
             nitro({
                 plugins: ["src/config/telemetry.ts"],
-                // Only read by the `vercel` preset: runs the server function
-                // in Frankfurt, the region closest to the Netherlands.
-                vercel: { functions: { regions: ["fra1"] } },
+                vercel: {
+                    // Only read by the `vercel` preset: runs the server
+                    // function in Frankfurt, the region closest to the
+                    // Netherlands.
+                    functions: { regions: ["fra1"] },
+                    // The static files Vercel serves itself never reach
+                    // `src/server.ts`. This route, first in
+                    // `.vercel/output/config.json`, gives every answer the
+                    // security headers, without the Content-Security-Policy,
+                    // which only matters for documents
+                    // (docs/errors-and-headers.md). Not a Nitro route rule:
+                    // the preset writes those without `continue`, so a
+                    // `/**` rule would end routing before the server.
+                    config: {
+                        version: 3,
+                        routes: [
+                            {
+                                src: "/(.*)",
+                                headers: { ...staticSecurityHeaders },
+                                continue: true,
+                            },
+                        ],
+                    },
+                },
                 // The data directory as the `assets:trackdown-data` storage
                 // mount. In development Nitro reads it from disk; in a build
                 // each file becomes a lazy import inside the server bundle,

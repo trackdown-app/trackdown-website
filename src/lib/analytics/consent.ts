@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "@/lib/zod";
 
 export const CONSENT_COOKIE_NAME = "trackdown-consent";
 export const CONSENT_MAX_AGE_SECONDS = 365 * 24 * 60 * 60;

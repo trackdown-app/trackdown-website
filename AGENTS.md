@@ -48,6 +48,7 @@
   - `docs/deploy.md`: Nitro's preset detection, the `.vercel/output` layout, the function region, the game data's build-time variables, the deploy workflow and its secrets, the Vercel project and its environments, a manual deploy.
   - `docs/logging.md`: server logs and traces, PostHog EU, startup validation, Vercel flushing, privacy filtering, and the telemetry tests.
   - `docs/analytics.md`: the consent banner and status, native consent forms and cookie settings, the versioned consent cookie, the browser analytics integration contract, and the typed game events.
+  - `docs/errors-and-headers.md`: the security headers, the Content-Security-Policy and its nonce, the static files' headers on Vercel, the Preview toolbar hosts, and the jitless `@/lib/zod`.
 - A new feature area gets its own `docs/<feature>.md`, an entry in the README's documentation list and a line in the list above.
 
 ## Strict Boolean Expressions

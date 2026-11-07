@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "@/lib/zod";
 import type { Attributes } from "@opentelemetry/api";
 import { ApiError, apiErrorCodeSchema } from "@/lib/api/api-error";
 import { networkIdSchema } from "@/lib/data/networks";

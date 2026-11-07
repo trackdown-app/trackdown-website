@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "@/lib/zod";
 import type { NetworkId } from "@/lib/data/networks";
 import { guessOutputSchema } from "@/lib/game/schemas";
 import type { ListedGuess } from "@/lib/game/trip-line";

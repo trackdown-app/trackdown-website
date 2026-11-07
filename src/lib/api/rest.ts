@@ -1,6 +1,6 @@
 // Marks this module server-only: it answers REST requests on the server.
 import "@tanstack/react-start/server-only";
-import { z } from "zod";
+import { z } from "@/lib/zod";
 import { ApiError } from "@/lib/api/api-error";
 import { unknownClientError } from "@/lib/api/client-identification";
 import { crossOriginError, rateLimitRefusal } from "@/lib/api/request-guard";

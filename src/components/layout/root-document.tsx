@@ -1,5 +1,10 @@
 import { ReactQueryDevtoolsPanel } from "@tanstack/react-query-devtools";
-import { HeadContent, Scripts, useLoaderData } from "@tanstack/react-router";
+import {
+    HeadContent,
+    ScriptOnce,
+    Scripts,
+    useLoaderData,
+} from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { TanStackDevtools } from "@tanstack/react-devtools";
 import type { ReactNode } from "react";
@@ -23,7 +28,9 @@ export function RootDocument({ children }: { children: ReactNode }) {
         // the browser.
         <html lang={getLocale()} suppressHydrationWarning>
             <head>
-                <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+                {/* Server-rendered with the CSP nonce, then removes itself,
+                    so hydration finds nothing to match. */}
+                <ScriptOnce>{themeInitScript}</ScriptOnce>
                 <HeadContent />
             </head>
             <body className="flex min-h-svh flex-col">

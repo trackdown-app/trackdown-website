@@ -20,6 +20,8 @@ Vercel hosts the site and its API. TanStack Start reaches Vercel through Nitro, 
 
 The function runs in `fra1` (Frankfurt), the Vercel region closest to the Netherlands: `vercel.functions.regions` in the `nitro()` options, which only the `vercel` preset reads. Nitro writes it into the function's `.vc-config.json`.
 
+`vercel.config.routes` in the same options puts one route first in `.vercel/output/config.json`: the security headers on every answer, static files included, with `continue: true` so routing goes on to the files and the server ([errors-and-headers.md](errors-and-headers.md#static-files)). On a preview deployment (`VERCEL_ENV=preview`, set by Vercel) the Content-Security-Policy also allows the Vercel Toolbar.
+
 `.vercel/` is ignored by Git: it holds the build output and the local project link from `vercel link`.
 
 ## The game data

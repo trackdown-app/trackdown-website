@@ -1,6 +1,7 @@
 import { QueryClient } from "@tanstack/react-query";
 import { createRouter as createTanStackRouter } from "@tanstack/react-router";
 import { setupRouterSsrQueryIntegration } from "@tanstack/react-router-ssr-query";
+import { createIsomorphicFn, getGlobalStartContext } from "@tanstack/react-start";
 import type { ComponentType } from "react";
 import { deLocalizeUrl, localizeUrl } from "@/paraglide/runtime";
 import { ErrorPage } from "@/components/errors/error-page";
@@ -8,11 +9,28 @@ import { NotFoundPage } from "@/components/errors/not-found-page";
 import { routeTree } from "./routeTree.gen";
 
 /**
+ * This response's Content-Security-Policy nonce. On the server it comes from
+ * the request context `src/server.ts` passes; in the browser from the
+ * `csp-nonce` meta tag the router renders into the head, so the head the
+ * browser renders matches the server's. Undefined on the development server
+ * (docs/errors-and-headers.md).
+ */
+const getCspNonce = createIsomorphicFn()
+    .server(() => getGlobalStartContext()?.nonce)
+    .client(
+        () =>
+            document.querySelector<HTMLMetaElement>('meta[property="csp-nonce"]')
+                ?.content,
+    );
+
+/**
  * Called once per request on the server and once in the browser, so each
  * request gets its own query cache: a cache shared between requests would
  * keep every request's reads in the server's memory (docs/data-loading.md).
  */
 export function getRouter() {
+    const nonce = getCspNonce();
+
     const queryClient = new QueryClient({
         defaultOptions: {
             queries: {
@@ -53,6 +71,12 @@ export function getRouter() {
             input: ({ url }) => deLocalizeUrl(url),
             output: ({ url }) => localizeUrl(url),
         },
+        // Puts the nonce on every inline script the router renders and on
+        // `ScriptOnce`, such as the theme initializer. Give a route's
+        // `head().scripts` a `src`, never inline `children`: after hydration
+        // the router looks for an inline script by its `nonce` attribute,
+        // which the browser hides, and would run it again.
+        ...(nonce == null ? {} : { ssr: { nonce } }),
     });
 
     // Sends the queries the server render filled to the browser, so the
@@ -69,6 +93,10 @@ export function getRouter() {
 declare module "@tanstack/react-router" {
     interface Register {
         router: ReturnType<typeof getRouter>;
+        server: {
+            // What `src/server.ts` passes to the Start handler.
+            requestContext: { nonce?: string };
+        };
     }
 
     interface StaticDataRouteOption {

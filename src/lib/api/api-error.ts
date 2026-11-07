@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "@/lib/zod";
 
 // The one error format of every API answer (docs/api.md#errors). Holds no
 // server code, so the iOS app's contract and the browser can both read it.

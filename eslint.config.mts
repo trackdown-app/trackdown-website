@@ -174,6 +174,11 @@ export default defineConfig([
                             name: "cn",
                             message: 'Import cn from "@/lib/utils".',
                         },
+                        {
+                            name: "zod",
+                            message:
+                                'Import z from "@/lib/zod", which turns off the eval probe the Content-Security-Policy blocks.',
+                        },
                     ],
                 },
             ],

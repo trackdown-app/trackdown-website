@@ -7,7 +7,7 @@ import { UndiciInstrumentation } from "@opentelemetry/instrumentation-undici";
 import { resourceFromAttributes } from "@opentelemetry/resources";
 import { BatchLogRecordProcessor, LoggerProvider } from "@opentelemetry/sdk-logs";
 import { BatchSpanProcessor, TracerProvider } from "@opentelemetry/sdk-trace";
-import { z } from "zod";
+import { z } from "@/lib/zod";
 import {
     consoleOutput,
     createLogger,
