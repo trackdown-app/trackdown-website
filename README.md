@@ -42,4 +42,5 @@ The site runs on http://localhost:3000.
 - [Game page](docs/game.md)
 - [Sharing a result](docs/share.md)
 - [How to play](docs/how-to-play.md)
+- [Archive](docs/archive.md)
 - [Deploy](docs/deploy.md)

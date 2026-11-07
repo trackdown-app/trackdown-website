@@ -1,6 +1,6 @@
 # The game page
 
-The home page, `/` (`/en` in English), is today's puzzle on the Dutch network, after the design's Web · Playing board. `src/routes/index.tsx` loads it; `GamePage` (`src/components/game/game-page.tsx`) draws it.
+The home page, `/` (`/en` in English), is today's puzzle on the Dutch network, after the design's Web · Playing board. `src/routes/index.tsx` loads it; `GamePage` (`src/components/game/game-page.tsx`) draws it. The archive plays an earlier puzzle with the same `GamePage`, given `archive` ([archive.md](archive.md#playing-an-earlier-puzzle)).
 
 ## The route
 
@@ -22,7 +22,7 @@ Once the game is over the question, the search and the progress give way to the 
 `GameOver` (`src/components/game/game-over.tsx`) is the finished game, after the design's Web · Solved board, in the same column:
 
 - **The answer plate.** `AnswerPlate` (`src/components/game/answer-plate.tsx`): a 16px-cornered plate in `plate`, the theme turned over ([design-system.md](design-system.md#colour)). The logo mark in its plate colours, its bar filled, beside how it went in `plate-muted` 18px: "You tracked it down in 5 of 6 guesses" / "Je hebt hem gevonden in 5 van 6 gokken", or when missed "No guesses left. The mystery station was" / "Geen gokken meer. Het mysteriestation was". Below it the mystery station as the page's `h1`, Barlow Condensed 800, 52px to 112px with the width. The plate is a section named "Today's answer" / "Het antwoord van vandaag".
-- **The buttons.** "Share result" / "Deel je resultaat", the ink main button with a share icon, and "Play an older puzzle" / "Speel een eerdere puzzel", an outlined link to the archive (`/archief`). Both 52px, 12px corners. The share button shares the result ([share.md](share.md#sharing)), and a status line under the buttons says when it was copied instead. The archive page comes with its own feature: until then the link shows the not-found page.
+- **The buttons.** "Share result" / "Deel je resultaat", the ink main button with a share icon, and "Play an older puzzle" / "Speel een eerdere puzzel", an outlined link to the archive (`/archief`, [archive.md](archive.md)). Both 52px, 12px corners. The share button shares the result ([share.md](share.md#sharing)), and a status line under the buttons says when it was copied instead.
 - **How you got there.** `GuessList` in its revealed form ([guess-list.md](guess-list.md#revealed)): every guess, newest first, every change named.
 - **What you'll share.** `SharePreview` ([share.md](share.md#the-preview)): the exact text the share button hands on, without station names.
 
@@ -69,7 +69,7 @@ The server render has no storage, so it renders a game with no guesses. `useSync
 
 ## Storage
 
-A game is kept in `localStorage` under `trackdown:game:v1:{network}:{number}`, one entry per network and puzzle, as `{"guesses":[…]}`. A new day is a new puzzle number and so a new game; old entries stay, for the archive and statistics to come.
+A game is kept in `localStorage` under `trackdown:game:v1:{network}:{number}`, one entry per network and puzzle, as `{"guesses":[…]}`, with `"archive":true` once a guess at it was made in the archive ([archive.md](archive.md#the-streak)). A new day is a new puzzle number and so a new game; old entries stay, for the archive's results and statistics to come.
 
 `createGameStore` (`src/lib/game/game-store.ts`) guards every read and write with `try`/`catch`. Where storage is unavailable (blocked, full, a private window that refuses it) a write is held in the page's memory instead: the game plays as usual, it just does not survive a reload. An entry that is not valid JSON or not a game this version wrote reads as a game with no guesses. A breaking change to the format bumps the `v1` in the key.
 

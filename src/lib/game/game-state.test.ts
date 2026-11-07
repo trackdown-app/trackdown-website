@@ -23,13 +23,26 @@ describe("game state", () => {
     });
 
     it("reads back what it writes", () => {
-        expect(parseStoredGame(serializeGame([miss, hit]))).toEqual([miss, hit]);
+        expect(parseStoredGame(serializeGame([miss, hit]))).toEqual({
+            guesses: [miss, hit],
+            archive: false,
+        });
+    });
+
+    it("marks a game played in the archive, and only that one", () => {
+        expect(serializeGame([miss])).not.toContain("archive");
+        expect(parseStoredGame(serializeGame([miss], true))).toEqual({
+            guesses: [miss],
+            archive: true,
+        });
     });
 
     it("reads nothing, broken JSON or another shape as no guesses", () => {
-        expect(parseStoredGame(null)).toEqual([]);
-        expect(parseStoredGame("{")).toEqual([]);
-        expect(parseStoredGame('{"guesses":[{"guess":1}]}')).toEqual([]);
+        const none = { guesses: [], archive: false };
+        expect(parseStoredGame(null)).toEqual(none);
+        expect(parseStoredGame("{")).toEqual(none);
+        expect(parseStoredGame('{"guesses":[{"guess":1}]}')).toEqual(none);
+        expect(parseStoredGame('{"guesses":[],"archive":"yes"}')).toEqual(none);
     });
 
     it("is won at a correct guess and lost after the last", () => {

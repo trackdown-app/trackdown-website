@@ -6,11 +6,13 @@
     "game": {
         "dateLine": "{date}, puzzel {number}",
         "title": "Welk station is het mysterie van vandaag?",
+        "archiveTitle": "Welk station was het mysterie?",
         "intro": "Raad een station. Wij tekenen de snelste treinreis van daar naar het mysteriestation. Hoe korter de lijn, hoe dichter je bij bent.",
         "guessFailed": "Die gok kwam niet door. Probeer het opnieuw."
     },
     "gameOver": {
         "label": "Het antwoord van vandaag",
+        "archiveLabel": "Het antwoord",
         "won": "Je hebt hem gevonden in {count} van {total} gokken",
         "lost": "Geen gokken meer. Het mysteriestation was",
         "loading": "Het antwoord wordt geladen",
@@ -92,6 +94,20 @@
         "exampleCaption": "Je stapt één keer over, 17 minuten voor het mysteriestation. Raad het station waar je overstapt en de naam verschijnt.",
         "legendTitle": "Zo lees je de lijn",
         "play": "Speel het station van vandaag"
+    },
+    "archive": {
+        "pageTitle": "Archief · Trackdown",
+        "puzzlePageTitle": "Puzzel {number} · Trackdown",
+        "title": "Archief",
+        "lead": "Elke puzzel tot nu toe, nieuwste eerst. Haal in wat je hebt gemist. Puzzels uit het archief tellen niet mee voor je reeks.",
+        "label": "Puzzels",
+        "empty": "Er zijn nog geen puzzels.",
+        "puzzle": "Puzzel {number}",
+        "today": "Vandaag",
+        "unplayed": "Nog niet gespeeld",
+        "playing": "Gok {number} van {total}",
+        "won": "Gevonden in {count} van {total}",
+        "lost": "Niet gevonden"
     },
     "language": {
         "label": "Taal",
