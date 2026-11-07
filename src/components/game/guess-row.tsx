@@ -1,0 +1,63 @@
+import type { CSSProperties } from "react";
+import { m } from "@/paraglide/messages";
+import { TripLine } from "@/components/game/trip-line";
+import type { ListedGuess } from "@/lib/game/trip-line";
+import { spokenGuess, tripSummary } from "@/lib/game/trip-text";
+import type { StationNames } from "@/lib/game/trip-text";
+
+/**
+ * The 30-minute grid behind a trip line: a 1px `grid` rule every fifth of the
+ * track, counted from the mystery bar at the right.
+ */
+const gridBackground: CSSProperties = {
+    backgroundImage:
+        "repeating-linear-gradient(to left, transparent 0, transparent calc(20% - 1px), var(--td-grid) calc(20% - 1px), var(--td-grid) 20%)",
+};
+
+type GuessRowProps = {
+    guess: ListedGuess;
+    /** Which guess it was, from 1. */
+    number: number;
+    names: StationNames;
+};
+
+/**
+ * One row of the guess list (docs/guess-list.md): the guess's number, its
+ * station and a summary of the trip, then the trip line on the time grid. A
+ * screen reader reads the row as one sentence instead.
+ */
+export function GuessRow({ guess, number, names }: GuessRowProps) {
+    const name = names.get(guess.guess) ?? guess.guess;
+    const summary = guess.correct
+        ? m["guessList.found"]()
+        : tripSummary(guess, names);
+
+    return (
+        <li className="flex min-h-[104px] flex-wrap gap-x-4 border-b border-rule">
+            <span className="sr-only">{spokenGuess(guess, number, names)}</span>
+            <div
+                aria-hidden="true"
+                className="flex max-w-[240px] flex-[1_1_240px] items-baseline gap-3 py-4"
+            >
+                <span className="w-3.5 flex-none text-[15px] font-semibold text-muted-foreground">
+                    {number}
+                </span>
+                <div className="min-w-0">
+                    <div className="font-condensed text-[30px] leading-none font-bold">
+                        {name}
+                    </div>
+                    <div className="mt-1.5 text-[15px] leading-[1.35] text-muted-foreground">
+                        {summary}
+                    </div>
+                </div>
+            </div>
+            <div
+                aria-hidden="true"
+                className="flex min-h-[72px] min-w-0 flex-[999_1_320px] items-center justify-end bg-clip-content bg-origin-content pr-3"
+                style={gridBackground}
+            >
+                {!guess.correct && <TripLine guess={guess} />}
+            </div>
+        </li>
+    );
+}

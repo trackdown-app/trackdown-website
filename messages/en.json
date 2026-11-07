@@ -13,6 +13,41 @@
         "list": "Matching stations",
         "noMatch": "No station matches “{query}”"
     },
+    "guessList": {
+        "label": "Your guesses",
+        "mysteryStation": "Mystery station",
+        "found": "You're here",
+        "spokenGuess": "Guess {number}, {station}: {duration} to the mystery station. {steps}.",
+        "spokenFound": "Guess {number}, {station}: the mystery station.",
+        "grid30": "30 min",
+        "grid60": "1 h",
+        "grid90": "1 h 30",
+        "grid120": "2 h"
+    },
+    "trip": {
+        "minutes": "{minutes}m",
+        "hoursMinutes": "{hours}h {minutes}m",
+        "spokenMinute": "1 minute",
+        "spokenMinutes": "{minutes} minutes",
+        "spokenHour": "1 hour",
+        "spokenHours": "{hours} hours",
+        "spokenHoursMinutes": "{hours} {minutes}",
+        "direct": "direct",
+        "changes": "{count} changes",
+        "changeAt": "change at {station}",
+        "changeHidden": "change at a hidden station",
+        "summary": "{duration}, {changes}",
+        "spokenRide": "{train}, {duration}",
+        "spokenChangeAt": "change at {station}, {duration}",
+        "spokenChangeHidden": "change at a hidden station, {duration}"
+    },
+    "legend": {
+        "label": "Legend",
+        "guess": "Your guess",
+        "ride": "Train and ride time",
+        "changeKnown": "Change, station known",
+        "changeHidden": "Change, guess it to reveal"
+    },
     "language": {
         "label": "Language",
         "nl": "Dutch",

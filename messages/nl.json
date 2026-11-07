@@ -13,6 +13,41 @@
         "list": "Passende stations",
         "noMatch": "Geen station gevonden voor „{query}”"
     },
+    "guessList": {
+        "label": "Je gokken",
+        "mysteryStation": "Mysteriestation",
+        "found": "Hier ben je",
+        "spokenGuess": "Gok {number}, {station}: {duration} naar het mysteriestation. {steps}.",
+        "spokenFound": "Gok {number}, {station}: het mysteriestation.",
+        "grid30": "30 min",
+        "grid60": "1 u",
+        "grid90": "1 u 30",
+        "grid120": "2 u"
+    },
+    "trip": {
+        "minutes": "{minutes}m",
+        "hoursMinutes": "{hours}u {minutes}m",
+        "spokenMinute": "1 minuut",
+        "spokenMinutes": "{minutes} minuten",
+        "spokenHour": "1 uur",
+        "spokenHours": "{hours} uur",
+        "spokenHoursMinutes": "{hours} {minutes}",
+        "direct": "rechtstreeks",
+        "changes": "{count} overstappen",
+        "changeAt": "overstap in {station}",
+        "changeHidden": "overstap op een verborgen station",
+        "summary": "{duration}, {changes}",
+        "spokenRide": "{train}, {duration}",
+        "spokenChangeAt": "overstap in {station}, {duration}",
+        "spokenChangeHidden": "overstap op een verborgen station, {duration}"
+    },
+    "legend": {
+        "label": "Legenda",
+        "guess": "Jouw gok",
+        "ride": "Trein en reistijd",
+        "changeKnown": "Overstap, station bekend",
+        "changeHidden": "Overstap, raad hem om te onthullen"
+    },
     "language": {
         "label": "Taal",
         "nl": "Nederlands",

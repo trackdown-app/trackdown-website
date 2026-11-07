@@ -30,7 +30,7 @@ Both halves of the header wrap. At phone width the network pill drops below the 
 
 `SiteFooter` (`src/components/layout/site-footer.tsx`) sits below a hairline (`rule`) in muted 15px text and holds:
 
-- **The legend slot.** A route that names a component in `staticData.footerLegend` gets it here, such as the game's line legend and the countdown to the next station on the playing page. The footer takes the deepest matched route's legend, so a child route can name its own. Without one, the footer shows the tagline (`footer.tagline`), as on the privacy board. With a legend, the links take a row of their own, as on the playing board. The type lives with the router's `Register` in `src/router.tsx`.
+- **The legend slot.** A route that names a component in `staticData.footerLegend` gets it here, such as the game's line legend (`GameLegend`, [guess-list.md](guess-list.md#legend)) and the countdown to the next station on the playing page. The footer takes the deepest matched route's legend, so a child route can name its own. Without one, the footer shows the tagline (`footer.tagline`), as on the privacy board. With a legend, the links take a row of their own, as on the playing board. The type lives with the router's `Register` in `src/router.tsx`.
 - **The links**: About, Privacy, Terms and Cookie settings, in a `<nav>` named `footer.nav`. The current page carries `aria-current="page"` and shows in ink, semibold. Each link is 44px high.
 
 "Cookie settings" links to the privacy policy's part on cookies (`/privacy#cookies`, `cookieSettingsLink`) until the cookie banner exists; the banner's own button, which opens it again, then replaces the link.
