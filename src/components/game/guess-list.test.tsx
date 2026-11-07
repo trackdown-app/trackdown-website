@@ -1,0 +1,153 @@
+// @vitest-environment happy-dom
+import { afterEach, describe, expect, it } from "vitest";
+import { cleanup, render, screen, within } from "@testing-library/react";
+import { overwriteGetLocale } from "@/paraglide/runtime";
+import { GuessList } from "@/components/game/guess-list";
+import type { ListedGuess } from "@/lib/game/trip-line";
+
+const stations = [
+    { code: "hvs", name: "Hilversum" },
+    { code: "ut", name: "Utrecht Centraal" },
+    { code: "hdr", name: "Den Helder" },
+    { code: "mt", name: "Maastricht" },
+];
+
+// The design's four guesses, oldest first.
+const guesses: ListedGuess[] = [
+    {
+        guess: "hvs",
+        correct: false,
+        steps: [{ kind: "ride", train: "IC", minutes: 13 }],
+        totalMinutes: 13,
+    },
+    {
+        guess: "ut",
+        correct: false,
+        steps: [{ kind: "ride", train: "IC", minutes: 17 }],
+        totalMinutes: 17,
+    },
+    {
+        guess: "hdr",
+        correct: false,
+        steps: [
+            { kind: "ride", train: "IC", minutes: 72 },
+            { kind: "change", station: null, minutes: 9 },
+            { kind: "ride", train: "IC", minutes: 36 },
+        ],
+        totalMinutes: 117,
+    },
+    {
+        guess: "mt",
+        correct: false,
+        steps: [
+            { kind: "ride", train: "IC", minutes: 122 },
+            { kind: "change", station: "ut", minutes: 6 },
+            { kind: "ride", train: "IC", minutes: 17 },
+        ],
+        totalMinutes: 145,
+    },
+];
+
+afterEach(() => {
+    cleanup();
+});
+
+function rows(): HTMLElement[] {
+    return within(screen.getByRole("list", { name: "Your guesses" })).getAllByRole(
+        "listitem",
+    );
+}
+
+describe("GuessList", () => {
+    it("lists the guesses newest first, each read as one sentence", () => {
+        overwriteGetLocale(() => "en");
+        render(<GuessList guesses={guesses} stations={stations} />);
+
+        const texts = rows().map(
+            (row) => row.querySelector(".sr-only")?.textContent,
+        );
+        expect(texts).toEqual([
+            "Guess 4, Maastricht: 2 hours 25 minutes to the mystery station. IC, 2 hours 2 minutes, change at Utrecht Centraal, 6 minutes, IC, 17 minutes.",
+            "Guess 3, Den Helder: 1 hour 57 minutes to the mystery station. IC, 1 hour 12 minutes, change at a hidden station, 9 minutes, IC, 36 minutes.",
+            "Guess 2, Utrecht Centraal: 17 minutes to the mystery station. IC, 17 minutes.",
+            "Guess 1, Hilversum: 13 minutes to the mystery station. IC, 13 minutes.",
+        ]);
+    });
+
+    it("hides the drawing from a screen reader", () => {
+        overwriteGetLocale(() => "en");
+        render(<GuessList guesses={guesses} stations={stations} />);
+
+        for (const row of rows()) {
+            const drawn = [...row.children].filter(
+                (child) => !child.classList.contains("sr-only"),
+            );
+            expect(drawn.length).toBe(2);
+            for (const child of drawn) {
+                expect(child.getAttribute("aria-hidden")).toBe("true");
+            }
+        }
+    });
+
+    it("shows the summary, the ride labels that fit and a ? for a hidden change", () => {
+        overwriteGetLocale(() => "en");
+        render(<GuessList guesses={guesses} stations={stations} />);
+
+        const [maastricht, denHelder] = rows();
+        expect(maastricht?.textContent).toContain(
+            "2h 25m, change at Utrecht Centraal",
+        );
+        expect(maastricht?.textContent).toContain("IC 2h 02m");
+        expect(maastricht?.textContent).not.toContain("?");
+        expect(denHelder?.textContent).toContain("IC 1h 12m");
+        expect(denHelder?.textContent).toContain("IC 36m");
+        expect(denHelder?.textContent).toContain("?");
+    });
+
+    it("labels the time grid and the mystery station", () => {
+        overwriteGetLocale(() => "en");
+        const { container } = render(
+            <GuessList guesses={guesses} stations={stations} />,
+        );
+
+        expect(container.textContent).toContain("Mystery station");
+        for (const label of ["30 min", "1 h", "1 h 30", "2 h"]) {
+            expect(container.textContent).toContain(label);
+        }
+    });
+
+    it("speaks Dutch by default", () => {
+        render(<GuessList guesses={guesses} stations={stations} />);
+
+        expect(screen.getByRole("list", { name: "Je gokken" })).toBeDefined();
+        expect(screen.getByText("Mysteriestation")).toBeDefined();
+    });
+
+    it("draws no trip for a correct guess", () => {
+        overwriteGetLocale(() => "en");
+        render(
+            <GuessList
+                guesses={[
+                    ...guesses,
+                    { guess: "ut2", correct: true, steps: [], totalMinutes: 0 },
+                ]}
+                stations={[
+                    ...stations,
+                    { code: "ut2", name: "Amersfoort Centraal" },
+                ]}
+            />,
+        );
+
+        const [found] = rows();
+        expect(found?.textContent).toContain("You're here");
+        expect(found?.querySelector(".sr-only")?.textContent).toBe(
+            "Guess 5, Amersfoort Centraal: the mystery station.",
+        );
+    });
+
+    it("renders nothing before the first guess", () => {
+        const { container } = render(<GuessList guesses={[]} stations={stations} />);
+
+        expect(container.innerHTML).toBe("");
+    });
+});

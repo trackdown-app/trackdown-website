@@ -38,4 +38,5 @@ The site runs on http://localhost:3000.
 - [Design system](docs/design-system.md)
 - [Site shell](docs/site-shell.md)
 - [Station search](docs/station-search.md)
+- [Guess list](docs/guess-list.md)
 - [Deploy](docs/deploy.md)
