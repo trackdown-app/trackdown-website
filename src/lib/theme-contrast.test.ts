@@ -3,9 +3,9 @@ import { describe, expect, it } from "vitest";
 
 const css = readFileSync(new URL("../styles.css", import.meta.url), "utf8");
 
-/** The `--td-*` hex colours declared inside the first `:root { … }` after `start`. */
-function readTokens(start: number): Map<string, string> {
-    const open = css.indexOf(":root {", start);
+/** The `--td-*` hex colours declared inside the given selector’s block. */
+function readTokens(selector: string): Map<string, string> {
+    const open = css.indexOf(selector);
     const close = css.indexOf("}", open);
     const block = css.slice(open, close);
     const tokens = new Map<string, string>();
@@ -19,8 +19,8 @@ function readTokens(start: number): Map<string, string> {
 }
 
 const modes = {
-    light: readTokens(0),
-    dark: readTokens(css.indexOf("@media (prefers-color-scheme: dark)")),
+    light: readTokens(":root {"),
+    dark: readTokens(':root[data-theme="dark"] {'),
 };
 
 function luminance(hex: string): number {
@@ -64,4 +64,8 @@ describe.each(Object.entries(modes))("%s theme", (_mode, tokens) => {
         const bg = tokens.get(ground) ?? "";
         expect(contrast(fg, bg)).toBeGreaterThanOrEqual(4.5);
     });
+});
+
+it("keeps the no-JavaScript dark palette identical", () => {
+    expect(readTokens(":root:not([data-theme]) {")).toEqual(modes.dark);
 });

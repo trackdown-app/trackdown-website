@@ -22,10 +22,7 @@ Paraglide's default URL patterns read a leading `/nl` as the Dutch locale's pref
 
 ## Keeping the choice
 
-The choice lives in the `trackdown-network` cookie (`src/lib/network-choice.ts`): the network's id, `Path=/`, a year (`Max-Age`), `SameSite=Lax`, `Secure` over HTTPS. A cookie rather than `localStorage`, because the server reads it to answer `/` with the right redirect. It is set:
-
-- when the visitor picks a network in the picker, before the navigation, and
-- on every visit to a network's page (the layout's effect), so a shared link to another network becomes the choice too and the cookie's year starts again.
+The choice lives in the `trackdown-network` cookie (`src/lib/network-choice.ts`): the network's id, `Path=/`, a year (`Max-Age`), `SameSite=Lax`, `Secure` over HTTPS. A cookie rather than `localStorage`, because the server reads it to answer `/` with the right redirect. It is set only when the visitor picks a network in the picker, before the navigation: a preference they asked for, so it needs no consent, and merely visiting a page sets no cookie, as the consent contract promises ([analytics.md](analytics.md#consent-cookie)). Following a link to another network's page plays that network without changing the choice.
 
 `readNetworkChoice`, a `createIsomorphicFn`, reads it from the request's `Cookie` header in the server render and from `document.cookie` in the browser; a value that is not a network the game has reads as no choice. The root route's `beforeLoad` puts the result, or `defaultNetwork`, in every route's context as `chosenNetwork`.
 
@@ -40,7 +37,7 @@ The choice lives in the `trackdown-network` cookie (`src/lib/network-choice.ts`)
 - **To play** lists every network in `networks`: its chip in ink, its name in Barlow Condensed and, on the current one, the design's check in `line-1` with "Gekozen" / "Chosen" for screen readers. Each row links to the network's game; the router marks the current network's link `aria-current="page"`. Following one keeps it as the choice and closes the popup.
 - **Coming next** lists `upcomingNetworks` with soft chips and "Komt later" / "Coming later". They are not links. The design's "Notify me" buttons, network search and "Suggest a network" link are left out: there is nothing behind them yet.
 
-A network's name is its country's, from the runtime's own region names (`networkName`, `Intl.DisplayNames`): "Nederland" and "Netherlands", "België" and "Belgium", so a new network needs no message.
+A network's name is its country's, from the runtime's own region names (`regionName` in `src/lib/data/networks.ts`, `Intl.DisplayNames`; `networkName` in `src/lib/game/network-name.ts` for a network): "Nederland" and "Netherlands", "België" and "Belgium", so a new network needs no message.
 
 ## Adding a network
 

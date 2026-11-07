@@ -17,7 +17,7 @@ export type Network = {
     id: NetworkId;
     /** The network's folder inside the data directory. */
     dataDir: string;
-    /** The country it covers, which names it in every language (`networkName`). */
+    /** The country it covers, which names it in every language (`regionName`). */
     region: RegionCode;
 };
 
@@ -43,9 +43,10 @@ export const upcomingNetworks: ReadonlyArray<RegionCode> = [
 ];
 
 /**
- * The name of `region`'s network in `locale`, the country's name from the
- * runtime's own data: "Nederland", "Netherlands". Falls back to the code.
+ * The name of `region` in `locale`, the country's name from the runtime's
+ * own data: "Nederland", "Netherlands". Falls back to the code. A network is
+ * named after its region (`networkName`, `src/lib/game/network-name.ts`).
  */
-export function networkName(region: RegionCode, locale: string): string {
+export function regionName(region: RegionCode, locale: string): string {
     return new Intl.DisplayNames([locale], { type: "region" }).of(region) ?? region;
 }

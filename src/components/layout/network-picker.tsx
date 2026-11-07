@@ -9,8 +9,8 @@ import { PopoverContent } from "@/components/ui/popover-content";
 import { PopoverTitle } from "@/components/ui/popover-title";
 import {
     networkIds,
-    networkName,
     networks,
+    regionName,
     upcomingNetworks,
 } from "@/lib/data/networks";
 import { keepNetworkChoice } from "@/lib/network-choice";
@@ -30,7 +30,7 @@ export function NetworkPicker() {
     const locale = getLocale();
     const [open, setOpen] = useState(false);
     const upcomingId = useId();
-    const currentName = networkName(current.region, locale);
+    const currentName = regionName(current.region, locale);
 
     return (
         <Popover open={open} onOpenChange={setOpen}>
@@ -87,7 +87,7 @@ export function NetworkPicker() {
                                         className="size-11 text-[15px]"
                                     />
                                     <span className={`flex-1 ${nameClasses}`}>
-                                        {networkName(network.region, locale)}
+                                        {regionName(network.region, locale)}
                                     </span>
                                     {chosen && (
                                         <span className="flex size-6 items-center justify-center rounded-full bg-line-1 text-on-line">
@@ -130,7 +130,7 @@ export function NetworkPicker() {
                                     />
                                     <span className="flex flex-1 flex-col">
                                         <span className={nameClasses}>
-                                            {networkName(region, locale)}
+                                            {regionName(region, locale)}
                                         </span>
                                         <span className="text-sm text-muted-foreground">
                                             {m["networkPicker.comingLater"]()}

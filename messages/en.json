@@ -21,6 +21,24 @@
         "share": "Share result",
         "olderPuzzle": "Play an older puzzle"
     },
+    "statistics": {
+        "title": "Your {network} record",
+        "played": "Played",
+        "won": "Won",
+        "winPercent": "{percent}%",
+        "streak": "Streak",
+        "bestStreak": "Best streak",
+        "guessesNeeded": "Guesses needed",
+        "missed": "Missed",
+        "rowOne": "1 guess: {count}",
+        "rowMany": "{guesses} guesses: {count}",
+        "rowMissed": "Missed: {count}",
+        "rowToday": "{row}, today's game",
+        "loading": "Loading your record",
+        "failed": "Your record didn't load.",
+        "retry": "Try again",
+        "close": "Close"
+    },
     "progress": {
         "playing": "Guess {number} of {total}, newest first",
         "won": "Found in {count} of {total}, newest first",
@@ -122,7 +140,8 @@
         "howToPlay": "How to play",
         "statistics": "Statistics",
         "network": "Network",
-        "changeNetwork": "Change network"
+        "changeNetwork": "Change network",
+        "darkMode": "Dark mode"
     },
     "networkPicker": {
         "title": "Networks",
@@ -131,6 +150,15 @@
         "chosen": "Chosen",
         "upcoming": "Coming next",
         "comingLater": "Coming later"
+    },
+    "consent": {
+        "title": "Cookies, only if you're OK with it",
+        "copy": "Trackdown is a hobby project without ads. Visits are counted anonymously, without cookies. With your OK, PostHog also sets a cookie so I can see how returning players do and make the game better. Nothing is sold. Decline and the game works exactly the same.",
+        "privacy": "Privacy policy",
+        "decline": "Decline",
+        "accept": "Accept",
+        "accepted": "Analytics cookie on. Thanks for helping improve Trackdown.",
+        "declined": "No analytics cookie. Visits are only counted anonymously."
     },
     "footer": {
         "tagline": "Trackdown, a hobby project by Bram Gussekloo",

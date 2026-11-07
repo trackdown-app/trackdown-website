@@ -1,7 +1,5 @@
-import { Outlet, createFileRoute, notFound } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { createFileRoute, notFound } from "@tanstack/react-router";
 import { networkIdSchema } from "@/lib/data/networks";
-import { keepNetworkChoice } from "@/lib/network-choice";
 
 /**
  * Every page of one network: its game at `/{network}` and its archive at
@@ -17,14 +15,4 @@ export const Route = createFileRoute("/$network")({
         }
         return { network: parsed.data };
     },
-    component: NetworkPages,
 });
-
-function NetworkPages() {
-    const { network } = Route.useRouteContext();
-    // The network played last is the one `/` sends back to.
-    useEffect(() => {
-        keepNetworkChoice(network);
-    }, [network]);
-    return <Outlet />;
-}

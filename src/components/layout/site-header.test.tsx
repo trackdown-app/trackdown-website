@@ -76,15 +76,15 @@ describe("SiteHeader", () => {
         expect(html).toContain('aria-label="Network: Netherlands. Change network"');
     });
 
-    it("keeps the statistics button reachable by keyboard, announced as unavailable", async () => {
+    it("renders the statistics button as an enabled dialog trigger", async () => {
         const html = await renderAt(SiteHeader, "/nl");
         const button = /<button [^>]*aria-label="Statistieken"[^>]*>/.exec(
             html,
         )?.[0];
 
-        expect(button).toContain('aria-disabled="true"');
+        expect(button).toContain('aria-haspopup="dialog"');
+        expect(button).not.toContain("aria-disabled");
         expect(button).not.toMatch(/\sdisabled(=|\s|>)/);
-        expect(button).not.toContain('tabindex="-1"');
     });
 
     it("carries the language switch", async () => {

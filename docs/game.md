@@ -24,9 +24,7 @@ Once the game is over the question, the search and the progress give way to the 
 - **The answer plate.** `AnswerPlate` (`src/components/game/answer-plate.tsx`): a 16px-cornered plate in `plate`, the theme turned over ([design-system.md](design-system.md#colour)). The logo mark in its plate colours, its bar filled, beside how it went in `plate-muted` 18px: "You tracked it down in 5 of 6 guesses" / "Je hebt hem gevonden in 5 van 6 gokken", or when missed "No guesses left. The mystery station was" / "Geen gokken meer. Het mysteriestation was". Below it the mystery station as the page's `h1`, Barlow Condensed 800, 52px to 112px with the width. The plate is a section named "Today's answer" / "Het antwoord van vandaag".
 - **The buttons.** "Share result" / "Deel je resultaat", the ink main button with a share icon, and "Play an older puzzle" / "Speel een eerdere puzzel", an outlined link to the network's archive (`/{network}/archief`, `networkArchivePath`, [archive.md](archive.md)). Both 52px, 12px corners. The share button shares the result ([share.md](share.md#sharing)), and a status line under the buttons says when it was copied instead.
 - **How you got there.** `GuessList` in its revealed form ([guess-list.md](guess-list.md#revealed)): every guess, newest first, every change named.
-- **What you'll share.** `SharePreview` ([share.md](share.md#the-preview)): the exact text the share button hands on, without station names.
-
-The design's record beside "What you'll share" comes with statistics.
+- **Your record and what you'll share.** Side by side in a row that wraps: the player's record at the network ([statistics.md](statistics.md)), and `SharePreview` ([share.md](share.md#the-preview)), the exact text the share button hands on, without station names.
 
 ### The answer comes from the reveal
 
@@ -69,14 +67,16 @@ The server render has no storage, so it renders a game with no guesses. `useSync
 
 ## Storage
 
-A game is kept in `localStorage` under `trackdown:game:v1:{network}:{number}`, one entry per network and puzzle, as `{"guesses":[…]}`, with `"archive":true` once a guess at it was made in the archive ([archive.md](archive.md#the-streak)). A new day is a new puzzle number and so a new game; old entries stay, for the archive's results and statistics to come.
+Successful guesses also emit the typed [game analytics events](analytics.md#game-events): first play, each guess, the outcome and first archive play. Failed guesses and restored games emit none; event properties contain only puzzle metadata and counts.
+
+A game is kept in `localStorage` under `trackdown:game:v1:{network}:{number}`, one entry per network and puzzle, as `{"guesses":[…]}`, with `"archive":true` once a guess at it was made in the archive ([archive.md](archive.md#the-streak)), which keeps it out of the streak ([statistics.md](statistics.md#streaks)). A new day is a new puzzle number and so a new game; old entries stay, for the archive's results and the statistics.
 
 `createGameStore` (`src/lib/game/game-store.ts`) guards every read and write with `try`/`catch`. Where storage is unavailable (blocked, full, a private window that refuses it) a write is held in the page's memory instead: the game plays as usual, it just does not survive a reload. An entry that is not valid JSON or not a game this version wrote reads as a game with no guesses. A breaking change to the format bumps the `v1` in the key.
 
 ## Tests
 
 - `src/lib/game/game-state.test.ts` covers the key, writing and reading back a game, broken entries, the status, and the store with storage and without.
-- `src/components/game/game-page.test.tsx` renders the page in `happy-dom` with `submitGuessFn` mocked: the day line, kept guesses and progress, a guess sent with the earlier ones and kept over a reload, a hidden change on an earlier trip named once it is guessed, a game without storage, a guess that fails, Dutch. With `revealAnswerFn` mocked too: winning (the reveal asked once with the guesses, the answer as the focused heading, the revealed list, the buttons), missing (every change named, focus left alone), no answer before the reveal answers, and a reveal that fails and is asked again; sharing the result ([share.md](share.md#tests)).
+- `src/components/game/game-page.test.tsx` renders the page in `happy-dom` with `submitGuessFn` mocked: the day line, kept guesses and progress, a guess sent with the earlier ones and kept over a reload, a hidden change on an earlier trip named once it is guessed, a game without storage, a guess that fails, Dutch. With `revealAnswerFn` mocked too: winning (the reveal asked once with the guesses, the answer as the focused heading, the revealed list, the buttons), missing (every change named, focus left alone), no answer before the reveal answers, and a reveal that fails and is asked again; sharing the result ([share.md](share.md#tests)); the record, with `getPuzzleArchiveFn` mocked ([statistics.md](statistics.md#tests)).
 - `src/lib/game/countdown.test.ts` covers the clock and the duration, midnight in Amsterdam rather than UTC, and the 23- and 25-hour days the clocks change.
 - `src/components/game/next-puzzle-countdown.test.tsx` renders the countdown in `happy-dom` with fake timers and `getTodayPuzzleFn` mocked: the text in both languages, ticking, reading the puzzle again at zero, asking again while the server still answers the old one, and hydrating over a server render two seconds older without an error.
 - `src/router.test.tsx` renders `/nl` through the router with the server functions mocked, the countdown in its footer.

@@ -27,10 +27,3 @@ export const sitePaths = {
 export function networkArchivePath(network: NetworkId): string {
     return `/${network}/archief`;
 }
-
-/**
- * Where "Cookie settings" in the footer points until the cookie banner
- * exists: the privacy policy's part on cookies. The banner's own button,
- * which opens it again, replaces the link.
- */
-export const cookieSettingsLink = { path: sitePaths.privacy, hash: "cookies" };

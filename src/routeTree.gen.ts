@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as NetworkRouteRouteImport } from './routes/$network/route'
+import { Route as ConsentRouteImport } from './routes/consent'
 import { Route as HoeTeSpelenRouteImport } from './routes/hoe-te-spelen'
 import { Route as NetworkIndexRouteImport } from './routes/$network/index'
 import { Route as NetworkArchiefIndexRouteImport } from './routes/$network/archief/index'
@@ -32,6 +33,11 @@ const IndexRoute = IndexRouteImport.update({
 const NetworkRouteRoute = NetworkRouteRouteImport.update({
   id: '/$network',
   path: '/$network',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConsentRoute = ConsentRouteImport.update({
+  id: '/consent',
+  path: '/consent',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HoeTeSpelenRoute = HoeTeSpelenRouteImport.update({
@@ -102,6 +108,7 @@ const ApiV1NetworkPuzzlesNumberRevealRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$network': typeof NetworkRouteRouteWithChildren
+  '/consent': typeof ConsentRoute
   '/hoe-te-spelen': typeof HoeTeSpelenRoute
   '/$network/': typeof NetworkIndexRoute
   '/$network/archief/$number': typeof NetworkArchiefNumberRoute
@@ -117,6 +124,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/consent': typeof ConsentRoute
   '/hoe-te-spelen': typeof HoeTeSpelenRoute
   '/$network': typeof NetworkIndexRoute
   '/$network/archief/$number': typeof NetworkArchiefNumberRoute
@@ -134,6 +142,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/$network': typeof NetworkRouteRouteWithChildren
+  '/consent': typeof ConsentRoute
   '/hoe-te-spelen': typeof HoeTeSpelenRoute
   '/$network/': typeof NetworkIndexRoute
   '/$network/archief/$number': typeof NetworkArchiefNumberRoute
@@ -152,6 +161,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/$network'
+    | '/consent'
     | '/hoe-te-spelen'
     | '/$network/'
     | '/$network/archief/$number'
@@ -167,6 +177,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/consent'
     | '/hoe-te-spelen'
     | '/$network'
     | '/$network/archief/$number'
@@ -183,6 +194,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/$network'
+    | '/consent'
     | '/hoe-te-spelen'
     | '/$network/'
     | '/$network/archief/$number'
@@ -200,6 +212,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   NetworkRouteRoute: typeof NetworkRouteRouteWithChildren
+  ConsentRoute: typeof ConsentRoute
   HoeTeSpelenRoute: typeof HoeTeSpelenRoute
   ApiV1SplatRoute: typeof ApiV1SplatRoute
   ApiV1MetaRoute: typeof ApiV1MetaRoute
@@ -225,6 +238,13 @@ declare module '@tanstack/react-router' {
       path: '/$network'
       fullPath: '/$network'
       preLoaderRoute: typeof NetworkRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/consent': {
+      id: '/consent'
+      path: '/consent'
+      fullPath: '/consent'
+      preLoaderRoute: typeof ConsentRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/hoe-te-spelen': {
@@ -333,6 +353,7 @@ const NetworkRouteRouteWithChildren = NetworkRouteRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   NetworkRouteRoute: NetworkRouteRouteWithChildren,
+  ConsentRoute: ConsentRoute,
   HoeTeSpelenRoute: HoeTeSpelenRoute,
   ApiV1SplatRoute: ApiV1SplatRoute,
   ApiV1MetaRoute: ApiV1MetaRoute,
@@ -348,10 +369,11 @@ export const routeTree = rootRouteImport
   ._addFileTypes<FileRouteTypes>()
 
 import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
+import type { startInstance } from './start.ts'
 declare module '@tanstack/react-start' {
   interface Register {
     ssr: true
     router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
   }
 }

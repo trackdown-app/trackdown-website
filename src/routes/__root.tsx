@@ -2,6 +2,8 @@ import type { QueryClient } from "@tanstack/react-query";
 import { createRootRouteWithContext } from "@tanstack/react-router";
 import { m } from "@/paraglide/messages";
 import { RootDocument } from "@/components/layout/root-document";
+import { consentQueryOptions } from "@/lib/analytics/consent.queries";
+import type { ConsentChoice } from "@/lib/analytics/consent";
 import { defaultNetwork } from "@/lib/data/networks";
 import { readNetworkChoice } from "@/lib/network-choice";
 import appCss from "../styles.css?url";
@@ -18,6 +20,13 @@ export const Route = createRootRouteWithContext<RouterContext>()({
     beforeLoad: async () => ({
         chosenNetwork: (await readNetworkChoice()) ?? defaultNetwork,
     }),
+    loader: async ({ context }): Promise<{ consent: ConsentChoice | null }> => ({
+        consent: await context.queryClient.ensureQueryData(consentQueryOptions()),
+    }),
+    // Native consent forms reload the page after a change. Client navigation
+    // can keep the server-rendered answer for this document's lifetime.
+    staleTime: Infinity,
+    headers: () => ({ "Cache-Control": "private, no-store" }),
     head: () => ({
         meta: [
             {

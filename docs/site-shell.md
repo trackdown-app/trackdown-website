@@ -1,6 +1,6 @@
 # Site shell
 
-The parts every page shares: the skip link, the header and the footer, and the not-found and error pages. `RootDocument` (`src/components/layout/root-document.tsx`), the root route's `shellComponent` in `src/routes/__root.tsx`, renders them around each page, the not-found and error pages included. The page itself sits in `<div id="content">` between the header and the footer.
+The parts every page shares: the skip link, the header and the footer, the cookie consent banner, and the not-found and error pages. `RootDocument` (`src/components/layout/root-document.tsx`), the root route's `shellComponent` in `src/routes/__root.tsx`, renders them around each page, the not-found and error pages included. The page itself sits in `<div id="content">` between the header and the footer. The root loader reads consent for the server-rendered banner or status. Pages are private and uncacheable ([analytics.md](analytics.md)).
 
 The design draws the shell on the Trackdown design canvas's Web · Playing board (header and footer with the legend) and Web · Privacy policy board (footer with the tagline). The header, the footer and every page's `main` share one column, `shellContainer` (`src/components/layout/shell-container.ts`): 1080px at most, centred, 24px on each side.
 
@@ -19,21 +19,22 @@ Every focusable element shows the site-wide `:focus-visible` outline from `src/s
 - **The logo**, linking to the current network's game (a router `<Link to="/$network">`, so it points at `/nl`, or `/en/nl` on an English page; the network from `useCurrentNetwork`, [network-picker.md](network-picker.md#keeping-the-choice)): the line mark (`LogoMark`, `src/components/layout/logo-mark.tsx`, the Brand board's SVG drawn in the theme's tokens, so it follows dark mode) and the wordmark in Barlow Condensed 800. Its name starts with the visible "Trackdown" and says where it goes (`header.home`).
 - **The network pill** (`NetworkPicker`): an ink-bordered pill with the network's code chip, its name and a chevron, the button that opens the network picker ([network-picker.md](network-picker.md#the-picker)). Screen readers hear "Netwerk: Nederland. Kies een netwerk".
 - **Archive and How to play** in a `<nav>` named `header.nav`. The current page carries `aria-current="page"` and shows underlined and semibold. Both have their route ([archive.md](archive.md), [how-to-play.md](how-to-play.md)), so both are a router `<Link>`. Archive is the current network's (`/{network}/archief`), and the current page on every puzzle of it too (`/{network}/archief/{number}`).
-- **The statistics button**, a 44px icon button (Lucide's `ChartNoAxesColumn`) named `header.statistics`. Statistics are not kept yet, so it has nothing to open: it is disabled with Base UI's `focusableWhenDisabled`, so it stays in the Tab order and is announced as unavailable (`aria-disabled="true"`). The statistics work gives it an `onClick` and drops `disabled`.
+- **The statistics button**, a 44px icon button (Lucide's `ChartNoAxesColumn`) named `header.statistics`. It opens the statistics dialog, the player's record at today's network (`StatisticsDialog`, [statistics.md](statistics.md#the-dialog)).
+- **The theme toggle** (`ThemeToggle`), a 44px shadcn icon button beside Statistics. Its stable accessible name is “Dark mode” / “Donkere modus”; `aria-pressed` tells whether dark mode is active. Moon and sun icons follow the resolved theme. Click, Enter or Space switches to the opposite theme and saves the override ([design-system.md](design-system.md#dark-mode)). The design does not draw this control, so it reuses the statistics button’s shape, spacing and tokens.
 - **The language switch** (`LanguageSwitch`, [i18n.md](i18n.md#language-switch)), which the design does not draw; it sits last.
 
 Both halves of the header wrap. At phone width the network pill drops below the logo and the language switch below the links, so nothing scrolls sideways down to 320px. Every control is at least 44px high.
 
-`src/components/layout/site-header.test.tsx` checks the links in both languages, `aria-current`, the pill's name in both languages, that the statistics button stays focusable and the language switch.
+`src/components/layout/site-header.test.tsx` checks the links in both languages, `aria-current`, the pill's name in both languages, that the statistics button is an enabled dialog trigger and the language switch.
 
 ## Footer
 
 `SiteFooter` (`src/components/layout/site-footer.tsx`) sits below a hairline (`rule`) in muted 15px text and holds:
 
 - **The legend slot.** A route that names a component in `staticData.footerLegend` gets it here, such as the game page's `PlayingFooterLegend`: the line legend (`GameLegend`, [guess-list.md](guess-list.md#legend)) and, opposite it, the countdown to the next station (`NextPuzzleCountdown`, [game.md](game.md#countdown)). A legend may be a fragment of several parts; each is an item of the footer's wrapping row. The footer takes the deepest matched route's legend, so a child route can name its own. Without one, the footer shows the tagline (`footer.tagline`), as on the privacy board. With a legend, the links take a row of their own, as on the playing board. The type lives with the router's `Register` in `src/router.tsx`.
-- **The links**: About, Privacy, Terms and Cookie settings, in a `<nav>` named `footer.nav`. The current page carries `aria-current="page"` and shows in ink, semibold. Each link is 44px high.
+- **The links**: About, Privacy and Terms, plus a Cookie settings button, in a `<nav>` named `footer.nav`. The current page link carries `aria-current="page"` and shows in ink, semibold. Each control is at least 44px high.
 
-"Cookie settings" links to the privacy policy's part on cookies (`/privacy#cookies`, `cookieSettingsLink`) until the cookie banner exists; the banner's own button, which opens it again, then replaces the link.
+"Cookie settings" submits a GET to the current localized page with `cookie-settings=open#cookie-title`, reopening the banner even without JavaScript ([analytics.md](analytics.md#banner-and-settings)). Footer padding leaves room for the fixed consent status.
 
 ```ts
 export const Route = createFileRoute("/")({

@@ -21,6 +21,24 @@
         "share": "Deel je resultaat",
         "olderPuzzle": "Speel een eerdere puzzel"
     },
+    "statistics": {
+        "title": "Jouw record in {network}",
+        "played": "Gespeeld",
+        "won": "Gewonnen",
+        "winPercent": "{percent}%",
+        "streak": "Reeks",
+        "bestStreak": "Beste reeks",
+        "guessesNeeded": "Benodigde gokken",
+        "missed": "Gemist",
+        "rowOne": "1 gok: {count}",
+        "rowMany": "{guesses} gokken: {count}",
+        "rowMissed": "Gemist: {count}",
+        "rowToday": "{row}, het spel van vandaag",
+        "loading": "Je record wordt geladen",
+        "failed": "Je record kwam niet door.",
+        "retry": "Probeer het opnieuw",
+        "close": "Sluiten"
+    },
     "progress": {
         "playing": "Gok {number} van {total}, nieuwste eerst",
         "won": "Gevonden in {count} van {total}, nieuwste eerst",
@@ -122,7 +140,8 @@
         "howToPlay": "Hoe speel je",
         "statistics": "Statistieken",
         "network": "Netwerk",
-        "changeNetwork": "Kies een netwerk"
+        "changeNetwork": "Kies een netwerk",
+        "darkMode": "Donkere modus"
     },
     "networkPicker": {
         "title": "Netwerken",
@@ -131,6 +150,15 @@
         "chosen": "Gekozen",
         "upcoming": "Binnenkort",
         "comingLater": "Komt later"
+    },
+    "consent": {
+        "title": "Cookies, alleen als jij het goed vindt",
+        "copy": "Trackdown is een hobbyproject zonder advertenties. Bezoeken worden anoniem geteld, zonder cookies. Met jouw toestemming plaatst PostHog ook een cookie, zodat ik kan zien hoe terugkerende spelers het doen en het spel kan verbeteren. Er wordt niets verkocht. Weiger je, dan werkt het spel precies hetzelfde.",
+        "privacy": "Privacybeleid",
+        "decline": "Weigeren",
+        "accept": "Accepteren",
+        "accepted": "Analytische cookie aan. Bedankt dat je helpt Trackdown te verbeteren.",
+        "declined": "Geen analytische cookie. Bezoeken worden alleen anoniem geteld."
     },
     "footer": {
         "tagline": "Trackdown, een hobbyproject van Bram Gussekloo",

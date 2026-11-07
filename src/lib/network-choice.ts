@@ -10,7 +10,7 @@ import type { NetworkId } from "@/lib/data/networks";
  */
 export const networkCookieName = "trackdown-network";
 
-/** A year, in seconds; every visit to a network's page renews it. */
+/** A year, in seconds; every pick in the picker renews it. */
 const networkCookieMaxAge = 60 * 60 * 24 * 365;
 
 /** The kept network in a `Cookie` header or `document.cookie`, if it is one the game has. */

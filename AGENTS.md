@@ -38,11 +38,14 @@
   - `docs/station-search.md`: the station search combobox, its matching, keyboard and screen reader behaviour, the combobox parts in `src/components/ui/`.
   - `docs/guess-list.md`: the guess list, its rows and summaries, the trip line's width, segments, change rings and labels, the time grid, the game legend, the screen reader text.
   - `docs/game.md`: the game page at `/`, its route and loader, the progress dots, the game state and the guess mutation, how a game is kept in `localStorage`.
+  - `docs/statistics.md`: the player's record (played, won, streaks, guesses needed), how it is worked out from kept games, the streak rules, the record on the solved screen, the statistics dialog and its dialog parts in `src/components/ui/`.
   - `docs/share.md`: the share text and its grid, the Web Share API and clipboard fallback, the Share result button, the "What you'll share" preview.
   - `docs/how-to-play.md`: the How to play page at `/hoe-te-spelen`, its rules, example trip and legend.
   - `docs/archive.md`: the archive at `/archief` and its list, playing an earlier puzzle at `/archief/{number}`, the 404 for a future puzzle, the archive mark that keeps a game out of the streak.
   - `docs/network-picker.md`: the network routes under `/{network}`, the `/` redirect, the `trackdown-network` cookie that keeps the choice, the header's network pill and picker, adding a network.
   - `docs/deploy.md`: Nitro's preset detection, the `.vercel/output` layout, the function region, the game data's build-time variables, the deploy workflow and its secrets, the Vercel project and its environments, a manual deploy.
+  - `docs/logging.md`: server logs and traces, PostHog EU, startup validation, Vercel flushing, privacy filtering, and the telemetry tests.
+  - `docs/analytics.md`: the consent banner and status, native consent forms and cookie settings, the versioned consent cookie, the browser analytics integration contract, and the typed game events.
 - A new feature area gets its own `docs/<feature>.md`, an entry in the README's documentation list and a line in the list above.
 
 ## Strict Boolean Expressions

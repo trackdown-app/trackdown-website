@@ -32,7 +32,7 @@ The page sets its own `<title>`, "Puzzle 142 · Trackdown" (`archive.puzzlePageT
 
 ## The streak
 
-Archive games do not count for the streak. Every guess made on `/{network}/archief/{number}` marks the kept game `"archive": true` (`serializeGame`, `src/lib/game/game-state.ts`), and once marked it stays marked, even when the game is played on elsewhere. `parseStoredGame` reads it back as `archive`. A game played only on its own day, on the network's game page, has no `archive` field, so games kept before the archive read the same. Statistics, when they come, count a streak from games without it.
+Archive games do not count for the streak. Every guess made on `/{network}/archief/{number}` marks the kept game `"archive": true` (`serializeGame`, `src/lib/game/game-state.ts`), and once marked it stays marked, even when the game is played on elsewhere. `parseStoredGame` reads it back as `archive`. A game played only on its own day, on the network's game page, has no `archive` field, so games kept before the archive read the same. The statistics count a streak from games without it ([statistics.md](statistics.md#streaks)).
 
 ## Messages
 

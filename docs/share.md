@@ -25,6 +25,8 @@ The correct guess has no trip, so it has no line; the score and footer count it.
 
 ## Sharing
 
+A successful share or clipboard copy emits `result_shared` with puzzle metadata and the method, never the shared text. Cancelled and failed shares emit no game event ([analytics.md](analytics.md#game-events)).
+
 `ShareButton` (`src/components/game/share-button.tsx`) hands the text to `shareResult` (`src/lib/game/share-result.ts`):
 
 - **Web Share API.** Where `navigator.share` exists and `navigator.canShare({ text })` allows it, the device's share sheet opens with the text. A player closing the sheet (`AbortError`) is left alone. Any other refusal falls through to the clipboard.

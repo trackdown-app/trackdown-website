@@ -48,7 +48,13 @@ The suggestion list's shadow is `shadow-popover` (`0 16px 40px`, ink at 14% in l
 
 ### Dark mode
 
-Dark mode follows the operating system (`prefers-color-scheme`). There is no theme toggle. The `dark:` variant uses the same media query, but a component rarely needs it: every utility above already switches, because the tokens do.
+Dark mode follows the operating system (`prefers-color-scheme`) until the player toggles the header’s “Dark mode” button. That saves `light` or `dark` in `localStorage` under `trackdown:theme:v1`, overriding the system across visits. With no saved choice, live system changes update the page; another tab’s saved choice also updates it. Invalid or unreadable storage falls back to the system. If writing storage fails, the override lasts for the current visit.
+
+`src/lib/theme.ts` supplies a small, synchronous inline script. `RootDocument` puts it in the head before the stylesheet and page, so the first paint already uses the correct palette. It sets `data-theme` to the resolved theme and `data-theme-preference` to `system`, `light` or `dark` on `<html>`. The `<html>` element suppresses the expected hydration differences from these client-set attributes; the server and first client render of the button agree, then `useSyncExternalStore` reads the resolved theme. The icons follow CSS immediately. No theme request or cookie is needed. Without JavaScript the CSS media query still follows the system.
+
+The `dark:` variant uses `data-theme="dark"`; a component rarely needs it because the colour tokens switch together. The supplied `Trackdown.html` canvas confirms the existing light and dark playing palettes; the override button is an addition to the design, reusing its 44px header icon-button style.
+
+`src/components/layout/theme-toggle.test.tsx` executes the exact head script and checks both system themes, saved overrides, invalid/blocked storage, live system changes, persistence, cross-tab changes, keyboard use, hydration without mismatches and both languages. `src/router.test.tsx` checks that the script is sent before the stylesheet and body. The contrast tests also check that the no-JavaScript dark palette stays identical.
 
 ### Contrast
 

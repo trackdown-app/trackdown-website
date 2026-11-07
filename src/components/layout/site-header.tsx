@@ -1,12 +1,12 @@
 import { Link } from "@tanstack/react-router";
-import { ChartNoAxesColumn } from "lucide-react";
 import { m } from "@/paraglide/messages";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
 import { LanguageSwitch } from "@/components/language/language-switch";
 import { LogoMark } from "@/components/layout/logo-mark";
 import { NetworkPicker } from "@/components/layout/network-picker";
 import { shellContainer } from "@/components/layout/shell-container";
+import { StatisticsDialog } from "@/components/layout/statistics-dialog";
+import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { useCurrentNetwork } from "@/lib/use-current-network";
 
 const navLinkClasses =
@@ -15,7 +15,7 @@ const navLinkClasses =
 /**
  * The header every page shares, after the design's Web · Playing board: the
  * logo linking to the network's game and the network picker on the left;
- * the network's archive, How to play, the statistics button and the
+ * the network's archive, How to play, statistics, the theme toggle and the
  * language switch on the right. Both halves wrap, so it fits a 320px screen
  * without scrolling sideways.
  */
@@ -63,19 +63,8 @@ export function SiteHeader() {
                         </li>
                     </ul>
                 </nav>
-                {/* Statistics are not kept yet, so the button has nothing to
-                    open. It stays reachable by keyboard and is announced as
-                    unavailable (`aria-disabled`) until the statistics dialog
-                    gives it an `onClick` (docs/site-shell.md#header). */}
-                <Button
-                    variant="ghost"
-                    size="icon-lg"
-                    aria-label={m["header.statistics"]()}
-                    disabled
-                    focusableWhenDisabled
-                >
-                    <ChartNoAxesColumn aria-hidden="true" className="size-[22px]" />
-                </Button>
+                <StatisticsDialog network={network} />
+                <ThemeToggle />
                 <LanguageSwitch />
             </div>
         </header>
