@@ -39,11 +39,11 @@ Two build-time variables, read by `vite.config.ts` (from the environment, or `.e
 
 ## The deploy workflow
 
-`.github/workflows/deploy.yml` deploys every pull request to Preview and every push to `main` to Production. A newer push to a pull request cancels its running preview deploy; production deploys queue.
+`.github/workflows/deploy.yml` deploys every pull request to Preview, and every push to `main` and every dispatch from `main` to Production. A newer push to a pull request cancels its running preview deploy; production deploys queue, and GitHub keeps one waiting run, so a newer one replaces it.
 
-1. Checks out this repository, then trackdown-data's `main` into `.trackdown-data/` (Git-ignored, outside `public/`), only its `data/` folder. Both checkouts use `persist-credentials: false`, so no token is left in a `.git/config`.
+1. Checks out this repository, then trackdown-data into `.trackdown-data/` (Git-ignored, outside `public/`), only its `data/` folder: the dispatched `data_ref`, or else the tip of its `main`. Both checkouts use `persist-credentials: false`, so no token is left in a `.git/config`.
 2. Pins the deploy to that commit: its SHA becomes `TRACKDOWN_DATA_REF`. The step summary names it next to the deployment URL.
-3. `bun install`, then `bun run data:check` on the checkout, which fails the deploy when a data file does not match the loader's schemas ([data.md](data.md#checking-the-data)), then `vercel pull`, `vercel build` (with `TRACKDOWN_DATA_DIR` and `TRACKDOWN_DATA_REF`), `bun run build:guard` on the checkout, which fails the deploy before anything is uploaded when any of the data is in `.vercel/output/static` ([data.md](data.md#the-build-guard)), and `vercel deploy --prebuilt`, with `--prod` on `main`. The Vercel CLI is the `vercel` dev dependency. Only `.vercel/output/` is uploaded.
+3. `bun install`, then `bun run data:check` on the checkout, which fails the deploy when a data file does not match the loader's schemas ([data.md](data.md#checking-the-data)), then `vercel pull`, `vercel build` (with `TRACKDOWN_DATA_DIR` and `TRACKDOWN_DATA_REF`), `bun run build:guard` on the checkout, which fails the deploy before anything is uploaded when any of the data is in `.vercel/output/static` ([data.md](data.md#the-build-guard)), and `vercel deploy --prebuilt`, with `--prod` for production. The Vercel CLI is the `vercel` dev dependency. Only `.vercel/output/` is uploaded.
 4. The job runs in the GitHub environment `Preview` or `Production`, whose URL is the deployment, so a pull request links its preview.
 
 It uses `pull_request`, never `pull_request_target`: a pull request from a fork gets no secrets, and neither does one from Dependabot. The job skips those instead of failing, so code from outside the repository never runs next to a secret. They still get the CI checks (`pr.yml`), which need no data.
@@ -58,6 +58,23 @@ What the repository needs, in its settings (Secrets and variables → Actions):
 | `VERCEL_PROJECT_ID` | Variable | The project ID (`projectId` in the same file). |
 
 Neither token is a Vercel environment variable: the data token stays in GitHub, and the build reads the data from the runner's disk.
+
+## When the data changes
+
+A push to trackdown-data's `main` that touches `data/` (the December timetable rebuild, say) deploys production here without anyone running a deploy:
+
+1. trackdown-data's `.github/workflows/redeploy-website.yml` runs `gh workflow run deploy.yml --repo trackdown-app/trackdown-website --ref main -f data_ref=<the pushed SHA>`. It checks out nothing and its `GITHUB_TOKEN` gets no permissions.
+2. This repository's deploy workflow takes that `workflow_dispatch` like a push to `main`: it checks the `data_ref` is a full 40-character SHA, checks out trackdown-data at that commit, and deploys production. `TRACKDOWN_DATA_REF`, and so `/api/v1/meta`, is that SHA.
+
+The dispatch is `workflow_dispatch`, not `repository_dispatch`, for the token's scope. `repository_dispatch` takes Contents: write on this repository, enough to push to `main`. `workflow_dispatch` takes Actions: write, which can start, rerun and cancel this repository's workflows but cannot read or change its code or secrets. A dispatch from another branch skips the job, so the token cannot deploy production from anything but `main`.
+
+What trackdown-data needs, in its settings (Secrets and variables → Actions):
+
+| Name | Kind | What it is |
+| --- | --- | --- |
+| `WEBSITE_DEPLOY_TOKEN` | Secret | Fine-grained personal access token: resource owner `trackdown-app`, only the `trackdown-website` repository, permission Actions: read and write. |
+
+To redeploy by hand, for example after rotating a token: Actions → Deploy → Run workflow on `main`, with `data_ref` empty for the tip of trackdown-data's `main`, or a commit SHA to deploy (or roll back to) that commit.
 
 ## The Vercel project
 

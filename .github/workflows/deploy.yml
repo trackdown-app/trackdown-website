@@ -4,6 +4,18 @@ on:
   pull_request:
   push:
     branches: [main]
+  # A push to trackdown-data's `main` starts this through its own workflow
+  # (.github/workflows/redeploy-website.yml there), passing the commit it
+  # pushed. `workflow_dispatch` rather than `repository_dispatch`: starting
+  # it takes a token with Actions: write, while `repository_dispatch` needs
+  # Contents: write, which could push to this repository (docs/deploy.md).
+  # Run from the Actions tab without `data_ref`, it redeploys the data's tip.
+  workflow_dispatch:
+    inputs:
+      data_ref:
+        description: trackdown-data commit SHA to deploy (empty for the tip of main)
+        type: string
+        required: false
 
 # Every action is pinned to a commit SHA, with its release in a trailing
 # comment, so a moved tag cannot change what runs. Dependabot
@@ -12,7 +24,8 @@ permissions:
   contents: read
 
 # A newer push to a pull request replaces its running preview deploy.
-# Production deploys queue and never cancel one another mid-upload.
+# Production deploys (pushes and dispatches alike) queue and never cancel one
+# another mid-upload. GitHub keeps one waiting run: a newer one replaces it.
 concurrency:
   group: deploy-${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || 'production' }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
@@ -22,18 +35,22 @@ jobs:
     name: Deploy
     # `pull_request` (never `pull_request_target`) gives a fork's pull request
     # no secrets, and neither has Dependabot's. Their runs skip this job
-    # instead of failing; their code never runs next to a secret.
+    # instead of failing; their code never runs next to a secret. A dispatch
+    # deploys production only from `main`; one started on another branch
+    # skips.
     if: >-
       github.event_name == 'push' ||
-      (github.event.pull_request.head.repo.full_name == github.repository &&
+      (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') ||
+      (github.event_name == 'pull_request' &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
       github.actor != 'dependabot[bot]')
     runs-on: ubuntu-latest
     environment:
-      name: ${{ github.event_name == 'push' && 'Production' || 'Preview' }}
+      name: ${{ github.event_name != 'pull_request' && 'Production' || 'Preview' }}
       url: ${{ steps.deploy.outputs.url }}
     env:
-      VERCEL_ENVIRONMENT: ${{ github.event_name == 'push' && 'production' || 'preview' }}
-      VERCEL_PROD_FLAG: ${{ github.event_name == 'push' && '--prod' || '' }}
+      VERCEL_ENVIRONMENT: ${{ github.event_name != 'pull_request' && 'production' || 'preview' }}
+      VERCEL_PROD_FLAG: ${{ github.event_name != 'pull_request' && '--prod' || '' }}
       VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
       VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
     steps:
@@ -41,14 +58,27 @@ jobs:
         with:
           persist-credentials: false
 
-      # The private data, at the tip of its `main`, into a Git-ignored folder
-      # outside `public/`. The token is read-only for that one repository and
-      # only this step sees it; `persist-credentials: false` keeps it out of
+      # A dispatch's `data_ref` is a full commit SHA or empty; anything else
+      # fails here, before any token is used.
+      - name: Check the data ref
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          DATA_REF: ${{ inputs.data_ref }}
+        run: |
+          if [ -n "$DATA_REF" ] && ! printf '%s' "$DATA_REF" | grep -Eqx '[0-9a-f]{40}'; then
+            echo "::error::data_ref must be a full 40-character commit SHA, got '$DATA_REF'"
+            exit 1
+          fi
+
+      # The private data, at the dispatched commit or else the tip of its
+      # `main`, into a Git-ignored folder outside `public/`. The token is
+      # read-only for that one repository and only this step sees it;
+      # `persist-credentials: false` keeps it out of
       # `.trackdown-data/.git/config`. Only `data/` is checked out.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: trackdown-app/trackdown-data
-          ref: main
+          ref: ${{ inputs.data_ref || 'main' }}
           token: ${{ secrets.TRACKDOWN_DATA_TOKEN }}
           path: .trackdown-data
           sparse-checkout: data
