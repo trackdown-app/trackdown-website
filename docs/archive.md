@@ -28,7 +28,7 @@ The loader fills the archive and the stations queries and finds `{number}` in th
 - **Today's puzzle** redirects (307) to the network's game, so it has one address and counts for the streak.
 - **An earlier puzzle** is played by `GamePage` with `archive`, its `maxGuesses` from `src/lib/game/rules.ts`. It is the same game as the network's game page: the search, the guess list, the progress, the reveal, sharing. Only the words change: the question is "Which station was the mystery?" / "Welk station was het mysterie?" and the answer plate is "The answer" / "Het antwoord" rather than today's. The route keys the page by the puzzle's number, so moving to another puzzle starts a fresh game.
 
-The page sets its own `<title>`, "Puzzle 142 · Trackdown" (`archive.puzzlePageTitle`), the list "Archive · Trackdown" (`archive.pageTitle`). Its footer legend is the line legend only (`GameLegend`): the countdown is to today's next puzzle, not this one's.
+The page sets its own `<title>`, "Puzzle 142 · Trackdown" (`archive.puzzlePageTitle`), the list "Archive · Trackdown" (`archive.pageTitle`), through `seo()` with a description, canonical URL and hreflang links ([seo.md](seo.md)). Its footer legend is the line legend only (`GameLegend`): the countdown is to today's next puzzle, not this one's.
 
 ## The streak
 

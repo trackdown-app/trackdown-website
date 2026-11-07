@@ -186,6 +186,27 @@ describe("the site's router", () => {
         expect(html).toContain('href="#content"');
     });
 
+    it("describes the game page for a link preview with its puzzle number", async () => {
+        const { html } = await respondAt(getRouter, "/nl");
+
+        expect(html).toContain("<title>Trackdown NL · Puzzel 142</title>");
+        expect(html).toContain(
+            '<meta property="og:title" content="Trackdown NL · Puzzel 142"/>',
+        );
+        expect(html).toContain(
+            '<meta property="og:image" content="https://trackdown.nl/og-image.png"/>',
+        );
+        expect(html).toContain(
+            '<link rel="canonical" href="https://trackdown.nl/nl"/>',
+        );
+        expect(html).toContain(
+            '<link rel="alternate" hrefLang="en" href="https://trackdown.nl/en/nl"/>',
+        );
+        expect(html).toContain(
+            '<link rel="icon" href="/favicon.svg" type="image/svg+xml"/>',
+        );
+    });
+
     it("sends the theme initializer in the head before the stylesheet and body", async () => {
         const { html } = await respondAt(getRouter, "/nl");
         const script = html.indexOf(themeInitScript);

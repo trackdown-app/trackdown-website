@@ -36,8 +36,26 @@ export const Route = createRootRouteWithContext<RouterContext>()({
                 name: "viewport",
                 content: "width=device-width, initial-scale=1",
             },
+            // The defaults of a page without `seo()` of its own, such as the
+            // not-found and error pages: no canonical URL or alternates
+            // (docs/seo.md).
             {
                 title: m["site.name"](),
+            },
+            {
+                name: "description",
+                content: m["seo.description"](),
+            },
+            // The browser's toolbar on a phone, in the page's background.
+            {
+                name: "theme-color",
+                content: "#f6f7f5",
+                media: "(prefers-color-scheme: light)",
+            },
+            {
+                name: "theme-color",
+                content: "#15181c",
+                media: "(prefers-color-scheme: dark)",
             },
         ],
         links: [
@@ -45,6 +63,11 @@ export const Route = createRootRouteWithContext<RouterContext>()({
                 rel: "stylesheet",
                 href: appCss,
             },
+            // The icons in `public/` (docs/seo.md#icons).
+            { rel: "icon", href: "/favicon.ico", sizes: "32x32" },
+            { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
+            { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
+            { rel: "manifest", href: "/manifest.webmanifest" },
         ],
     }),
     shellComponent: RootDocument,

@@ -3,6 +3,15 @@
     "site": {
         "name": "Trackdown"
     },
+    "seo": {
+        "description": "Guess the mystery station every day. Each guess draws the fastest train trip to the mystery: the shorter the line, the closer you are.",
+        "gameTitle": "Trackdown {network} · Puzzle {number}",
+        "gameDescription": "Puzzle {number}: which station is today's mystery? Guess a station and follow the fastest train trip there.",
+        "archiveDescription": "Every Trackdown puzzle so far, newest first. Catch up on the ones you missed.",
+        "archivePuzzleDescription": "Play Trackdown puzzle {number} from the archive: which station was the mystery?",
+        "howToPlayDescription": "How to play Trackdown: guess a station, follow the fastest train trip and find the mystery station.",
+        "imageAlt": "The Trackdown logo: a train line with a change to a station, with the word Trackdown below it."
+    },
     "game": {
         "dateLine": "{date}, puzzle {number}",
         "title": "Which station is today's mystery?",

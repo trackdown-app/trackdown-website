@@ -199,6 +199,8 @@ A REST answer says how long it may be kept (`RestCache`, `src/lib/api/rest.ts`):
 
 `Vercel-CDN-Cache-Control` is read by Vercel's CDN only and not passed on. With `deploy` the CDN keeps the answer for a year, per URL (so per `locale`), and its cache belongs to one deployment, so a new deploy answers afresh; a client (the iOS app, a browser) keeps it for a day. An error is never kept, whatever the operation's cache.
 
+Every answer, an error included, also carries `X-Robots-Tag: noindex`, so no API URL shows up in search results ([seo.md](seo.md#robotstxt)).
+
 ## Abuse protection
 
 The game data is private: the API must make scraping the whole data set slow and visible. Its guards live in `src/lib/api/request-guard.ts`.

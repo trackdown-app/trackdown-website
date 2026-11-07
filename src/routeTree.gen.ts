@@ -13,6 +13,8 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as NetworkRouteRouteImport } from './routes/$network/route'
 import { Route as ConsentRouteImport } from './routes/consent'
 import { Route as HoeTeSpelenRouteImport } from './routes/hoe-te-spelen'
+import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as NetworkIndexRouteImport } from './routes/$network/index'
 import { Route as NetworkArchiefIndexRouteImport } from './routes/$network/archief/index'
 import { Route as NetworkArchiefNumberRouteImport } from './routes/$network/archief/$number'
@@ -43,6 +45,16 @@ const ConsentRoute = ConsentRouteImport.update({
 const HoeTeSpelenRoute = HoeTeSpelenRouteImport.update({
   id: '/hoe-te-spelen',
   path: '/hoe-te-spelen',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
+  id: '/robots.txt',
+  path: '/robots.txt',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const NetworkIndexRoute = NetworkIndexRouteImport.update({
@@ -110,6 +122,8 @@ export interface FileRoutesByFullPath {
   '/$network': typeof NetworkRouteRouteWithChildren
   '/consent': typeof ConsentRoute
   '/hoe-te-spelen': typeof HoeTeSpelenRoute
+  '/robots.txt': typeof RobotsDottxtRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/$network/': typeof NetworkIndexRoute
   '/$network/archief/$number': typeof NetworkArchiefNumberRoute
   '/api/v1/$': typeof ApiV1SplatRoute
@@ -126,6 +140,8 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/consent': typeof ConsentRoute
   '/hoe-te-spelen': typeof HoeTeSpelenRoute
+  '/robots.txt': typeof RobotsDottxtRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/$network': typeof NetworkIndexRoute
   '/$network/archief/$number': typeof NetworkArchiefNumberRoute
   '/api/v1/$': typeof ApiV1SplatRoute
@@ -144,6 +160,8 @@ export interface FileRoutesById {
   '/$network': typeof NetworkRouteRouteWithChildren
   '/consent': typeof ConsentRoute
   '/hoe-te-spelen': typeof HoeTeSpelenRoute
+  '/robots.txt': typeof RobotsDottxtRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/$network/': typeof NetworkIndexRoute
   '/$network/archief/$number': typeof NetworkArchiefNumberRoute
   '/api/v1/$': typeof ApiV1SplatRoute
@@ -163,6 +181,8 @@ export interface FileRouteTypes {
     | '/$network'
     | '/consent'
     | '/hoe-te-spelen'
+    | '/robots.txt'
+    | '/sitemap.xml'
     | '/$network/'
     | '/$network/archief/$number'
     | '/api/v1/$'
@@ -179,6 +199,8 @@ export interface FileRouteTypes {
     | '/'
     | '/consent'
     | '/hoe-te-spelen'
+    | '/robots.txt'
+    | '/sitemap.xml'
     | '/$network'
     | '/$network/archief/$number'
     | '/api/v1/$'
@@ -196,6 +218,8 @@ export interface FileRouteTypes {
     | '/$network'
     | '/consent'
     | '/hoe-te-spelen'
+    | '/robots.txt'
+    | '/sitemap.xml'
     | '/$network/'
     | '/$network/archief/$number'
     | '/api/v1/$'
@@ -214,6 +238,8 @@ export interface RootRouteChildren {
   NetworkRouteRoute: typeof NetworkRouteRouteWithChildren
   ConsentRoute: typeof ConsentRoute
   HoeTeSpelenRoute: typeof HoeTeSpelenRoute
+  RobotsDottxtRoute: typeof RobotsDottxtRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   ApiV1SplatRoute: typeof ApiV1SplatRoute
   ApiV1MetaRoute: typeof ApiV1MetaRoute
   ApiV1OpenapiDotjsonRoute: typeof ApiV1OpenapiDotjsonRoute
@@ -252,6 +278,20 @@ declare module '@tanstack/react-router' {
       path: '/hoe-te-spelen'
       fullPath: '/hoe-te-spelen'
       preLoaderRoute: typeof HoeTeSpelenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/robots.txt': {
+      id: '/robots.txt'
+      path: '/robots.txt'
+      fullPath: '/robots.txt'
+      preLoaderRoute: typeof RobotsDottxtRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/$network/': {
@@ -355,6 +395,8 @@ const rootRouteChildren: RootRouteChildren = {
   NetworkRouteRoute: NetworkRouteRouteWithChildren,
   ConsentRoute: ConsentRoute,
   HoeTeSpelenRoute: HoeTeSpelenRoute,
+  RobotsDottxtRoute: RobotsDottxtRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   ApiV1SplatRoute: ApiV1SplatRoute,
   ApiV1MetaRoute: ApiV1MetaRoute,
   ApiV1OpenapiDotjsonRoute: ApiV1OpenapiDotjsonRoute,

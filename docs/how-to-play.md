@@ -11,7 +11,7 @@ The design draws How to play only for the iPhone, as a sheet over the game (the 
 
 The board's headings are "How to play" only; the page adds a heading over the example and the legend, so a screen reader can jump between the parts.
 
-The page sets its own `<title>` (`howToPlay.pageTitle`).
+The page sets its own `<title>` (`howToPlay.pageTitle`) and description through `seo()` ([seo.md](seo.md)).
 
 ## Messages
 
