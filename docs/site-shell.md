@@ -16,16 +16,16 @@ Every focusable element shows the site-wide `:focus-visible` outline from `src/s
 
 `SiteHeader` (`src/components/layout/site-header.tsx`), in the order of the keyboard:
 
-- **The logo**, linking home (a router `<Link to="/">`, so it points at `/en` on an English page): the line mark (`LogoMark`, `src/components/layout/logo-mark.tsx`, the Brand board's SVG drawn in the theme's tokens, so it follows dark mode) and the wordmark in Barlow Condensed 800. Its name starts with the visible "Trackdown" and says where it goes (`header.home`).
-- **The network pill** (`NetworkPill`): an ink-bordered pill with an `NL` chip and "Nederland". The Netherlands is the only network, so the pill is a label for now, not a control, and the design's chevron is left out. Screen readers hear "Netwerk: Nederland". The network picker turns it into the button that opens the picker.
-- **Archive and How to play** in a `<nav>` named `header.nav`. The current page carries `aria-current="page"` and shows underlined and semibold. Both have their route ([archive.md](archive.md), [how-to-play.md](how-to-play.md)), so both are a router `<Link>`. Archive is also the current page on every puzzle of the archive (`/archief/{number}`).
+- **The logo**, linking to the current network's game (a router `<Link to="/$network">`, so it points at `/nl`, or `/en/nl` on an English page; the network from `useCurrentNetwork`, [network-picker.md](network-picker.md#keeping-the-choice)): the line mark (`LogoMark`, `src/components/layout/logo-mark.tsx`, the Brand board's SVG drawn in the theme's tokens, so it follows dark mode) and the wordmark in Barlow Condensed 800. Its name starts with the visible "Trackdown" and says where it goes (`header.home`).
+- **The network pill** (`NetworkPicker`): an ink-bordered pill with the network's code chip, its name and a chevron, the button that opens the network picker ([network-picker.md](network-picker.md#the-picker)). Screen readers hear "Netwerk: Nederland. Kies een netwerk".
+- **Archive and How to play** in a `<nav>` named `header.nav`. The current page carries `aria-current="page"` and shows underlined and semibold. Both have their route ([archive.md](archive.md), [how-to-play.md](how-to-play.md)), so both are a router `<Link>`. Archive is the current network's (`/{network}/archief`), and the current page on every puzzle of it too (`/{network}/archief/{number}`).
 - **The statistics button**, a 44px icon button (Lucide's `ChartNoAxesColumn`) named `header.statistics`. It opens the statistics dialog, the player's record at today's network (`StatisticsDialog`, [statistics.md](statistics.md#the-dialog)).
 - **The theme toggle** (`ThemeToggle`), a 44px shadcn icon button beside Statistics. Its stable accessible name is “Dark mode” / “Donkere modus”; `aria-pressed` tells whether dark mode is active. Moon and sun icons follow the resolved theme. Click, Enter or Space switches to the opposite theme and saves the override ([design-system.md](design-system.md#dark-mode)). The design does not draw this control, so it reuses the statistics button’s shape, spacing and tokens.
 - **The language switch** (`LanguageSwitch`, [i18n.md](i18n.md#language-switch)), which the design does not draw; it sits last.
 
 Both halves of the header wrap. At phone width the network pill drops below the logo and the language switch below the links, so nothing scrolls sideways down to 320px. Every control is at least 44px high.
 
-`src/components/layout/site-header.test.tsx` checks the links in both languages, `aria-current`, the pill's screen reader text, that the statistics button is an enabled dialog trigger and the language switch.
+`src/components/layout/site-header.test.tsx` checks the links in both languages, `aria-current`, the pill's name in both languages, that the statistics button is an enabled dialog trigger and the language switch.
 
 ## Footer
 
@@ -47,9 +47,9 @@ export const Route = createFileRoute("/")({
 
 ## Page paths
 
-`src/lib/site-paths.ts` holds the path of every page the shell links to, without a locale: `/archief`, `/hoe-te-spelen`, `/over`, `/privacy` and `/voorwaarden`. Paths are the same in both languages ([i18n.md](i18n.md#locale-routing)), so they are Dutch; `localizeHref` adds `/en` on an English page.
+`src/lib/site-paths.ts` holds the path of every page the shell links to, without a locale: `/`, `/hoe-te-spelen`, `/over`, `/privacy` and `/voorwaarden`, and `networkArchivePath` for a network's archive (`/{network}/archief`), for a link outside a router. Paths are the same in both languages ([i18n.md](i18n.md#locale-routing)), so they are Dutch; `localizeHref` adds `/en` on an English page.
 
-The home page, the archive and How to play have a route, and the shell links to them with a router `<Link>`. It links to the others with `PageLink` (`src/components/layout/page-link.tsx`), a plain `<a href={localizeHref(path)}>` that marks the current page with `aria-current`, rather than a typed `<Link>`. Until a page lands its link shows the not-found page. Switch a link to `<Link>` once its route exists, or keep `PageLink` and change the path here if the page takes another one.
+The home page (a redirect to the chosen network's game), a network's game and archive, and How to play have a route, and the shell links to them with a router `<Link>`. It links to the others with `PageLink` (`src/components/layout/page-link.tsx`), a plain `<a href={localizeHref(path)}>` that marks the current page with `aria-current`, rather than a typed `<Link>`. Until a page lands its link shows the not-found page. Switch a link to `<Link>` once its route exists, or keep `PageLink` and change the path here if the page takes another one.
 
 ## Not-found and error pages
 
@@ -64,7 +64,7 @@ The router still sends the error's message to the browser in its hydration data 
 
 A route that needs its own not-found or error page sets `notFoundComponent` or `errorComponent`.
 
-`src/router.test.tsx` renders requests through the router's own SSR request handler (`createRequestHandler` from `@tanstack/react-router/ssr/server`): `/` answers 200 inside the header and footer, the archive's pages as [archive.md](archive.md#tests) lists, an unknown path 404 with the not-found page, and a route whose loader throws 500 with the error page and without the error's message in the visible page.
+`src/router.test.tsx` renders requests through the router's own SSR request handler (`createRequestHandler` from `@tanstack/react-router/ssr/server`): `/` redirects to `/nl`, `/nl` answers 200 inside the header and footer, a network the game has no data for 404 ([network-picker.md](network-picker.md#tests)), the archive's pages as [archive.md](archive.md#tests) lists, an unknown path 404 with the not-found page, and a route whose loader throws 500 with the error page and without the error's message in the visible page.
 
 ## Messages
 

@@ -18,11 +18,11 @@ function currentPaths(html: string): string[] {
 }
 
 describe("SiteHeader", () => {
-    it("links home, the archive and how to play in Dutch", async () => {
+    it("links the network's game and archive and how to play in Dutch", async () => {
         const linked = linkedPaths(await renderAt(SiteHeader, "/over"));
 
         expect(linked).toEqual(
-            expect.arrayContaining(["/", "/archief", "/hoe-te-spelen"]),
+            expect.arrayContaining(["/nl", "/nl/archief", "/hoe-te-spelen"]),
         );
     });
 
@@ -31,20 +31,24 @@ describe("SiteHeader", () => {
         const html = await renderAt(SiteHeader, "/over");
 
         expect(linkedPaths(html)).toEqual(
-            expect.arrayContaining(["/en/archief", "/en/hoe-te-spelen"]),
+            expect.arrayContaining([
+                "/en/nl",
+                "/en/nl/archief",
+                "/en/hoe-te-spelen",
+            ]),
         );
         expect(html).toContain("How to play");
     });
 
     it("marks the current page with aria-current", async () => {
-        expect(currentPaths(await renderAt(SiteHeader, "/archief"))).toEqual([
-            "/archief",
+        expect(currentPaths(await renderAt(SiteHeader, "/nl/archief"))).toEqual([
+            "/nl/archief",
         ]);
     });
 
     it("marks the archive as the current page on one of its puzzles", async () => {
-        expect(currentPaths(await renderAt(SiteHeader, "/archief/3"))).toEqual([
-            "/archief",
+        expect(currentPaths(await renderAt(SiteHeader, "/nl/archief/3"))).toEqual([
+            "/nl/archief",
         ]);
     });
 
@@ -56,26 +60,37 @@ describe("SiteHeader", () => {
         ]);
     });
 
-    it("shows the network pill with its name for a screen reader", async () => {
-        const html = await renderAt(SiteHeader, "/");
+    it("shows the network pill as the button that opens the picker", async () => {
+        const html = await renderAt(SiteHeader, "/nl");
+        const pill = /<button [^>]*aria-haspopup[^>]*>/.exec(html)?.[0];
 
-        expect(html).toContain('<span class="sr-only">Netwerk: </span>');
+        expect(pill).toContain('aria-label="Netwerk: Nederland. Kies een netwerk"');
+        expect(pill).toContain('aria-expanded="false"');
         expect(html).toContain("Nederland");
     });
 
-    it("renders the statistics button as an enabled dialog trigger", async () => {
-        const button = /<button [^>]*>/.exec(await renderAt(SiteHeader, "/"))?.[0];
+    it("names the network in English on an English page", async () => {
+        overwriteGetLocale(() => "en");
+        const html = await renderAt(SiteHeader, "/nl");
 
-        expect(button).toContain('aria-label="Statistieken"');
+        expect(html).toContain('aria-label="Network: Netherlands. Change network"');
+    });
+
+    it("renders the statistics button as an enabled dialog trigger", async () => {
+        const html = await renderAt(SiteHeader, "/nl");
+        const button = /<button [^>]*aria-label="Statistieken"[^>]*>/.exec(
+            html,
+        )?.[0];
+
         expect(button).toContain('aria-haspopup="dialog"');
         expect(button).not.toContain("aria-disabled");
         expect(button).not.toMatch(/\sdisabled(=|\s|>)/);
     });
 
     it("carries the language switch", async () => {
-        const html = await renderAt(SiteHeader, "/archief");
+        const html = await renderAt(SiteHeader, "/nl/archief");
 
         expect(html).toContain('hrefLang="en"');
-        expect(linkedPaths(html)).toContain("/en/archief");
+        expect(linkedPaths(html)).toContain("/en/nl/archief");
     });
 });

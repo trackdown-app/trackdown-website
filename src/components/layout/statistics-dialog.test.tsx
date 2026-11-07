@@ -22,7 +22,7 @@ function renderDialog() {
     });
     render(
         <QueryClientProvider client={queryClient}>
-            <StatisticsDialog />
+            <StatisticsDialog network="nl" />
         </QueryClientProvider>,
     );
     return userEvent.setup();

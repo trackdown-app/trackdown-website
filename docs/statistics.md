@@ -4,7 +4,7 @@ A player's record at one network, after the design's "Your Netherlands record" o
 
 ## The record
 
-`StatisticsRecord` (`src/components/game/statistics-record.tsx`) draws it without a heading, so each place gives its own: "Your Netherlands record" / "Jouw record in Nederland" (`statistics.title`, the network's name from `networkName`, `src/lib/game/network-name.ts`).
+`StatisticsRecord` (`src/components/game/statistics-record.tsx`) draws it without a heading, so each place gives its own: "Your Netherlands record" / "Jouw record in Nederland" (`statistics.title`, the network's name from `networkName`, `src/lib/game/network-name.ts`, its country's name, [network-picker.md](network-picker.md#the-picker)).
 
 - **The figures.** `StatisticsSummary` (`src/components/game/statistics-summary.tsx`): a `<dl>` of Played, Won (a whole percent), Streak and Best streak, the labels in muted 15px, the figures in Barlow Condensed 700 at 48px. Four in a row; two rows of two below 640px, where four figures do not fit a phone.
 - **Guesses needed.** `GuessDistribution` (`src/components/game/guess-distribution.tsx`): one row per number of guesses a game was won in, 1 to 6, then Missed. Each bar is 10px high with 5px corners, as long as its count against the longest (80% of the row at most, 2% at least), the count after it in semibold. Today's game's bar is `line-1`; the others are `empty`. The labels and bars are hidden from screen readers; each row reads as a sentence instead ("2 guesses: 11, today's game").
@@ -31,7 +31,7 @@ A game played in the archive is kept with `"archive": true` ([archive.md](archiv
 
 ## The dialog
 
-`StatisticsDialog` (`src/components/layout/statistics-dialog.tsx`) is the header's statistics button ([site-shell.md](site-shell.md#header)) and the dialog it opens: the record at today's network (`todayNetwork`), its title as the dialog's name, and a 44px close button named "Close" / "Sluiten". The record is only read once the dialog opens, so a page that never opens it never asks for the archive. Escape and a click outside close it; focus goes back to the button.
+`StatisticsDialog` (`src/components/layout/statistics-dialog.tsx`) is the header's statistics button ([site-shell.md](site-shell.md#header)) and the dialog it opens: the record at the network the header hands it (`useCurrentNetwork`, [network-picker.md](network-picker.md#keeping-the-choice)), its title as the dialog's name, and a 44px close button named "Close" / "Sluiten". The record is only read once the dialog opens, so a page that never opens it never asks for the archive. Escape and a click outside close it; focus goes back to the button.
 
 The dialog is shadcn/ui's (base-vega, on Base UI), split one part per file: `Dialog` and `DialogTrigger` (`src/components/ui/dialog.ts`), `DialogContent` (the backdrop, a `card` plate with 16px corners and the popover shadow, and the close button, whose label is a prop) and `DialogTitle`.
 

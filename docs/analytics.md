@@ -24,7 +24,7 @@ The POST accepts `Sec-Fetch-Site: same-origin`, or, without that header, an `Ori
 | `version` | `CONSENT_TEXT_VERSION`, currently `1` |
 | `givenAt` | ISO timestamp set by the server when the choice is submitted |
 
-The cookie is host-only, has `Path=/`, `HttpOnly`, `SameSite=Lax` and a one-year `Max-Age` (`31536000` seconds). It is `Secure` outside Vite development. No cookie is set merely by visiting or reopening settings. Missing and invalid records, and records from another text version, mean no consent (`null`). Raise `CONSENT_TEXT_VERSION` whenever the banner's wording or what acceptance allows changes.
+The cookie is host-only, has `Path=/`, `HttpOnly`, `SameSite=Lax` and a one-year `Max-Age` (`31536000` seconds). It is `Secure` outside Vite development. No cookie is set merely by visiting or reopening settings. The only other cookie the site sets itself is `trackdown-network`, the network a visitor picked in the network picker, set only when they pick one ([network-picker.md](network-picker.md#keeping-the-choice)). Missing and invalid records, and records from another text version, mean no consent (`null`). Raise `CONSENT_TEXT_VERSION` whenever the banner's wording or what acceptance allows changes.
 
 The browser receives only `ConsentChoice | null` through the loader; it does not read the HTTP-only cookie. Browser analytics uses `choice.analytics === true` as the only permission for cookie persistence; `null` and `false` mean cookieless operation. Withdrawing uses the same Decline form and replaces the record with `false`. The next document removes old PostHog persistence before starting the SDK. Marketing consent and advertising trackers are outside this contract.
 

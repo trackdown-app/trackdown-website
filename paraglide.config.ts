@@ -12,6 +12,19 @@ export const paraglideCompilerOptions: CompilerOptions = {
     // The locale lives in the URL so every language has its own indexable
     // address: Dutch at `/`, English under `/en`. See docs/i18n.md.
     strategy: ["url", "baseLocale"],
+    // Only `/en` is a locale prefix. Paraglide's default patterns treat a
+    // leading `/nl` as the Dutch prefix too and strip it, which would take
+    // the Dutch network's pages at `/nl` (docs/network-picker.md#routes).
+    // Listing the patterns makes Paraglide match exactly these.
+    urlPatterns: [
+        {
+            pattern: ":protocol://:domain(.*)::port?/:path(.*)?",
+            localized: [
+                ["en", ":protocol://:domain(.*)::port?/en/:path(.*)?"],
+                ["nl", ":protocol://:domain(.*)::port?/:path(.*)?"],
+            ],
+        },
+    ],
     // The English home is `/en`, not `/en/`. A browser asking for a path with
     // a trailing slash is redirected to the one without.
     trailingSlash: "never",

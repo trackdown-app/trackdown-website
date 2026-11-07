@@ -110,7 +110,7 @@ describe("shareText", () => {
                 "●━           17m",
                 "●━           13m",
                 "Tracked down in 5",
-                "https://trackdown.nl/en",
+                "https://trackdown.nl/en/nl",
             ].join("\n"),
         );
     });
@@ -135,7 +135,7 @@ describe("shareText", () => {
         expect(lines).toHaveLength(9);
         expect(lines.slice(-2)).toEqual([
             "Not tracked down",
-            "https://trackdown.nl/en",
+            "https://trackdown.nl/en/nl",
         ]);
     });
 
@@ -149,7 +149,7 @@ describe("shareText", () => {
         });
         expect(text.split("\n").slice(-2)).toEqual([
             "Gevonden in 5",
-            "https://trackdown.nl",
+            "https://trackdown.nl/nl",
         ]);
         expect(text).toContain("2u25");
     });

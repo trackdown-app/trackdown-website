@@ -10,10 +10,12 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as NetworkRouteRouteImport } from './routes/$network/route'
 import { Route as ConsentRouteImport } from './routes/consent'
 import { Route as HoeTeSpelenRouteImport } from './routes/hoe-te-spelen'
-import { Route as ArchiefIndexRouteImport } from './routes/archief/index'
-import { Route as ArchiefNumberRouteImport } from './routes/archief/$number'
+import { Route as NetworkIndexRouteImport } from './routes/$network/index'
+import { Route as NetworkArchiefIndexRouteImport } from './routes/$network/archief/index'
+import { Route as NetworkArchiefNumberRouteImport } from './routes/$network/archief/$number'
 import { Route as ApiV1SplatRouteImport } from './routes/api/v1/$'
 import { Route as ApiV1MetaRouteImport } from './routes/api/v1/meta'
 import { Route as ApiV1OpenapiDotjsonRouteImport } from './routes/api/v1/openapi[.]json'
@@ -28,6 +30,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const NetworkRouteRoute = NetworkRouteRouteImport.update({
+  id: '/$network',
+  path: '/$network',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ConsentRoute = ConsentRouteImport.update({
   id: '/consent',
   path: '/consent',
@@ -38,15 +45,20 @@ const HoeTeSpelenRoute = HoeTeSpelenRouteImport.update({
   path: '/hoe-te-spelen',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ArchiefIndexRoute = ArchiefIndexRouteImport.update({
+const NetworkIndexRoute = NetworkIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => NetworkRouteRoute,
+} as any)
+const NetworkArchiefIndexRoute = NetworkArchiefIndexRouteImport.update({
   id: '/archief/',
   path: '/archief/',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => NetworkRouteRoute,
 } as any)
-const ArchiefNumberRoute = ArchiefNumberRouteImport.update({
+const NetworkArchiefNumberRoute = NetworkArchiefNumberRouteImport.update({
   id: '/archief/$number',
   path: '/archief/$number',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => NetworkRouteRoute,
 } as any)
 const ApiV1SplatRoute = ApiV1SplatRouteImport.update({
   id: '/api/v1/$',
@@ -95,13 +107,15 @@ const ApiV1NetworkPuzzlesNumberRevealRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/$network': typeof NetworkRouteRouteWithChildren
   '/consent': typeof ConsentRoute
   '/hoe-te-spelen': typeof HoeTeSpelenRoute
-  '/archief/$number': typeof ArchiefNumberRoute
-  '/archief/': typeof ArchiefIndexRoute
+  '/$network/': typeof NetworkIndexRoute
+  '/$network/archief/$number': typeof NetworkArchiefNumberRoute
   '/api/v1/$': typeof ApiV1SplatRoute
   '/api/v1/meta': typeof ApiV1MetaRoute
   '/api/v1/openapi.json': typeof ApiV1OpenapiDotjsonRoute
+  '/$network/archief/': typeof NetworkArchiefIndexRoute
   '/api/v1/$network/stations': typeof ApiV1NetworkStationsRoute
   '/api/v1/$network/puzzles/today': typeof ApiV1NetworkPuzzlesTodayRoute
   '/api/v1/$network/puzzles/': typeof ApiV1NetworkPuzzlesIndexRoute
@@ -112,11 +126,12 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/consent': typeof ConsentRoute
   '/hoe-te-spelen': typeof HoeTeSpelenRoute
-  '/archief/$number': typeof ArchiefNumberRoute
-  '/archief': typeof ArchiefIndexRoute
+  '/$network': typeof NetworkIndexRoute
+  '/$network/archief/$number': typeof NetworkArchiefNumberRoute
   '/api/v1/$': typeof ApiV1SplatRoute
   '/api/v1/meta': typeof ApiV1MetaRoute
   '/api/v1/openapi.json': typeof ApiV1OpenapiDotjsonRoute
+  '/$network/archief': typeof NetworkArchiefIndexRoute
   '/api/v1/$network/stations': typeof ApiV1NetworkStationsRoute
   '/api/v1/$network/puzzles/today': typeof ApiV1NetworkPuzzlesTodayRoute
   '/api/v1/$network/puzzles': typeof ApiV1NetworkPuzzlesIndexRoute
@@ -126,13 +141,15 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/$network': typeof NetworkRouteRouteWithChildren
   '/consent': typeof ConsentRoute
   '/hoe-te-spelen': typeof HoeTeSpelenRoute
-  '/archief/$number': typeof ArchiefNumberRoute
-  '/archief/': typeof ArchiefIndexRoute
+  '/$network/': typeof NetworkIndexRoute
+  '/$network/archief/$number': typeof NetworkArchiefNumberRoute
   '/api/v1/$': typeof ApiV1SplatRoute
   '/api/v1/meta': typeof ApiV1MetaRoute
   '/api/v1/openapi.json': typeof ApiV1OpenapiDotjsonRoute
+  '/$network/archief/': typeof NetworkArchiefIndexRoute
   '/api/v1/$network/stations': typeof ApiV1NetworkStationsRoute
   '/api/v1/$network/puzzles/today': typeof ApiV1NetworkPuzzlesTodayRoute
   '/api/v1/$network/puzzles/': typeof ApiV1NetworkPuzzlesIndexRoute
@@ -143,13 +160,15 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/$network'
     | '/consent'
     | '/hoe-te-spelen'
-    | '/archief/$number'
-    | '/archief/'
+    | '/$network/'
+    | '/$network/archief/$number'
     | '/api/v1/$'
     | '/api/v1/meta'
     | '/api/v1/openapi.json'
+    | '/$network/archief/'
     | '/api/v1/$network/stations'
     | '/api/v1/$network/puzzles/today'
     | '/api/v1/$network/puzzles/'
@@ -160,11 +179,12 @@ export interface FileRouteTypes {
     | '/'
     | '/consent'
     | '/hoe-te-spelen'
-    | '/archief/$number'
-    | '/archief'
+    | '/$network'
+    | '/$network/archief/$number'
     | '/api/v1/$'
     | '/api/v1/meta'
     | '/api/v1/openapi.json'
+    | '/$network/archief'
     | '/api/v1/$network/stations'
     | '/api/v1/$network/puzzles/today'
     | '/api/v1/$network/puzzles'
@@ -173,13 +193,15 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/$network'
     | '/consent'
     | '/hoe-te-spelen'
-    | '/archief/$number'
-    | '/archief/'
+    | '/$network/'
+    | '/$network/archief/$number'
     | '/api/v1/$'
     | '/api/v1/meta'
     | '/api/v1/openapi.json'
+    | '/$network/archief/'
     | '/api/v1/$network/stations'
     | '/api/v1/$network/puzzles/today'
     | '/api/v1/$network/puzzles/'
@@ -189,10 +211,9 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  NetworkRouteRoute: typeof NetworkRouteRouteWithChildren
   ConsentRoute: typeof ConsentRoute
   HoeTeSpelenRoute: typeof HoeTeSpelenRoute
-  ArchiefNumberRoute: typeof ArchiefNumberRoute
-  ArchiefIndexRoute: typeof ArchiefIndexRoute
   ApiV1SplatRoute: typeof ApiV1SplatRoute
   ApiV1MetaRoute: typeof ApiV1MetaRoute
   ApiV1OpenapiDotjsonRoute: typeof ApiV1OpenapiDotjsonRoute
@@ -212,6 +233,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/$network': {
+      id: '/$network'
+      path: '/$network'
+      fullPath: '/$network'
+      preLoaderRoute: typeof NetworkRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/consent': {
       id: '/consent'
       path: '/consent'
@@ -226,19 +254,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HoeTeSpelenRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/archief/': {
-      id: '/archief/'
-      path: '/archief'
-      fullPath: '/archief/'
-      preLoaderRoute: typeof ArchiefIndexRouteImport
-      parentRoute: typeof rootRouteImport
+    '/$network/': {
+      id: '/$network/'
+      path: '/'
+      fullPath: '/$network/'
+      preLoaderRoute: typeof NetworkIndexRouteImport
+      parentRoute: typeof NetworkRouteRoute
     }
-    '/archief/$number': {
-      id: '/archief/$number'
+    '/$network/archief/': {
+      id: '/$network/archief/'
+      path: '/archief'
+      fullPath: '/$network/archief/'
+      preLoaderRoute: typeof NetworkArchiefIndexRouteImport
+      parentRoute: typeof NetworkRouteRoute
+    }
+    '/$network/archief/$number': {
+      id: '/$network/archief/$number'
       path: '/archief/$number'
-      fullPath: '/archief/$number'
-      preLoaderRoute: typeof ArchiefNumberRouteImport
-      parentRoute: typeof rootRouteImport
+      fullPath: '/$network/archief/$number'
+      preLoaderRoute: typeof NetworkArchiefNumberRouteImport
+      parentRoute: typeof NetworkRouteRoute
     }
     '/api/v1/$': {
       id: '/api/v1/$'
@@ -299,12 +334,27 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface NetworkRouteRouteChildren {
+  NetworkIndexRoute: typeof NetworkIndexRoute
+  NetworkArchiefNumberRoute: typeof NetworkArchiefNumberRoute
+  NetworkArchiefIndexRoute: typeof NetworkArchiefIndexRoute
+}
+
+const NetworkRouteRouteChildren: NetworkRouteRouteChildren = {
+  NetworkIndexRoute: NetworkIndexRoute,
+  NetworkArchiefNumberRoute: NetworkArchiefNumberRoute,
+  NetworkArchiefIndexRoute: NetworkArchiefIndexRoute,
+}
+
+const NetworkRouteRouteWithChildren = NetworkRouteRoute._addFileChildren(
+  NetworkRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  NetworkRouteRoute: NetworkRouteRouteWithChildren,
   ConsentRoute: ConsentRoute,
   HoeTeSpelenRoute: HoeTeSpelenRoute,
-  ArchiefNumberRoute: ArchiefNumberRoute,
-  ArchiefIndexRoute: ArchiefIndexRoute,
   ApiV1SplatRoute: ApiV1SplatRoute,
   ApiV1MetaRoute: ApiV1MetaRoute,
   ApiV1OpenapiDotjsonRoute: ApiV1OpenapiDotjsonRoute,

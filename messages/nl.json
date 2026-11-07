@@ -84,7 +84,7 @@
         "header": "Trackdown {network} {number}, {score}/{total}",
         "won": "Gevonden in {count}",
         "lost": "Niet gevonden",
-        "url": "https://trackdown.nl",
+        "url": "https://trackdown.nl/{network}",
         "minutes": "{minutes}m",
         "hoursMinutes": "{hours}u{minutes}",
         "copied": "Gekopieerd. Plak het waar je maar wilt.",
@@ -140,8 +140,16 @@
         "howToPlay": "Hoe speel je",
         "statistics": "Statistieken",
         "network": "Netwerk",
-        "networkNl": "Nederland",
+        "changeNetwork": "Kies een netwerk",
         "darkMode": "Donkere modus"
+    },
+    "networkPicker": {
+        "title": "Netwerken",
+        "lead": "Elk netwerk heeft zijn eigen station van de dag.",
+        "available": "Te spelen",
+        "chosen": "Gekozen",
+        "upcoming": "Binnenkort",
+        "comingLater": "Komt later"
     },
     "consent": {
         "title": "Cookies, alleen als jij het goed vindt",

@@ -44,6 +44,7 @@ The site runs on http://localhost:3000.
 - [Statistics](docs/statistics.md)
 - [How to play](docs/how-to-play.md)
 - [Archive](docs/archive.md)
+- [Network picker](docs/network-picker.md)
 - [Deploy](docs/deploy.md)
 - [Server logs and traces](docs/logging.md)
 - [Analytics and cookie consent](docs/analytics.md)

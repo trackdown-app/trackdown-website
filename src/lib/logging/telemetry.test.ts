@@ -211,14 +211,17 @@ describe("request lifecycle", () => {
                     return new Response(null, { status: 204 });
                 },
             ),
-            traceRequest(new Request("https://trackdown.test/archief"), async () => {
-                annotateRequest({
-                    "trackdown.network": "nl",
-                    "trackdown.puzzle.number": 8,
-                });
-                await Promise.resolve();
-                return new Response(null, { status: 204 });
-            }),
+            traceRequest(
+                new Request("https://trackdown.test/nl/archief"),
+                async () => {
+                    annotateRequest({
+                        "trackdown.network": "nl",
+                        "trackdown.puzzle.number": 8,
+                    });
+                    await Promise.resolve();
+                    return new Response(null, { status: 204 });
+                },
+            ),
         ]);
         await background();
         const messages = records()
@@ -230,7 +233,7 @@ describe("request lifecycle", () => {
                     /^GET \/api\/v1\/meta 204 \(\d+ ms\) network=nl puzzle=7$/,
                 ),
                 expect.stringMatching(
-                    /^GET \/archief 204 \(\d+ ms\) network=nl puzzle=8$/,
+                    /^GET \/\{network\}\/archief 204 \(\d+ ms\) network=nl puzzle=8$/,
                 ),
             ]),
         );
@@ -352,9 +355,20 @@ describe("privacy boundaries", () => {
     it("keeps only known routes, methods, networks and numeric puzzle numbers", () => {
         expect(
             requestAttributes(
-                new Request("https://trackdown.test/en/archief/42?station=secret"),
+                new Request(
+                    "https://trackdown.test/en/nl/archief/42?station=secret",
+                ),
             ),
-        ).toMatchObject({ "http.route": "/archief/{number}" });
+        ).toMatchObject({
+            "http.route": "/{network}/archief/{number}",
+            "trackdown.network": "nl",
+            "trackdown.puzzle.number": 42,
+        });
+        expect(
+            requestAttributes(new Request("https://trackdown.test/be/archief/1"))[
+                "http.route"
+            ],
+        ).toBe("unknown");
         expect(
             requestAttributes(
                 new Request(

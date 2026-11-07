@@ -29,7 +29,7 @@ The schemas hold no data, so `data-schema.ts` may be imported anywhere, the brow
 
 ## Networks
 
-`src/lib/data/networks.ts` lists the networks: `networkIdSchema` (a zod enum, now `nl` only) and `networks`, which gives each its folder in `data/`. Adding a network adds its id to the enum and its entry to `networks`; TypeScript refuses the one without the other.
+`src/lib/data/networks.ts` lists the networks: `networkIdSchema` (a zod enum, now `nl` only) and `networks`, which gives each its folder in `data/` and its country (`region`, which names it). Adding a network adds its id to the enum and its entry to `networks`; TypeScript refuses the one without the other. The same file holds `defaultNetwork` and `upcomingNetworks`, the countries the network picker lists as coming later; a new network leaves that list ([network-picker.md](network-picker.md#adding-a-network)).
 
 ## The loader
 

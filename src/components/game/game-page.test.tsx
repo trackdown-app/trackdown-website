@@ -441,7 +441,7 @@ describe("GamePage", () => {
             screen
                 .getByRole("link", { name: "Play an older puzzle" })
                 .getAttribute("href"),
-        ).toBe("/en/archief");
+        ).toBe("/en/nl/archief");
     });
 
     it("is missed after the sixth wrong guess, every change named", async () => {
@@ -634,7 +634,7 @@ describe("GamePage", () => {
                 "●━━━━━━━━━━  2h25",
                 "●━           13m",
                 "Tracked down in 3",
-                "https://trackdown.nl/en",
+                "https://trackdown.nl/en/nl",
             ].join("\n"),
         );
         for (const station of stations) {
@@ -690,7 +690,7 @@ describe("GamePage", () => {
         await user.click(screen.getByRole("button", { name: "Share result" }));
 
         expect(writeText).toHaveBeenCalledWith(
-            "Trackdown NL 142, 2/6\n●━  17m\nTracked down in 2\nhttps://trackdown.nl/en",
+            "Trackdown NL 142, 2/6\n●━  17m\nTracked down in 2\nhttps://trackdown.nl/en/nl",
         );
         expect((await screen.findByRole("status")).textContent).toBe(
             "Copied. Paste it wherever you like.",

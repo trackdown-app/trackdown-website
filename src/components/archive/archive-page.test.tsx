@@ -50,7 +50,9 @@ async function renderArchive(list: readonly ArchivedPuzzle[] = puzzles) {
     const pageRoute = createRoute({ getParentRoute: () => rootRoute, path: "$" });
     const router = createRouter({
         routeTree: rootRoute.addChildren([pageRoute]),
-        history: createMemoryHistory({ initialEntries: [localizeHref("/archief")] }),
+        history: createMemoryHistory({
+            initialEntries: [localizeHref("/nl/archief")],
+        }),
         rewrite: {
             input: ({ url }) => deLocalizeUrl(url),
             output: ({ url }) => localizeUrl(url),
@@ -87,11 +89,11 @@ describe("ArchivePage", () => {
             screen.getByRole("heading", { level: 1, name: "Archive" }),
         ).toBeDefined();
         expect(rows().map((row) => row.getAttribute("href"))).toEqual([
-            // Today's is played on the home page.
-            "/en",
-            "/en/archief/3",
-            "/en/archief/2",
-            "/en/archief/1",
+            // Today's is played on the network's game.
+            "/en/nl",
+            "/en/nl/archief/3",
+            "/en/nl/archief/2",
+            "/en/nl/archief/1",
         ]);
         expect(rows()[0]?.textContent).toContain("Puzzle 4Today");
         expect(rows()[1]?.textContent).toContain("Thursday 5 November");
@@ -144,12 +146,12 @@ describe("ArchivePage", () => {
         window.localStorage.setItem(gameStorageKey("nl", 3), serializeGame([hit]));
         const html = await renderAt(
             () => <ArchivePage network="nl" puzzles={puzzles} today={today} />,
-            "/archief",
+            "/nl/archief",
         );
 
         expect(html).toContain("Archief");
         expect(html).toContain("tellen niet mee voor je reeks");
-        expect(html).toContain('href="/archief/3"');
+        expect(html).toContain('href="/nl/archief/3"');
         expect(html).toContain("Donderdag 5 november");
         expect(html).not.toContain("Gevonden");
         expect(html.match(/Nog niet gespeeld/g)).toHaveLength(4);

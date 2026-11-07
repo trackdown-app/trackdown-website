@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { AsyncLocalStorage } from "node:async_hooks";
+import { networkIdSchema } from "@/lib/data/networks";
 import { operationAttributes, routeSchema } from "@/lib/logging/attributes";
 import type { TelemetryAttributes } from "@/lib/logging/attributes";
 
@@ -18,12 +19,16 @@ export function requestAttributes(request: Request): TelemetryAttributes {
         /^\/api\/v1\/([^/]+)\/(stations|puzzles)(?:\/(today|[1-9][0-9]*))?(?:\/(guesses|reveal))?$/.exec(
             path,
         );
+    // A network's pages (docs/network-picker.md#routes). Only a network the
+    // game has counts; any other first segment stays unknown below.
+    const page = /^\/([^/]+)(?:\/(archief)(?:\/([1-9][0-9]*))?)?$/.exec(path);
+    const pageNetwork = networkIdSchema.safeParse(page?.[1]);
     let route = path;
     if (api != null) {
         const tail = api[3];
         route = `/api/v1/{network}/${api[2]}${tail == null ? "" : tail === "today" ? "/today" : "/{number}"}${api[4] == null ? "" : `/${api[4]}`}`;
-    } else if (/^\/archief\/[1-9][0-9]*$/.test(path)) {
-        route = "/archief/{number}";
+    } else if (page != null && pageNetwork.success) {
+        route = `/{network}${page[2] == null ? "" : "/archief"}${page[3] == null ? "" : "/{number}"}`;
     } else if (path.startsWith("/_serverFn/")) {
         route = "/_serverFn/{id}";
     }
@@ -41,6 +46,13 @@ export function requestAttributes(request: Request): TelemetryAttributes {
               : known.success
                 ? "page"
                 : "unknown",
-        ...operationAttributes({ network: api?.[1], number: api?.[3] }),
+        ...operationAttributes(
+            api == null
+                ? {
+                      network: pageNetwork.success ? pageNetwork.data : undefined,
+                      number: page?.[3],
+                  }
+                : { network: api[1], number: api[3] },
+        ),
     };
 }

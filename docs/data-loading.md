@@ -23,7 +23,7 @@ function TracksIndex() {
 }
 ```
 
-The home page, the game, loads today's puzzle and the stations this way, sends each guess through a mutation and reads the finished game's answer through a query ([game.md](game.md)). The archive loads the puzzle list, and an earlier puzzle's page the list and the stations ([archive.md](archive.md)). The game's operations (`metaQueryOptions`, `todayPuzzleQueryOptions`, `puzzleArchiveQueryOptions`, `stationsQueryOptions` and `revealQueryOptions` so far) live in `src/lib/game/`, each with a service the server function calls ([api.md](api.md#the-pieces)).
+A network's game page loads today's puzzle and the stations this way, sends each guess through a mutation and reads the finished game's answer through a query ([game.md](game.md)). The archive loads the puzzle list, and an earlier puzzle's page the list and the stations ([archive.md](archive.md)). The game's operations (`metaQueryOptions`, `todayPuzzleQueryOptions`, `puzzleArchiveQueryOptions`, `stationsQueryOptions` and `revealQueryOptions` so far) live in `src/lib/game/`, each with a service the server function calls ([api.md](api.md#the-pieces)).
 
 ## The query client
 

@@ -42,6 +42,7 @@
   - `docs/share.md`: the share text and its grid, the Web Share API and clipboard fallback, the Share result button, the "What you'll share" preview.
   - `docs/how-to-play.md`: the How to play page at `/hoe-te-spelen`, its rules, example trip and legend.
   - `docs/archive.md`: the archive at `/archief` and its list, playing an earlier puzzle at `/archief/{number}`, the 404 for a future puzzle, the archive mark that keeps a game out of the streak.
+  - `docs/network-picker.md`: the network routes under `/{network}`, the `/` redirect, the `trackdown-network` cookie that keeps the choice, the header's network pill and picker, adding a network.
   - `docs/deploy.md`: Nitro's preset detection, the `.vercel/output` layout, the function region, the game data's build-time variables, the deploy workflow and its secrets, the Vercel project and its environments, a manual deploy.
   - `docs/logging.md`: server logs and traces, PostHog EU, startup validation, Vercel flushing, privacy filtering, and the telemetry tests.
   - `docs/analytics.md`: the consent banner and status, native consent forms and cookie settings, the versioned consent cookie, the browser analytics integration contract, and the typed game events.
