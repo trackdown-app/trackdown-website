@@ -32,6 +32,7 @@ The site runs on http://localhost:3000.
 - [Getting started](docs/getting-started.md)
 - [Data loading](docs/data-loading.md)
 - [Game data](docs/data.md)
+- [API](docs/api.md)
 - [Internationalisation](docs/i18n.md)
 - [Design system](docs/design-system.md)
 - [Site shell](docs/site-shell.md)

@@ -10,33 +10,53 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiV1SplatRouteImport } from './routes/api/v1/$'
+import { Route as ApiV1MetaRouteImport } from './routes/api/v1/meta'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiV1SplatRoute = ApiV1SplatRouteImport.update({
+  id: '/api/v1/$',
+  path: '/api/v1/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1MetaRoute = ApiV1MetaRouteImport.update({
+  id: '/api/v1/meta',
+  path: '/api/v1/meta',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/api/v1/$': typeof ApiV1SplatRoute
+  '/api/v1/meta': typeof ApiV1MetaRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/api/v1/$': typeof ApiV1SplatRoute
+  '/api/v1/meta': typeof ApiV1MetaRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/api/v1/$': typeof ApiV1SplatRoute
+  '/api/v1/meta': typeof ApiV1MetaRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/api/v1/$' | '/api/v1/meta'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/api/v1/$' | '/api/v1/meta'
+  id: '__root__' | '/' | '/api/v1/$' | '/api/v1/meta'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ApiV1SplatRoute: typeof ApiV1SplatRoute
+  ApiV1MetaRoute: typeof ApiV1MetaRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +68,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/v1/$': {
+      id: '/api/v1/$'
+      path: '/api/v1/$'
+      fullPath: '/api/v1/$'
+      preLoaderRoute: typeof ApiV1SplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/meta': {
+      id: '/api/v1/meta'
+      path: '/api/v1/meta'
+      fullPath: '/api/v1/meta'
+      preLoaderRoute: typeof ApiV1MetaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ApiV1SplatRoute: ApiV1SplatRoute,
+  ApiV1MetaRoute: ApiV1MetaRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
