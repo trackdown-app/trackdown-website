@@ -110,6 +110,7 @@ describe("shareText", () => {
                 "●━           17m",
                 "●━           13m",
                 "Tracked down in 5",
+                "https://trackdown.nl/en",
             ].join("\n"),
         );
     });
@@ -131,8 +132,11 @@ describe("shareText", () => {
         });
         const lines = text.split("\n");
         expect(lines[0]).toBe("Trackdown NL 142, X/6");
-        expect(lines).toHaveLength(8);
-        expect(lines.at(-1)).toBe("Not tracked down");
+        expect(lines).toHaveLength(9);
+        expect(lines.slice(-2)).toEqual([
+            "Not tracked down",
+            "https://trackdown.nl/en",
+        ]);
     });
 
     it("speaks Dutch", () => {
@@ -143,7 +147,10 @@ describe("shareText", () => {
             guesses,
             status: "won",
         });
-        expect(text.split("\n").at(-1)).toBe("Gevonden in 5");
+        expect(text.split("\n").slice(-2)).toEqual([
+            "Gevonden in 5",
+            "https://trackdown.nl",
+        ]);
         expect(text).toContain("2u25");
     });
 
@@ -161,8 +168,9 @@ describe("shareText", () => {
                 for (const name of names) {
                     expect(text).not.toContain(name);
                 }
-                // Only the header's words, the grid's marks, times and the footer.
-                const grid = text.split("\n").slice(1, -1);
+                // Only the header's words, the grid's marks, times, the
+                // footer and the site.
+                const grid = text.split("\n").slice(1, -2);
                 for (const line of grid) {
                     expect(line).toMatch(/^●[━○]+ +\d+[hu]?\d*m?$/u);
                 }

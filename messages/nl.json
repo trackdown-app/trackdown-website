@@ -64,6 +64,7 @@
         "header": "Trackdown {network} {number}, {score}/{total}",
         "won": "Gevonden in {count}",
         "lost": "Niet gevonden",
+        "url": "https://trackdown.nl",
         "minutes": "{minutes}m",
         "hoursMinutes": "{hours}u{minutes}",
         "copied": "Gekopieerd. Plak het waar je maar wilt.",
