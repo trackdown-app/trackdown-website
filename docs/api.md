@@ -13,6 +13,7 @@ iOS:  GET /api/v1/meta ── metaHandlers.GET ──────────┘
 | Operation | Service | Web | REST | Input | Output |
 | --- | --- | --- | --- | --- | --- |
 | `meta` | `getMeta` (`src/lib/game/meta.ts`) | `getMetaFn`, `metaQueryOptions(network)` | `GET /api/v1/meta` | `metaInputSchema`: `network` (query string), default `nl` | `metaOutputSchema`: the network's `meta.json`, with `network` and `dataRef` |
+| `todayPuzzle` | `getTodayPuzzle` (`src/lib/game/today-puzzle.ts`) | `getTodayPuzzleFn`, `todayPuzzleQueryOptions(network)` | `GET /api/v1/{network}/puzzles/today` | `todayPuzzleInputSchema`: `network` (path), required | `todayPuzzleOutputSchema`: `network`, `number`, `date`, `maxGuesses`, `nextPuzzleAt`; never the station |
 
 `dataRef` is the trackdown-data commit the build was made from, or `local` ([deploy.md](deploy.md#the-game-data)).
 
@@ -24,13 +25,30 @@ GET /api/v1/meta?network=nl
      "builtAt":"2026-11-07T12:00:00.000Z","network":"nl","dataRef":"3f2a…"}
 ```
 
+### Today's puzzle
+
+Which puzzle is today's, without its answer, so the web and iOS show the same puzzle number and count down to the same moment.
+
+```text
+GET /api/v1/nl/puzzles/today
+
+200 {"network":"nl","number":142,"date":"2026-11-06","maxGuesses":6,
+     "nextPuzzleAt":"2026-11-06T23:00:00.000Z"}
+```
+
+- **The day** runs from midnight to midnight in Europe/Amsterdam (`puzzleTimeZone`, `src/lib/game/rules.ts`), for every player wherever they are. `src/lib/game/puzzle-day.ts` turns the service context's `now()` into that date and finds the instant the next date starts. The day the clocks change is 23 or 25 hours long, so `nextPuzzleAt` is `22:00Z` in summer time and `23:00Z` in winter time.
+- **The puzzle** is the entry of `puzzles.json` with that date. A day without one (before puzzle 1, past the end of the schedule) answers `not_found`.
+- **The answer** is never in it: the service builds the answer field by field, and `todayPuzzleOutputSchema` is strict, so its test fails on any field it does not name, `station` included.
+- **`maxGuesses`** is the game's `maxGuesses` (`rules.ts`), 6.
+- **`todayPuzzleQueryOptions`** keeps the answer fresh until `nextPuzzleAt`.
+
 ## The pieces
 
 - **Schemas** (`src/lib/game/schemas.ts`): the input and output schema of every operation, in one place. They hold no data and no server code, so the browser may import them, and they are the contract the iOS app follows.
-- **Services** (`src/lib/game/<operation>.ts`, server-only): one function per operation, `(input, context) => Promise<output>`. The input is already checked. Everything else it reads comes from the `ServiceContext` it is given (`src/lib/game/service-context.ts`): the game data and the data's commit. The server function and the REST route pass `serviceContext`, which reads the real data; a test passes the fixture. A service throws an `ApiError` for an answer that is the caller's fault (a puzzle that does not exist yet); any other error is a server error.
+- **Services** (`src/lib/game/<operation>.ts`, server-only): one function per operation, `(input, context) => Promise<output>`. The input is already checked. Everything else it reads comes from the `ServiceContext` it is given (`src/lib/game/service-context.ts`): the game data, the data's commit and the current time (`now()`). The server function and the REST route pass `serviceContext`, which reads the real data; a test passes the fixture. A service throws an `ApiError` for an answer that is the caller's fault (a puzzle that does not exist yet); any other error is a server error.
 - **Server functions** (`src/lib/game/<operation>.functions.ts`) and **query options** (`<operation>.queries.ts`): the web's side, as in [data-loading.md](data-loading.md#the-pieces). The validator is the operation's input schema, the handler calls the service with `serviceContext`.
-- **REST handlers** (`src/lib/api/v1-handlers.ts`, server-only): the iOS side. `restGet(inputSchema, run)` (`src/lib/api/rest.ts`) reads the input from the query string, checks it, calls the service and answers JSON with `Cache-Control: no-store`. `restHandlers` adds an `ANY` handler that answers every other method 405 with `Allow: GET`.
-- **REST routes** (`src/routes/api/v1/<operation>.ts`): a file route with only `server.handlers`, the operation's handlers from `v1-handlers.ts`. `src/routes/api/v1/$.ts` answers every other path under `/api/v1` 404 in the error format, not with the site's not-found page.
+- **REST handlers** (`src/lib/api/v1-handlers.ts`, server-only): the iOS side. `restGet(inputSchema, run)` (`src/lib/api/rest.ts`) reads the input from the query string and the route's path parameters (a path parameter wins over a query field of the same name), checks it, calls the service and answers JSON with `Cache-Control: no-store`. `restHandlers` adds an `ANY` handler that answers every other method 405 with `Allow: GET`.
+- **REST routes** (`src/routes/api/v1/<operation>.ts`, or a nested path such as `$network/puzzles/today.ts` for `/api/v1/{network}/puzzles/today`): a file route with only `server.handlers`, the operation's handlers from `v1-handlers.ts`. `src/routes/api/v1/$.ts` answers every other path under `/api/v1` 404 in the error format, not with the site's not-found page.
 
 ## Errors
 
@@ -67,4 +85,4 @@ The router's locale rewrite also matches `/en/api/v1/…` ([i18n.md](i18n.md#loc
 
 ## Tests
 
-`src/lib/game/meta.test.ts` runs the service and its schemas on the fixture. `src/lib/api/v1-handlers.test.ts` calls the REST handlers with a `Request`, as Start does, with `serviceContext` mocked to read the fixture: the answer, a bad input, a server error that keeps its message to itself, another method and an unknown path.
+`src/lib/game/meta.test.ts` runs the service and its schemas on the fixture. `src/lib/game/today-puzzle.test.ts` runs `getTodayPuzzle` at fixed instants on the fixture with its schedule carried on for 400 days: puzzle 142 on 6 November 2026, the switch at Amsterdam midnight in winter and summer, both clock changes, no station in the answer and a day without a puzzle. `src/lib/api/v1-handlers.test.ts` calls the REST handlers with a `Request` and path parameters, as Start does, with `serviceContext` mocked to read the fixture at a fixed time: the answer, a bad input, a server error that keeps its message to itself, a day without a puzzle, another method and an unknown path.
