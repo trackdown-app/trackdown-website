@@ -1,6 +1,10 @@
 import type { CaptureResult, PostHog, PostHogConfig } from "posthog-js";
 import { CONSENT_TEXT_VERSION } from "@/lib/analytics/consent";
 import type { ConsentChoice } from "@/lib/analytics/consent";
+import type {
+    AnalyticsEventName,
+    AnalyticsEventProperties,
+} from "@/lib/analytics/events";
 
 // Public ingestion key, intentionally included in the browser bundle. This is
 // not a personal API key. Server telemetry keeps its own runtime configuration.
@@ -9,6 +13,34 @@ export const posthogProjectToken =
 export const posthogApiHost = "https://t.trackdown.nl";
 
 let loading: Promise<PostHog> | null = null;
+
+/** Use the document's consent mode; analytics never blocks a game action. */
+export function trackEvent<Name extends AnalyticsEventName>(
+    name: Name,
+    properties: AnalyticsEventProperties[Name],
+): void {
+    if (typeof window === "undefined" || loading == null) return;
+    // Copy only the event contract's fields. Structural typing can otherwise
+    // let a larger game object carry station data into capture at runtime.
+    const safe = {
+        network: properties.network,
+        puzzle_number: properties.puzzle_number,
+        archive: properties.archive,
+        ...(name === "guess_made" && "guess_number" in properties
+            ? { guess_number: properties.guess_number }
+            : {}),
+        ...((name === "puzzle_solved" || name === "puzzle_missed") &&
+        "guesses_used" in properties
+            ? { guesses_used: properties.guesses_used }
+            : {}),
+        ...(name === "result_shared" && "method" in properties
+            ? { method: properties.method }
+            : {}),
+    };
+    void loading
+        .then((posthog) => posthog.capture(name, safe))
+        .catch(() => undefined);
+}
 
 /** Remove only this project's persistence, preserving games and consent. */
 export function clearPostHogStorage(): void {

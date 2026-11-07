@@ -67,6 +67,8 @@ The server render has no storage, so it renders a game with no guesses. `useSync
 
 ## Storage
 
+Successful guesses also emit the typed [game analytics events](analytics.md#game-events): first play, each guess, the outcome and first archive play. Failed guesses and restored games emit none; event properties contain only puzzle metadata and counts.
+
 A game is kept in `localStorage` under `trackdown:game:v1:{network}:{number}`, one entry per network and puzzle, as `{"guesses":[…]}`, with `"archive":true` once a guess at it was made in the archive ([archive.md](archive.md#the-streak)), which keeps it out of the streak ([statistics.md](statistics.md#streaks)). A new day is a new puzzle number and so a new game; old entries stay, for the archive's results and the statistics.
 
 `createGameStore` (`src/lib/game/game-store.ts`) guards every read and write with `try`/`catch`. Where storage is unavailable (blocked, full, a private window that refuses it) a write is held in the page's memory instead: the game plays as usual, it just does not survive a reload. An entry that is not valid JSON or not a game this version wrote reads as a game with no guesses. A breaking change to the format bumps the `v1` in the key.

@@ -22,6 +22,9 @@ import type {
 } from "@/lib/game/schemas";
 import type { ShareNavigator } from "@/lib/game/share-result";
 import type { ListedGuess } from "@/lib/game/trip-line";
+import { trackEvent } from "@/lib/analytics/posthog-client";
+
+vi.mock("@/lib/analytics/posthog-client", () => ({ trackEvent: vi.fn() }));
 
 const { submitGuessFn } = vi.hoisted(() => ({
     submitGuessFn: vi.fn<(options: { data: GuessInput }) => Promise<GuessOutput>>(),
@@ -156,6 +159,7 @@ function reveal(input: RevealInput): RevealOutput {
 }
 
 beforeEach(() => {
+    vi.mocked(trackEvent).mockClear();
     window.localStorage.clear();
     revealAnswerFn.mockReset();
     revealAnswerFn.mockImplementation(({ data }) => Promise.resolve(reveal(data)));
@@ -232,6 +236,12 @@ describe("GamePage", () => {
         expect(guessedNames()).toEqual(["Utrecht Centraal", "Hilversum"]);
         // Kept guesses do not play their arrival again.
         expect(document.querySelector(".guess-enter")).toBeNull();
+        expect(trackEvent).toHaveBeenCalledExactlyOnceWith("guess_made", {
+            network: "nl",
+            puzzle_number: 142,
+            archive: false,
+            guess_number: 2,
+        });
     });
 
     it("asks in the past tense in the archive and marks the kept game as an archive game", async () => {
@@ -258,22 +268,52 @@ describe("GamePage", () => {
             expect(guessedNames()).toEqual(["Utrecht Centraal", "Hilversum"]);
         });
         expect(parseStoredGame(window.localStorage.getItem(key)).archive).toBe(true);
+        expect(vi.mocked(trackEvent).mock.calls).toEqual([
+            [
+                "archive_puzzle_played",
+                { network: "nl", puzzle_number: 142, archive: true },
+            ],
+            [
+                "guess_made",
+                {
+                    network: "nl",
+                    puzzle_number: 142,
+                    archive: true,
+                    guess_number: 2,
+                },
+            ],
+        ]);
     });
 
-    it("keeps an archive game an archive game when it is played on", async () => {
-        window.localStorage.setItem(key, serializeGame([miss("hvs")], true));
-        submitGuessFn.mockImplementation(({ data }) =>
-            Promise.resolve(answer(data, false)),
-        );
-        const user = renderGame(createGameStore(() => window.localStorage));
+    it.each([false, true])(
+        "keeps archive events deduplicated when resumed with archive=%s",
+        async (archive) => {
+            window.localStorage.setItem(key, serializeGame([miss("hvs")], true));
+            submitGuessFn.mockImplementation(({ data }) =>
+                Promise.resolve(answer(data, false)),
+            );
+            const user = renderGame(
+                createGameStore(() => window.localStorage),
+                {},
+                archive,
+            );
 
-        await guess(user, "Utrecht Centraal");
+            await guess(user, "Utrecht Centraal");
 
-        await waitFor(() => {
-            expect(guessedNames()).toEqual(["Utrecht Centraal", "Hilversum"]);
-        });
-        expect(parseStoredGame(window.localStorage.getItem(key)).archive).toBe(true);
-    });
+            await waitFor(() => {
+                expect(guessedNames()).toEqual(["Utrecht Centraal", "Hilversum"]);
+            });
+            expect(parseStoredGame(window.localStorage.getItem(key)).archive).toBe(
+                true,
+            );
+            expect(trackEvent).toHaveBeenCalledExactlyOnceWith("guess_made", {
+                network: "nl",
+                puzzle_number: 142,
+                archive: true,
+                guess_number: 2,
+            });
+        },
+    );
 
     it("names the archive's answer without calling it today's", () => {
         window.localStorage.setItem(
@@ -375,6 +415,26 @@ describe("GamePage", () => {
             screen.getByRole("heading", { level: 2, name: "How you got there" }),
         ).toBeDefined();
         expect(guessedNames()).toEqual(["Zwolle", "Hilversum"]);
+        expect(vi.mocked(trackEvent).mock.calls).toEqual([
+            [
+                "guess_made",
+                {
+                    network: "nl",
+                    puzzle_number: 142,
+                    archive: false,
+                    guess_number: 2,
+                },
+            ],
+            [
+                "puzzle_solved",
+                {
+                    network: "nl",
+                    puzzle_number: 142,
+                    archive: false,
+                    guesses_used: 2,
+                },
+            ],
+        ]);
         expect(screen.getByText("1h 15m, change at Utrecht Centraal")).toBeDefined();
         expect(screen.getByRole("button", { name: "Share result" })).toBeDefined();
         expect(
@@ -415,6 +475,7 @@ describe("GamePage", () => {
         expect(guessedNames()).toHaveLength(6);
         // A kept game shown again does not steal focus.
         expect(document.activeElement).toBe(document.body);
+        expect(trackEvent).not.toHaveBeenCalled();
     });
 
     it("never names the answer before the reveal answers", async () => {
@@ -601,6 +662,12 @@ describe("GamePage", () => {
             text: document.querySelector("pre")?.textContent,
         });
         expect(screen.getByRole("status").textContent).toBe("");
+        expect(trackEvent).toHaveBeenCalledExactlyOnceWith("result_shared", {
+            network: "nl",
+            puzzle_number: 142,
+            archive: false,
+            method: "shared",
+        });
     });
 
     it("copies the result without the Web Share API, and says so", async () => {
@@ -628,6 +695,12 @@ describe("GamePage", () => {
         expect((await screen.findByRole("status")).textContent).toBe(
             "Copied. Paste it wherever you like.",
         );
+        expect(trackEvent).toHaveBeenCalledExactlyOnceWith("result_shared", {
+            network: "nl",
+            puzzle_number: 142,
+            archive: false,
+            method: "copied",
+        });
     });
 
     it("says so when the result cannot be copied", async () => {
@@ -650,6 +723,7 @@ describe("GamePage", () => {
                 "Couldn't copy. Select the text under “What you'll share” and copy it yourself.",
             ),
         ).toBeDefined();
+        expect(trackEvent).not.toHaveBeenCalled();
     });
 
     it("says so when a guess does not go through, and keeps nothing", async () => {
@@ -662,6 +736,170 @@ describe("GamePage", () => {
             "That guess didn't go through. Try again.",
         );
         expect(window.localStorage.getItem(key)).toBeNull();
+        expect(trackEvent).not.toHaveBeenCalled();
+    });
+
+    it("tracks the first accepted guess once, without replaying it on reload", async () => {
+        submitGuessFn.mockImplementation(({ data }) =>
+            Promise.resolve(answer(data, false)),
+        );
+        const user = renderGame(createGameStore(() => window.localStorage));
+        expect(trackEvent).not.toHaveBeenCalled();
+
+        await guess(user, "Utrecht Centraal");
+        await waitFor(() => expect(trackEvent).toHaveBeenCalledTimes(2));
+        expect(vi.mocked(trackEvent).mock.calls).toEqual([
+            [
+                "puzzle_started",
+                { network: "nl", puzzle_number: 142, archive: false },
+            ],
+            [
+                "guess_made",
+                {
+                    network: "nl",
+                    puzzle_number: 142,
+                    archive: false,
+                    guess_number: 1,
+                },
+            ],
+        ]);
+
+        cleanup();
+        renderGame(createGameStore(() => window.localStorage));
+        expect(trackEvent).toHaveBeenCalledTimes(2);
+    });
+
+    it("tracks a new archive game and a first-guess win in order", async () => {
+        submitGuessFn.mockImplementation(({ data }) =>
+            Promise.resolve(answer(data, true)),
+        );
+        const user = renderGame(
+            createGameStore(() => window.localStorage),
+            {},
+            true,
+        );
+        await guess(user, "Zwolle");
+
+        await waitFor(() => expect(trackEvent).toHaveBeenCalledTimes(4));
+        expect(vi.mocked(trackEvent).mock.calls).toEqual([
+            ["puzzle_started", { network: "nl", puzzle_number: 142, archive: true }],
+            [
+                "archive_puzzle_played",
+                { network: "nl", puzzle_number: 142, archive: true },
+            ],
+            [
+                "guess_made",
+                {
+                    network: "nl",
+                    puzzle_number: 142,
+                    archive: true,
+                    guess_number: 1,
+                },
+            ],
+            [
+                "puzzle_solved",
+                {
+                    network: "nl",
+                    puzzle_number: 142,
+                    archive: true,
+                    guesses_used: 1,
+                },
+            ],
+        ]);
+
+        cleanup();
+        renderGame(
+            createGameStore(() => window.localStorage),
+            {},
+            true,
+        );
+        expect(trackEvent).toHaveBeenCalledTimes(4);
+    });
+
+    it("tracks a loss only when the last guess is accepted", async () => {
+        window.localStorage.setItem(
+            key,
+            serializeGame(
+                ["asd", "hvs", "mt", "hdr", "gn"].map((code) => miss(code)),
+            ),
+        );
+        submitGuessFn.mockImplementation(({ data }) =>
+            Promise.resolve(answer(data, false)),
+        );
+        const user = renderGame(createGameStore(() => window.localStorage));
+        await guess(user, "Utrecht Centraal");
+
+        await waitFor(() => expect(trackEvent).toHaveBeenCalledTimes(2));
+        expect(vi.mocked(trackEvent).mock.calls).toEqual([
+            [
+                "guess_made",
+                {
+                    network: "nl",
+                    puzzle_number: 142,
+                    archive: false,
+                    guess_number: 6,
+                },
+            ],
+            [
+                "puzzle_missed",
+                {
+                    network: "nl",
+                    puzzle_number: 142,
+                    archive: false,
+                    guesses_used: 6,
+                },
+            ],
+        ]);
+    });
+
+    it("does not track a duplicate response already saved by another tab", async () => {
+        const store = createGameStore(() => window.localStorage);
+        submitGuessFn.mockImplementation(({ data }) => {
+            store.write(key, serializeGame([answer(data, false)]));
+            return Promise.resolve(answer(data, false));
+        });
+        const user = renderGame(store);
+        await guess(user, "Utrecht Centraal");
+
+        await waitFor(() => expect(guessedNames()).toEqual(["Utrecht Centraal"]));
+        expect(trackEvent).not.toHaveBeenCalled();
+    });
+
+    it("does not track a cancelled share", async () => {
+        window.localStorage.setItem(
+            key,
+            serializeGame([
+                { guess: "zl", correct: true, steps: [], totalMinutes: 0 },
+            ]),
+        );
+        const user = renderGame(
+            createGameStore(() => window.localStorage),
+            {
+                share: () =>
+                    Promise.reject(new DOMException("Closed", "AbortError")),
+            },
+        );
+        await user.click(screen.getByRole("button", { name: "Share result" }));
+        expect(trackEvent).not.toHaveBeenCalled();
+    });
+
+    it("ignores an in-flight guess when another tab finishes the game", async () => {
+        const store = createGameStore(() => window.localStorage);
+        submitGuessFn.mockImplementation(({ data }) => {
+            store.write(
+                key,
+                serializeGame([
+                    { guess: "zl", correct: true, steps: [], totalMinutes: 0 },
+                ]),
+            );
+            return Promise.resolve(answer(data, false));
+        });
+        const user = renderGame(store);
+        await guess(user, "Utrecht Centraal");
+
+        await screen.findByRole("heading", { level: 1, name: "Zwolle" });
+        expect(parseStoredGame(store.read(key)).guesses).toHaveLength(1);
+        expect(trackEvent).not.toHaveBeenCalled();
     });
 
     it("speaks Dutch by default", () => {

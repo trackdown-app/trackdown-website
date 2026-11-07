@@ -110,7 +110,15 @@ export function GameOver({
                     headingRef={headingRef}
                 />
                 <div className="flex flex-wrap gap-3">
-                    <ShareButton text={share} target={shareTarget} />
+                    <ShareButton
+                        text={share}
+                        target={shareTarget}
+                        puzzle={{
+                            network: puzzle.network,
+                            puzzle_number: puzzle.number,
+                            archive,
+                        }}
+                    />
                     <a
                         href={localizeHref(sitePaths.archive)}
                         className={cn(
