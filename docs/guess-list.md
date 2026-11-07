@@ -48,6 +48,8 @@ A correct guess has no line; its row only opens. Kept guesses, the ones a reload
 
 Behind each track, a 1px `grid` rule every 30 minutes of the board's scale, counted from the right: every fifth of the track at 2h 30. Below the list, the grid's labels sit under their rules (`gridMarks`): "30 min", "1 h", "1 h 30", "2 h" (Dutch "1 u", "1 u 30", "2 u"), and on to "2 h 30", "3 h" on a longer board. Past six columns only the whole hours are labelled, so the labels never crowd at phone width. Above the list on the right, "Mystery station" / "Mysteriestation" with an ink `?` disc names the bar: a 26px `surface` pill with a 4px ink border, from the first row's line to the last.
 
+`MysteryBar` (`src/components/game/mystery-bar.tsx`) measures the centres of the first and last track areas (`data-trip-end`), extending 15px beyond each. A single row gets a 30px end cap centred on its line. It measures before paint and uses `ResizeObserver` on the list, rows and track areas to follow wrapping, font changes and the arrival animation. Until measured, the bar is hidden. The How to play example uses this same placement, so its bar stays on the trip line when the station text wraps above it.
+
 ## Revealed
 
 On the solved and missed screen ([game.md](game.md#solved-and-missed)) the list is the design's Web · Solved "How you got there", given the `reveal` operation's guesses, so every change is named and no `?` shows:
@@ -55,7 +57,7 @@ On the solved and missed screen ([game.md](game.md#solved-and-missed)) the list 
 - **The header.** "How you got there" / "Zo kwam je er" as an `h2` in Barlow Condensed bold 32px, and at the right in muted 15px "Newest first. Every change is revealed now." / "Nieuwste eerst. Elke overstap is nu onthuld." No progress and no "Mystery station" label.
 - **The rows.** 96px high, the station in 28px, and no time grid behind the track or labels below the list. The trip lines are drawn as on the playing board, on the same scale.
 - **The correct guess.** One 80px line: the number and the station in 30px at the left, "You're here" / "Hier ben je" in semibold 15px at the right, clear of the bar.
-- **The mystery bar.** Filled `ink`, no border: the station is known. It runs from 14px below the list's top to 30px above its bottom.
+- **The mystery bar.** Filled `ink`, no border: the station is known. It follows the same measured endpoints as the playing board, using the correct row's centre when there is no trip line. A first-guess win gets a centred 30px end cap.
 
 ## Legend
 
@@ -74,3 +76,4 @@ Times in the sentence spell out their units, one and many ("1 hour 1 minute", "1
 - `src/lib/game/trip-line.test.ts` covers the width and its limits, the board's scale and its grid labels, 29 minutes one width beside a 3-hour trip, where each ride and change sits, the same minutes drawn the same width with a change or without and whatever the wait after them, the labels that fit on a narrow and a wide track, hidden changes and the line colours.
 - `src/lib/game/trip-text.test.ts` covers the short and the spoken times, the summary and the sentence, in both languages.
 - `src/components/game/guess-list.test.tsx` renders the design's four guesses in `happy-dom`: the order, each row's sentence, the drawing hidden, the labels and `?`, the grid labels and their whole hours on a board widened by a 3-hour trip, Dutch, a correct guess, the entering row's class and timings, the revealed list's heading, its found row and no grid, in both languages, and the empty list.
+- `src/components/game/mystery-bar.test.tsx` supplies layout measurements to check the centred cap for a first-guess win, the wrapped example and its resize, and the span between endpoints when another row arrives.
