@@ -217,6 +217,20 @@ describe("the site's router", () => {
         expect(html).toContain('aria-label="Donkere modus"');
     });
 
+    it.each([
+        ["/over", "<title>Over Trackdown</title>"],
+        ["/privacy", "<title>Privacybeleid · Trackdown</title>"],
+        ["/voorwaarden", "<title>Gebruiksvoorwaarden · Trackdown</title>"],
+    ])("answers %s with its page inside the shell", async (path, title) => {
+        const { status, html } = await respondAt(getRouter, path);
+
+        expect(status).toBe(200);
+        expect(html).toContain(title);
+        expect(html).toContain("<header");
+        expect(html).toContain("<footer");
+        expect(html).toMatch(/<a [^>]*aria-current="page"[^>]*>/);
+    });
+
     it("answers how to play with its page, inside the header and footer", async () => {
         const { status, html } = await respondAt(getRouter, "/hoe-te-spelen");
 

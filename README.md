@@ -43,6 +43,7 @@ The site runs on http://localhost:3000.
 - [Sharing a result](docs/share.md)
 - [Statistics](docs/statistics.md)
 - [How to play](docs/how-to-play.md)
+- [About, privacy and terms](docs/about-privacy-terms.md)
 - [Archive](docs/archive.md)
 - [Network picker](docs/network-picker.md)
 - [SEO and link previews](docs/seo.md)

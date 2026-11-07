@@ -34,6 +34,9 @@ export const Route = createFileRoute("/hoe-te-spelen")({
 | The archive, `/{network}/archief` | `archive.pageTitle` | `seo.archiveDescription` |
 | An archive puzzle, `/{network}/archief/{number}` | `archive.puzzlePageTitle` | `seo.archivePuzzleDescription`, with the number |
 | How to play, `/hoe-te-spelen` | `howToPlay.pageTitle` | `seo.howToPlayDescription` |
+| About, `/over` | `about.pageTitle` | `seo.aboutDescription` |
+| Privacy policy, `/privacy` | `privacy.pageTitle` | `seo.privacyDescription` |
+| Terms of use, `/voorwaarden` | `terms.pageTitle` | `seo.termsDescription` |
 
 The game page's loader returns today's puzzle number for its head. The puzzle the loader reads (`todayPuzzle`) never carries the station, so the head cannot name it.
 
@@ -65,7 +68,7 @@ The PNGs and the ICO are renders of `favicon.svg` (and of the share image's SVG)
 
 ### Sitemap
 
-`/sitemap.xml` (`src/routes/sitemap[.]xml.ts`, `src/lib/sitemap.ts`) lists every network's game and archive and How to play, in Dutch and in English: one `<url>` per page and language. Each lists the page's language versions as `xhtml:link` alternates, the same `nl`, `en` and `x-default` its head lists, from the same `languageAlternates()`. An archive's puzzles are not listed; the archive links to each. A new network is listed as soon as it joins `networkIds` ([network-picker.md](network-picker.md)).
+`/sitemap.xml` (`src/routes/sitemap[.]xml.ts`, `src/lib/sitemap.ts`) lists every network's game and archive, How to play, About, Privacy and Terms, in Dutch and in English: one `<url>` per page and language. Each lists the page's language versions as `xhtml:link` alternates, the same `nl`, `en` and `x-default` its head lists, from the same `languageAlternates()`. An archive's puzzles are not listed; the archive links to each. A new network is listed as soon as it joins `networkIds` ([network-picker.md](network-picker.md)).
 
 ### robots.txt
 

@@ -47,9 +47,9 @@ export const Route = createFileRoute("/")({
 
 ## Page paths
 
-`src/lib/site-paths.ts` holds the path of every page the shell links to, without a locale: `/`, `/hoe-te-spelen`, `/over`, `/privacy` and `/voorwaarden`, and `networkArchivePath` for a network's archive (`/{network}/archief`), for a link outside a router. Paths are the same in both languages ([i18n.md](i18n.md#locale-routing)), so they are Dutch; `localizeHref` adds `/en` on an English page.
+`src/lib/site-paths.ts` holds the path of every page the shell links to, without a locale: `/`, `/hoe-te-spelen`, `/over`, `/privacy` and `/voorwaarden`, and `networkArchivePath` for a network's archive (`/{network}/archief`), for a link outside a router, such as the sitemap's or the cookie banner's. Paths are the same in both languages ([i18n.md](i18n.md#locale-routing)), so they are Dutch; `localizeHref` adds `/en` on an English page.
 
-The home page (a redirect to the chosen network's game), a network's game and archive, and How to play have a route, and the shell links to them with a router `<Link>`. It links to the others with `PageLink` (`src/components/layout/page-link.tsx`), a plain `<a href={localizeHref(path)}>` that marks the current page with `aria-current`, rather than a typed `<Link>`. Until a page lands its link shows the not-found page. Switch a link to `<Link>` once its route exists, or keep `PageLink` and change the path here if the page takes another one.
+Every one of these pages has a route, and the header and footer link to it with a typed router `<Link>`, which marks the current page with `aria-current="page"`. About, Privacy and Terms are in [about-privacy-terms.md](about-privacy-terms.md).
 
 ## Not-found and error pages
 
