@@ -64,3 +64,23 @@ nl: 395 stations, 1095 puzzles, all valid
 ```
 
 The deploy workflow runs it on its trackdown-data checkout before it builds, so data that does not match never reaches a deploy ([deploy.md](deploy.md#the-deploy-workflow)). A unit test runs the same checks on the fixture.
+
+## The build guard
+
+The data may be bundled into the server function and read there, never copied to the static output that Vercel's CDN serves. Two things keep it there:
+
+- **At build time.** The loader's modules are server-only (see [The loader](#the-loader)), so importing `gameData` from a component fails `vite build` with "Import denied in client environment".
+- **After the build.** `bun run build:guard [dir]` (`scripts/check-build-output.ts`) reads every file of the data directory `dir` (default `TRACKDOWN_DATA_DIR`) and every file of the static output that exists, `.vercel/output/static` after `vercel build` and `.output/public` after `bun run build`. It fails, listing each find, when a static file:
+  - has a data file's bytes, under any name (a data file put in `public/`);
+  - has a data file's name (`stations.json`, `to/alf.json`);
+  - or, for a text file (scripts, stylesheets, HTML, JSON, source maps), holds a data file's whole contents, one of its puzzles or stations, a trip keyed by its origin's code (`brv:[["IC",20]]`, how a `to/` file reads once a bundler inlines a JSON import) or a trip with a change on its own. A trip without a change (`[["IC",20]]`) is too short to tell apart from code, so it only counts with its code in front.
+
+  The text is compared with whitespace, quotes and backslashes removed, so JSON, a JS object literal and an escaped `JSON.parse('…')` string all match. The comparison lives in `findDataLeaks` (`src/lib/data/find-data-leaks.ts`), tested on the fixture.
+
+```text
+.vercel/output/static: 45 files, none holds any of 8 data files
+```
+
+CI's Build check builds with the fixture as `TRACKDOWN_DATA_DIR` and runs the guard on it ([getting-started.md](getting-started.md#continuous-integration)); the deploy workflow runs it on the real data after `vercel build`, before it uploads anything ([deploy.md](deploy.md#the-deploy-workflow)).
+
+Local copies of the data stay out of Git: `.gitignore` ignores `.env*`, the deploy workflow's `.trackdown-data/`, and a `data/` or `TrackdownData/` folder at the repository's root.

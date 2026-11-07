@@ -24,6 +24,9 @@ dist/
 
 # The private trackdown-data checkout of the deploy workflow (docs/deploy.md)
 .trackdown-data/
+# Local copies of the game data at the root (docs/data.md#the-build-guard)
+/data/
+/TrackdownData/
 
 # TypeScript cache
 *.tsbuildinfo
