@@ -91,8 +91,11 @@ describe("tripLineLayout", () => {
         );
 
         // The 9-minute wait is 6%, 20.4px on 340px, so the change is the
-        // 30px ring. Each ride's bar runs on under it to its centre, 27%,
-        // where the ring's half, 15px, covers it.
+        // 30px ring. Its right end is 3px over the next ride, which leaves at
+        // 24%, so its centre is 12px further: 24% + 12/340 = 27.53%. Each
+        // ride's bar runs on under it to there, where the ring's half,
+        // 15px, covers it.
+        const centre = 24 + (12 / 340) * 100;
         expect(layout.parts).toEqual([
             {
                 kind: "ride",
@@ -102,7 +105,7 @@ describe("tripLineLayout", () => {
                 startPercent: 78,
                 endPercent: expect.closeTo(30),
                 drawStartPercent: 78,
-                drawEndPercent: expect.closeTo(27),
+                drawEndPercent: expect.closeTo(centre),
                 insetStartPx: 11,
                 insetEndPx: 15,
                 label: "IC 1h 12m",
@@ -110,7 +113,8 @@ describe("tripLineLayout", () => {
             {
                 kind: "change",
                 known: true,
-                atPercent: expect.closeTo(27),
+                atPercent: expect.closeTo(centre),
+                widthPx: 30,
                 spanPercent: expect.closeTo(6),
             },
             {
@@ -120,13 +124,44 @@ describe("tripLineLayout", () => {
                 line: 2,
                 startPercent: expect.closeTo(24),
                 endPercent: 0,
-                drawStartPercent: expect.closeTo(27),
+                drawStartPercent: expect.closeTo(centre),
                 drawEndPercent: 0,
                 insetStartPx: 15,
                 insetEndPx: 13,
                 label: "IC 36m",
             },
         ]);
+    });
+
+    it("lines the changes up before the same last ride, whatever the wait", () => {
+        // The design review's case: SPR 29m to the bar after a 3-minute
+        // wait, a ring, and after a 17-minute one, a pill.
+        function shownLastPx(layout: ReturnType<typeof tripLineLayout>): number {
+            const last = layout.parts.at(-1);
+            return last?.kind === "ride"
+                ? ((last.drawStartPercent - last.drawEndPercent) / 100) * 1000 -
+                      last.insetStartPx -
+                      last.insetEndPx
+                : 0;
+        }
+        const ring = tripLineLayout(
+            trip(ride(37), change(null, 3), ride(29)),
+            format,
+            1000,
+            210,
+        );
+        const pill = tripLineLayout(
+            trip(ride(37), change(null, 17), ride(29)),
+            format,
+            1000,
+            210,
+        );
+
+        expect(ring.parts[1]).toMatchObject({ widthPx: 30 });
+        expect(shownLastPx(ring)).toBeCloseTo(shownLastPx(pill));
+        // 29 minutes, less the 3px the change reaches over and the half of
+        // the mystery bar.
+        expect(shownLastPx(ring)).toBeCloseTo((29 / 210) * 1000 - 3 - 13);
     });
 
     it("keeps a ride its own width whatever the wait after it", () => {

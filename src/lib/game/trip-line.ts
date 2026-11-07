@@ -75,9 +75,9 @@ export const narrowTrackPx = 340;
 /** Half the guess dot, which covers the start of the first ride. */
 const dotHalfPx = 11;
 /** A change's ring at its smallest, for a short wait. */
-export const changeMinPx = 30;
+const changeMinPx = 30;
 /** How far a change's pill reaches over each ride beside it, at the least. */
-export const changeOverlapPx = 3;
+const changeOverlapPx = 3;
 /** Half the mystery bar, which covers the end of the last ride. */
 const barHalfPx = 13;
 /** A label's width: Barlow bold at 13px, about 7.2px a character, plus padding. */
@@ -116,23 +116,23 @@ export type TripLineRide = {
  * One change of the line: the station, drawn as a pill as long as the wait
  * between the two rides, a 30px ring for a short one, as a metro map draws
  * an interchange. Empty when its station is known.
+ *
+ * The pill is anchored where the next ride leaves, its right end 3px over
+ * that ride, so every ride to the mystery bar shows its own minutes less
+ * those 3px whatever the wait before it, and the changes before the same
+ * last ride line up from row to row. A ring wider than its wait grows back
+ * over the ride before.
  */
 export type TripLineChange = {
     kind: "change";
     known: boolean;
-    /** The wait's middle, the pill's centre, in percent of the track from the right. */
+    /** The pill's centre, in percent of the track from the right. */
     atPercent: number;
+    /** The pill's width, in px: the wait and 3px over each ride, 30px at the least. */
+    widthPx: number;
     /** The wait's length, in percent of the track. */
     spanPercent: number;
 };
-
-/**
- * Half a change's pill, for a wait `waitPx` long: how far it covers the bar
- * of each ride beside it, which runs on to its centre.
- */
-function changeHalfPx(waitPx: number): number {
-    return Math.max(changeMinPx / 2, waitPx / 2 + changeOverlapPx);
-}
 
 export type TripLineLayout = {
     /** The line's width, and the guess dot's centre, in percent of the track from the right. */
@@ -217,16 +217,24 @@ export function tripLineLayout(
 
         if (step.kind === "change") {
             const spanPercent = startPercent - endPercent;
-            const atPercent = (startPercent + endPercent) / 2;
+            const widthPx = Math.max(
+                changeMinPx,
+                (spanPercent / 100) * trackPx + 2 * changeOverlapPx,
+            );
+            // Its right end 3px over the next ride, its centre half its
+            // width back from there.
+            const atPercent =
+                endPercent + ((widthPx / 2 - changeOverlapPx) / trackPx) * 100;
             // The ride before runs on under the pill to its centre.
             if (previous?.kind === "ride") {
                 previous.drawEndPercent = atPercent;
-                previous.insetEndPx = changeHalfPx((spanPercent / 100) * trackPx);
+                previous.insetEndPx = widthPx / 2;
             }
             parts.push({
                 kind: "change",
                 known: step.station != null,
                 atPercent,
+                widthPx,
                 spanPercent,
             });
             continue;
@@ -243,10 +251,7 @@ export function tripLineLayout(
             // It starts under the pill of the change before it, at its centre.
             drawStartPercent: after?.atPercent ?? startPercent,
             drawEndPercent: endPercent,
-            insetStartPx:
-                after == null
-                    ? dotHalfPx
-                    : changeHalfPx((after.spanPercent / 100) * trackPx),
+            insetStartPx: after == null ? dotHalfPx : after.widthPx / 2,
             insetEndPx: barHalfPx,
             label: null,
         });

@@ -1,8 +1,6 @@
 import { useRef } from "react";
 import type { CSSProperties } from "react";
 import {
-    changeMinPx,
-    changeOverlapPx,
     narrowTrackPx,
     trainReachesMs,
     tripLineLayout,
@@ -88,11 +86,9 @@ export function TripLine({
                 }
                 const ringStyle: CSSProperties & Record<`--${string}`, string> = {
                     right: `${part.atPercent}%`,
-                    // As long as the wait, reaching a little over each ride,
-                    // and never smaller than the 30px ring.
-                    width: `max(${changeMinPx}px, calc(${part.spanPercent}% + ${2 * changeOverlapPx}px))`,
+                    width: part.widthPx,
                     // Drops in as the train arrives at the station.
-                    "--ring-delay": `${trainReachesMs(layout.widthPercent, part.atPercent + part.spanPercent / 2)}ms`,
+                    "--ring-delay": `${trainReachesMs(layout.widthPercent, part.atPercent + (part.widthPx / 2 / trackPx) * 100)}ms`,
                 };
                 return (
                     <span
