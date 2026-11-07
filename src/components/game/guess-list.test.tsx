@@ -116,6 +116,33 @@ describe("GuessList", () => {
         }
     });
 
+    it("widens the grid for a trip past 2h 30, on one scale for every row", () => {
+        render(
+            <GuessList
+                guesses={[
+                    ...guesses,
+                    {
+                        guess: "vs",
+                        correct: false,
+                        steps: [{ kind: "ride", train: "IC", minutes: 183 }],
+                        totalMinutes: 183,
+                    },
+                ]}
+                stations={[...stations, { code: "vs", name: "Vlissingen" }]}
+            />,
+        );
+
+        // Seven columns of 30 minutes: only the whole hours are labelled.
+        const labels = [
+            ...document.querySelectorAll("[aria-hidden] .absolute.top-2"),
+        ];
+        expect(labels.map((label) => label.textContent)).toEqual([
+            "1 u",
+            "2 u",
+            "3 u",
+        ]);
+    });
+
     it("speaks Dutch by default", () => {
         render(<GuessList guesses={guesses} stations={stations} />);
 
@@ -143,6 +170,23 @@ describe("GuessList", () => {
         expect(found?.querySelector(".sr-only")?.textContent).toBe(
             "Guess 5, Amersfoort Centraal: the mystery station.",
         );
+    });
+
+    it("plays the arrival on the entering guess's row only, with its timings", () => {
+        overwriteGetLocale(() => "en");
+        render(
+            <GuessList guesses={guesses} stations={stations} enteringGuess="mt" />,
+        );
+
+        const [maastricht, ...older] = rows();
+        expect(maastricht?.classList.contains("guess-enter")).toBe(true);
+        for (const row of older) {
+            expect(row.classList.contains("guess-enter")).toBe(false);
+        }
+        const track = maastricht?.querySelector<HTMLElement>("[style*='--trip-ms']");
+        expect(track?.style.getPropertyValue("--trip-ms")).toBe("977ms");
+        const ring = maastricht?.querySelector<HTMLElement>(".trip-ring");
+        expect(ring?.style.getPropertyValue("--ring-delay")).toMatch(/^\d+ms$/);
     });
 
     it("renders nothing before the first guess", () => {

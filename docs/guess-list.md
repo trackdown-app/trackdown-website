@@ -2,7 +2,7 @@
 
 `GuessList` (`src/components/game/guess-list.tsx`) is the list of guesses on the design's Web · Playing board: one row per guess, newest first, with the trip from the guessed station to the mystery station drawn as a line. The shorter the line, the closer the guess.
 
-No page shows it yet: the game page, still to come, mounts it with the game's state, and names `GameLegend` as its footer legend.
+The game page mounts it with the game's state, with the progress dots in its header row, and names `GameLegend` as its footer legend ([game.md](game.md)).
 
 ## Props
 
@@ -10,6 +10,8 @@ No page shows it yet: the game page, still to come, mounts it with the game's st
 | --- | --- |
 | `guesses` | The guesses so far, oldest first: each `guess` operation's answer ([api.md](api.md#a-guess)), or the `reveal` operation's guesses. Only `guess`, `correct`, `steps` and `totalMinutes` are read (`ListedGuess` in `src/lib/game/trip-line.ts`) |
 | `stations` | The network's stations (`code` and `name`), to name each guess and each known change. A code it does not know shows as the code |
+| `progress` | Optional. What the header row shows at the left, opposite "Mystery station": the game page's progress dots |
+| `enteringGuess` | Optional. The station code of a guess just made on the page, whose row plays its arrival ([A new guess](#a-new-guess)) |
 
 Before the first guess the list renders nothing.
 
@@ -23,15 +25,27 @@ The summary is the total time and how the trip changes trains: "2h 25m, change a
 
 `TripLine` (`src/components/game/trip-line.tsx`) draws the line; `tripLineLayout` (`src/lib/game/trip-line.ts`) works out its shape, with no data and no messages, so it runs in the browser.
 
-- **Width.** The line runs from the guess dot at the left to the mystery bar at the right edge, as a share of the track: 150 minutes fill it, so each of the grid's five columns is 30 minutes. A trip shorter than 21 minutes still takes 14%, so its dot and a bit of line show; a trip longer than 2h 30 takes the whole track.
-- **Segments.** Each ride is as wide as its share of the trip's ride time. The rides take the three line colours in order of the changes: `line-1` for the first train, `line-2` after the first change, `line-3` after the second, then `line-1` again ([design-system.md](design-system.md#the-three-line-colours-are-for-trips-only)). The last ride runs 13px under the mystery bar.
-- **Change rings.** A 30px `surface` ring with a 4px ink border sits at each change: empty when the change's station is known, `?` when the `guess` operation hid it (`station: null`, because the player has not guessed that station yet).
-- **Ride labels.** Inside each ride, in `on-line` bold 13px: the train and its time ("IC 2h 02m") when it fits, else the time alone ("30m"), else nothing. Whether a label fits is worked out for the narrowest track, 340px at phone width, at about 7.2px a character plus 10px padding, so a label never spills at any width and every width shows the same labels.
-- **Guess dot.** A 22px ink dot with a 3px `bg` halo, over the start of the first ride.
+- **Scale.** Every minute takes the same width on every row, so a 29-minute ride is as wide in one trip as in any other. The whole board shares one scale, `boardMinutes` (`src/lib/game/trip-line.ts`): the track spans 2h 30, five grid columns of 30 minutes, or, once a guess's trip is longer, that trip rounded up to the next half hour (3h 03m spans 3h 30, seven columns). Every row then draws smaller; its parts glide to their new places (500ms, not with `prefers-reduced-motion: reduce`). Time runs from the mystery bar at the right edge (0) to the guess dot at the trip's total time. Only a line shorter than 48px leaves the scale, stretched to 48px so its dot shows beside the bar.
+- **Segments.** Each ride is drawn over its own minutes only, so "IC 37m" is one width whatever the wait after it. The minutes of a change, the wait, belong to the change's pill. The rides take the three line colours in order of the changes: `line-1` for the first train, `line-2` after the first change, `line-3` after the second, then `line-1` again ([design-system.md](design-system.md#the-three-line-colours-are-for-trips-only)). The last ride ends at the right edge, the centre of the mystery bar, which covers its last 13px.
+- **Changes.** A 30px tall `surface` shape with a 4px ink border over the wait between two rides, as a metro map draws an interchange: a 30px ring for a short wait, stretching into a pill as long as a longer one, reaching 3px over each ride. It is anchored where the next ride leaves, its right end always 3px over that ride, so the ride after it shows its own minutes less 3px whatever the wait, and the changes before the same last ride line up from row to row; a ring wider than its wait grows back over the ride before it instead. The bar of each ride beside it runs on under the pill to its centre, so the pill's rounded ends always cover the join and no corner of a ride shows beside the curve; what shows of a ride is still its own minutes. Empty when the change's station is known, `?` when the `guess` operation hid it (`station: null`, because the player has not guessed that station yet).
+- **Ride labels.** Inside each ride, in `on-line` bold 13px, centred in the part the dot, rings and bar leave visible: the train and its time ("IC 2h 02m") when it fits, else the time alone ("30m"), else nothing. Whether a label fits is worked out at about 7.2px a character plus 10px padding, on the track's measured width (`useElementWidth`, `src/lib/use-element-width.ts`, a `ResizeObserver`). The server render, before the browser has measured it, assumes the narrowest track, 340px at phone width, so a wide track can gain train names once the page loads.
+- **Guess dot.** A 22px ink dot with a 3px `bg` halo, centred on the start of the first ride.
+
+## A new guess
+
+A guess just made on the page arrives as a train ride. The row gets `guess-enter` (`GuessRow`'s `entering`); the keyframes live in `src/styles.css`, and `TripLine` sets the timings on the elements as CSS variables.
+
+1. **The row opens** at the top of the list (260ms, `max-height` and opacity), pushing the older guesses down rather than jumping them.
+2. **The guess dot lands** on the guessed station from 180ms, scaling up with a small overshoot (220ms).
+3. **The train runs** from 320ms: the rides are uncovered from the dot to the mystery bar (`clip-path`), easing in and out like a train pulling away and braking (an ease-in-out sine). The run takes longer the longer the line, `tripRunMs` in `src/lib/game/trip-line.ts`: 300ms plus 7ms per percent of track, so about 0.4s for the shortest trip and 1s across the whole track. How long it takes says how far the guess is.
+4. **Each change drops in** as the train arrives at its station, with the dot's overshoot. `trainReachesMs` works out when: the inverse of the run's easing at the change's left end.
+5. **The labels fade in** as the train arrives (180ms).
+
+A correct guess has no line; its row only opens. Kept guesses, the ones a reload shows, never move: only the answer to the last guess made on the page enters (`useGame`'s `lastAnswer`). With `prefers-reduced-motion: reduce` nothing moves; the row is drawn as it ends.
 
 ## Time grid and mystery bar
 
-Behind each track, a 1px `grid` rule every fifth of the track, counted from the right. Below the list, the grid's labels sit under their rules: "30 min", "1 h", "1 h 30", "2 h" (Dutch "1 u", "1 u 30", "2 u"). Above the list on the right, "Mystery station" / "Mysteriestation" with an ink `?` disc names the bar: a 26px `surface` pill with a 4px ink border, from the first row's line to the last.
+Behind each track, a 1px `grid` rule every 30 minutes of the board's scale, counted from the right: every fifth of the track at 2h 30. Below the list, the grid's labels sit under their rules (`gridMarks`): "30 min", "1 h", "1 h 30", "2 h" (Dutch "1 u", "1 u 30", "2 u"), and on to "2 h 30", "3 h" on a longer board. Past six columns only the whole hours are labelled, so the labels never crowd at phone width. Above the list on the right, "Mystery station" / "Mysteriestation" with an ink `?` disc names the bar: a 26px `surface` pill with a 4px ink border, from the first row's line to the last.
 
 ## Legend
 
@@ -47,6 +61,6 @@ Times in the sentence spell out their units, one and many ("1 hour 1 minute", "1
 
 ## Tests
 
-- `src/lib/game/trip-line.test.ts` covers the width and its limits, the labels that fit, hidden changes and the line colours.
+- `src/lib/game/trip-line.test.ts` covers the width and its limits, the board's scale and its grid labels, 29 minutes one width beside a 3-hour trip, where each ride and change sits, the same minutes drawn the same width with a change or without and whatever the wait after them, the labels that fit on a narrow and a wide track, hidden changes and the line colours.
 - `src/lib/game/trip-text.test.ts` covers the short and the spoken times, the summary and the sentence, in both languages.
-- `src/components/game/guess-list.test.tsx` renders the design's four guesses in `happy-dom`: the order, each row's sentence, the drawing hidden, the labels and `?`, the grid labels, Dutch, a correct guess and the empty list.
+- `src/components/game/guess-list.test.tsx` renders the design's four guesses in `happy-dom`: the order, each row's sentence, the drawing hidden, the labels and `?`, the grid labels and their whole hours on a board widened by a 3-hour trip, Dutch, a correct guess, the entering row's class and timings, and the empty list.

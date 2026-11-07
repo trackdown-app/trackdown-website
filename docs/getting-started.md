@@ -67,7 +67,7 @@ The design is taller than any style's defaults: its main buttons, input and list
 ## Stack
 
 - TanStack Start, Router and Query (React 19) on Vite 8, with Nitro (`nitro/vite`, preset detected from the environment) bundling the server into `.output/`, or `.vercel/output/` on Vercel. See [deploy.md](deploy.md).
-- Every page renders on the server; the placeholder home page is `src/routes/index.tsx`. Every page sits inside the site shell: skip link, header and footer, with not-found and error pages ([site-shell.md](site-shell.md)).
+- Every page renders on the server; the home page, `src/routes/index.tsx`, is today's game ([game.md](game.md)). Every page sits inside the site shell: skip link, header and footer, with not-found and error pages ([site-shell.md](site-shell.md)).
 - Tailwind CSS 4 (`src/styles.css`) and shadcn/ui (`components.json`). `cn` lives in `src/lib/utils.ts`. See [shadcn/ui](#shadcnui) and [design-system.md](design-system.md) for the tokens and fonts.
 - Strict TypeScript (`tsconfig.json`) with the `@/*` alias for `src/*`.
 - ESLint and Prettier (`eslint.config.mts`, `.prettierrc`), Vitest (`vitest.config.ts`).

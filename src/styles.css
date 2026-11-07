@@ -104,7 +104,8 @@
 
 @theme inline {
     --font-sans: "Barlow", ui-sans-serif, system-ui, sans-serif;
-    --font-condensed: "Barlow Condensed", "Barlow", ui-sans-serif, system-ui, sans-serif;
+    --font-condensed:
+        "Barlow Condensed", "Barlow", ui-sans-serif, system-ui, sans-serif;
 
     --radius-sm: calc(var(--radius) - 4px);
     --radius-md: calc(var(--radius) - 2px);
@@ -164,5 +165,76 @@
     :focus-visible {
         outline: 3px solid var(--ring);
         outline-offset: 3px;
+    }
+}
+
+/*
+ * A guess arriving (docs/guess-list.md#a-new-guess): the row opens at the top
+ * of the list, the guess dot lands on its station, and the train runs from
+ * there to the mystery bar, taking longer the longer the trip. Each change
+ * ring drops in as the train reaches it; the labels follow on arrival. Only
+ * on the row a guess on this page just added (`guess-enter`), and not at all
+ * for a reader who asks for less motion. `TripLine` sets the timings:
+ * `--trip-ms`, the run; `--trip-width`, how far it runs; `--ring-delay`, when
+ * the train reaches each ring.
+ */
+@layer components {
+    @media (prefers-reduced-motion: no-preference) {
+        .guess-enter {
+            --trip-depart: 320ms;
+            animation: guess-row-open 260ms cubic-bezier(0.2, 0, 0, 1) backwards;
+        }
+        .guess-enter .trip-dot {
+            animation: trip-marker-in 220ms 180ms cubic-bezier(0.34, 1.56, 0.64, 1)
+                backwards;
+        }
+        .guess-enter .trip-rides {
+            /* Eases in and out like a train pulling away and braking. */
+            animation: trip-run var(--trip-ms) var(--trip-depart)
+                cubic-bezier(0.37, 0, 0.63, 1) backwards;
+        }
+        .guess-enter .trip-ring {
+            animation: trip-marker-in 240ms
+                calc(var(--trip-depart) + var(--ring-delay))
+                cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+        }
+        .guess-enter .trip-label {
+            animation: trip-label-in 180ms calc(var(--trip-depart) + var(--trip-ms))
+                ease-out backwards;
+        }
+    }
+}
+
+@keyframes guess-row-open {
+    from {
+        max-height: 0;
+        opacity: 0;
+        overflow: hidden;
+    }
+    to {
+        max-height: 240px;
+        opacity: 1;
+        overflow: hidden;
+    }
+}
+
+@keyframes trip-marker-in {
+    from {
+        scale: 0;
+    }
+}
+
+@keyframes trip-run {
+    from {
+        clip-path: inset(0 var(--trip-width) 0 0);
+    }
+    to {
+        clip-path: inset(0);
+    }
+}
+
+@keyframes trip-label-in {
+    from {
+        opacity: 0;
     }
 }

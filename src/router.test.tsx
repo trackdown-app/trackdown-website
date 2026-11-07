@@ -10,6 +10,32 @@ import { NotFoundPage } from "@/components/errors/not-found-page";
 import { RootDocument } from "@/components/layout/root-document";
 import { getRouter } from "@/router";
 
+// The home page's loader calls server functions, which need the Start server
+// these tests render without. They answer with a made-up puzzle instead.
+vi.mock("@/lib/game/today-puzzle.functions", () => ({
+    getTodayPuzzleFn: () =>
+        Promise.resolve({
+            network: "nl",
+            number: 142,
+            date: "2026-11-06",
+            maxGuesses: 6,
+            nextPuzzleAt: "2026-11-06T23:00:00.000Z",
+        }),
+}));
+vi.mock("@/lib/game/stations.functions", () => ({
+    getStationsFn: () =>
+        Promise.resolve({
+            network: "nl",
+            locale: "nl",
+            stations: [
+                { code: "ut", name: "Utrecht Centraal", province: "Utrecht" },
+            ],
+        }),
+}));
+vi.mock("@/lib/game/guess.functions", () => ({
+    submitGuessFn: () => Promise.reject(new Error("not in this test")),
+}));
+
 /**
  * The server's answer to a request for `pathname`, rendered by the router's
  * own request handler, as `src/server.ts` does through Start.
@@ -50,10 +76,14 @@ function siteRouterWithFailingPage(): AnyRouter {
 }
 
 describe("the site's router", () => {
-    it("answers the home page with 200, inside the header and footer", async () => {
+    it("answers the home page with today's game, inside the header and footer", async () => {
         const { status, html } = await respondAt(getRouter, "/");
 
         expect(status).toBe(200);
+        expect(html).toContain("Vrijdag 6 november, puzzel 142");
+        expect(html).toContain("Welk station is het mysterie van vandaag?");
+        // The footer's legend replaces its tagline on the game page.
+        expect(html).toContain("Legenda");
         expect(html).toContain("<header");
         expect(html).toContain("<footer");
         expect(html).toContain('href="#content"');

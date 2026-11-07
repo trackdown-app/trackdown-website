@@ -425,6 +425,39 @@
           "minutes"
         ]
       },
+      "EarlierTrip": {
+        "type": "object",
+        "properties": {
+          "guess": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+$"
+          },
+          "steps": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/Ride"
+                },
+                {
+                  "$ref": "#/components/schemas/HiddenChange"
+                }
+              ],
+              "discriminator": {
+                "propertyName": "kind",
+                "mapping": {
+                  "ride": "#/components/schemas/Ride",
+                  "change": "#/components/schemas/HiddenChange"
+                }
+              }
+            }
+          }
+        },
+        "required": [
+          "guess",
+          "steps"
+        ]
+      },
       "GuessRequest": {
         "type": "object",
         "properties": {
@@ -485,6 +518,12 @@
           "totalMinutes": {
             "type": "integer",
             "minimum": 0
+          },
+          "earlierTrips": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EarlierTrip"
+            }
           }
         },
         "required": [
@@ -493,7 +532,8 @@
           "guess",
           "correct",
           "steps",
-          "totalMinutes"
+          "totalMinutes",
+          "earlierTrips"
         ]
       },
       "HiddenChange": {

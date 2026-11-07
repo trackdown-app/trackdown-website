@@ -2,7 +2,7 @@
 
 `StationSearch` (`src/components/game/station-search.tsx`) is the guess input of the design's Web · Playing board: a search box with the Guess button, and below it the stations the typed text matches. A player types part of a name, picks a station from the list and guesses it.
 
-No page shows it yet: the game page, still to come, mounts it with the game's state.
+The game page mounts it with the game's state ([game.md](game.md)).
 
 ## Props
 
@@ -31,7 +31,7 @@ The search is shadcn/ui's combobox on Base UI's `Combobox`, which follows the AR
 - **Escape** closes the list and keeps the typed text. So does a click outside: Base UI would empty an input whose text was not picked, and `StationSearch` ignores that reset (`input-clear`) so a name typed out in full survives the click on Guess.
 - The input's name is the visually hidden label "Raad een station" / "Guess a station". Each option's name is the station and its province, "Amsterdam Centraal, Noord-Holland", so a screen reader reads the province shown beside it as a separate phrase.
 - When nothing matches, the list says so: "Geen station gevonden voor „xyz”" / "No station matches “xyz”".
-- Focus shows the site's ring ([site-shell.md](site-shell.md#focus-ring)) around the whole box, not the bare input inside it.
+- Focus shows the site's ring ([site-shell.md](site-shell.md#focus-ring)) around the whole box, for the input and the Guess button alike: the button sits flush inside the box, so its own ring, 3px off it, would cut across the box's border. The button marks that it is the one with focus with a 3px ring of its own text colour (`primary-foreground`), inset 3px inside its edge.
 
 ## Look
 

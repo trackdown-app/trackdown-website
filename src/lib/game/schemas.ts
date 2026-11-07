@@ -117,6 +117,23 @@ export const guessChangeSchema = z.strictObject({
     minutes: z.number().int().nonnegative(),
 });
 
+/** `guess`: a trip's rides and changes, from the guess to the mystery station. */
+const guessStepsSchema = z.array(
+    z.discriminatedUnion("kind", [guessRideSchema, guessChangeSchema]),
+);
+
+/**
+ * `guess`: an earlier guess's trip again, its changes named by every guess
+ * so far, this one included, so a change the player has just guessed shows
+ * on the earlier trips too.
+ */
+export const earlierTripSchema = z.strictObject({
+    guess: stationCodeSchema,
+    steps: guessStepsSchema,
+});
+
+export type EarlierTrip = z.output<typeof earlierTripSchema>;
+
 /**
  * `guess`: how far the guess is from the mystery station. Never the mystery
  * station itself: strict, so a field this schema does not name fails the
@@ -129,11 +146,15 @@ export const guessOutputSchema = z.strictObject({
     guess: stationCodeSchema,
     correct: z.boolean(),
     /** The trip's rides and changes, from the guess to the mystery station. */
-    steps: z.array(
-        z.discriminatedUnion("kind", [guessRideSchema, guessChangeSchema]),
-    ),
+    steps: guessStepsSchema,
     /** Every ride and change together, in minutes. */
     totalMinutes: z.number().int().nonnegative(),
+    /**
+     * The input's earlier guesses, in its order, each with its trip again,
+     * changes named by every guess so far. A correct earlier guess cannot
+     * be among them: the game would be over.
+     */
+    earlierTrips: z.array(earlierTripSchema),
 });
 
 export type GuessOutput = z.output<typeof guessOutputSchema>;

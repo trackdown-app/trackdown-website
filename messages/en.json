@@ -3,8 +3,18 @@
     "site": {
         "name": "Trackdown"
     },
-    "home": {
-        "comingSoon": "Coming soon."
+    "game": {
+        "dateLine": "{date}, puzzle {number}",
+        "title": "Which station is today's mystery?",
+        "intro": "Guess any station. We draw the fastest train trip from there to the mystery station. The shorter the line, the closer you are.",
+        "won": "You tracked it down in {count} of {total}.",
+        "lost": "No guesses left. A new mystery station comes at midnight.",
+        "guessFailed": "That guess didn't go through. Try again."
+    },
+    "progress": {
+        "playing": "Guess {number} of {total}, newest first",
+        "won": "Found in {count} of {total}, newest first",
+        "lost": "All {total} guesses used, newest first"
     },
     "stationSearch": {
         "label": "Guess a station",
@@ -20,9 +30,8 @@
         "spokenGuess": "Guess {number}, {station}: {duration} to the mystery station. {steps}.",
         "spokenFound": "Guess {number}, {station}: the mystery station.",
         "grid30": "30 min",
-        "grid60": "1 h",
-        "grid90": "1 h 30",
-        "grid120": "2 h"
+        "gridHours": "{hours} h",
+        "gridHoursHalf": "{hours} h 30"
     },
     "trip": {
         "minutes": "{minutes}m",
