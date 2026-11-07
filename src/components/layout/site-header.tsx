@@ -28,7 +28,11 @@ export function SiteHeader() {
                 "flex flex-wrap items-center justify-between gap-x-4 gap-y-3 py-5",
             )}
         >
-            <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+            {/* 16px between the logo and the pill on a phone, so both fit
+                on one row from about 405px wide, with room to spare at
+                the common 412px whether Barlow or its fallback is drawn
+                (docs/accessibility.md#fonts). */}
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-3 sm:gap-x-6">
                 <Link
                     to="/$network"
                     params={{ network }}

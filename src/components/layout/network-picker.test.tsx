@@ -52,7 +52,8 @@ describe("NetworkPicker", () => {
         await renderPicker("/nl/archief");
         const user = userEvent.setup();
         const pill = screen.getByRole("button", {
-            name: "Network: Netherlands. Change network",
+            // The name starts with the network the pill shows (WCAG 2.5.3).
+            name: /^Netherlands\s*\. Change network$/,
         });
 
         await user.click(pill);
@@ -82,7 +83,7 @@ describe("NetworkPicker", () => {
         const router = await renderPicker("/hoe-te-spelen");
         const user = userEvent.setup();
 
-        await user.click(screen.getByRole("button", { name: /^Network: / }));
+        await user.click(screen.getByRole("button", { name: /Change network$/ }));
         await user.click(
             within(await screen.findByRole("dialog")).getByRole("link", {
                 name: /Netherlands/,

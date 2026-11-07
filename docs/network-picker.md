@@ -32,7 +32,7 @@ The choice lives in the `trackdown-network` cookie (`src/lib/network-choice.ts`)
 
 `NetworkPicker` (`src/components/layout/network-picker.tsx`) follows the design's Web · Playing board for the pill and the iOS · Choose network board for the list.
 
-- **The pill** is a Base UI popover trigger: an ink-bordered pill, 44px high, with the network's code chip (`NetworkChip`), its name and a chevron. Screen readers hear "Netwerk: Nederland. Kies een netwerk" / "Network: Netherlands. Change network", with the popover's `aria-expanded`.
+- **The pill** is a Base UI popover trigger: an ink-bordered pill, 44px high, with the network's code chip (`NetworkChip`), its name and a chevron. It is named by its own text: the name, then a visually hidden ". Kies een netwerk" / ". Change network", so screen readers hear "Nederland. Kies een netwerk" / "Netherlands. Change network", with the popover's `aria-expanded`, and the name starts with what the pill shows (WCAG 2.5.3, [accessibility.md](accessibility.md#names-that-match-what-is-shown)). The chip is hidden from screen readers.
 - **The popup** (`PopoverContent`, shadcn/ui's popover dressed as the design's plates: surface, ink border, 16px corners, the popover shadow) opens below the pill, at most 22rem wide and never wider than the screen less 16px on each side. Its title, "Netwerken" / "Networks", names the dialog; a lead says each network has its own daily station.
 - **To play** lists every network in `networks`: its chip in ink, its name in Barlow Condensed and, on the current one, the design's check in `line-1` with "Gekozen" / "Chosen" for screen readers. Each row links to the network's game; the router marks the current network's link `aria-current="page"`. Following one keeps it as the choice and closes the popup.
 - **Coming next** lists `upcomingNetworks` with soft chips and "Komt later" / "Coming later". They are not links. The design's "Notify me" buttons, network search and "Suggest a network" link are left out: there is nothing behind them yet.
@@ -48,7 +48,7 @@ Nothing else: the routes, the picker, the API and the kept games all go by the r
 
 ## Messages
 
-The pill's strings are `header.network` and `header.changeNetwork`; the popup's live under `networkPicker`. The share text's link names the network too (`share.url`, [share.md](share.md#the-text)).
+The pill's hidden text is `header.changeNetwork`; the popup's live under `networkPicker`. The share text's link names the network too (`share.url`, [share.md](share.md#the-text)).
 
 ## Tests
 

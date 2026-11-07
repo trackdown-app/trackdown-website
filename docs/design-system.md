@@ -64,7 +64,7 @@ The lowest pairs are on-line on `line-3` in light (5.0:1) and line 1 on `soft` i
 
 ## Typography
 
-Both fonts are self-hosted through `@fontsource` (`@fontsource/barlow`, `@fontsource/barlow-condensed`), imported at the top of `src/styles.css`. Vite bundles the font files, so the site makes no request to Google Fonts. Each weight's CSS covers the Latin, Latin Extended and Vietnamese subsets by `unicode-range`; a browser downloads only the subsets a page uses.
+Both fonts are self-hosted through `@fontsource` (`@fontsource/barlow`, `@fontsource/barlow-condensed`), imported at the top of `src/styles.css`. Vite bundles the font files, so the site makes no request to Google Fonts. Each weight's CSS covers the Latin, Latin Extended and Vietnamese subsets by `unicode-range`; a browser downloads only the subsets a page uses. The root route preloads the Latin file of every weight, and until they arrive the text is drawn in a fallback scaled to Barlow's metrics ("Barlow Fallback", "Barlow Condensed Fallback"), so nothing moves when Barlow swaps in ([accessibility.md](accessibility.md#fonts)). A new weight needs its preload in `src/lib/font-preloads.ts` and its fallback face in `src/styles.css`.
 
 | Family | Utility | Weights | Use |
 | --- | --- | --- | --- |

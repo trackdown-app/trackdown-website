@@ -46,3 +46,8 @@ project.inlang/cache/
 # Claude Code worktrees and local launch config
 .claude/worktrees/
 .claude/launch.json
+
+# Browser checks: Playwright's results and Lighthouse CI's reports (docs/accessibility.md)
+test-results/
+playwright-report/
+.lighthouseci/

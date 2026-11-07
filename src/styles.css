@@ -21,6 +21,89 @@
 @import "@fontsource/barlow-condensed/700.css";
 @import "@fontsource/barlow-condensed/800.css";
 
+/*
+ * Until Barlow arrives the text is drawn in Arial (or a font with Arial's
+ * metrics), scaled and spaced to take Barlow's room, so the page does not
+ * move when Barlow swaps in (docs/accessibility.md#fonts). `size-adjust`
+ * makes a line of the site's own text as wide as Barlow sets it; the
+ * overrides are Barlow's ascent (1.0em) and descent (0.2em) over that size.
+ * One face per weight the design sets, measured in Chromium against Arial
+ * (400, 500) and Arial Bold (600 and up).
+ */
+@font-face {
+    font-family: "Barlow Fallback";
+    src: local("Arial"), local("ArialMT"), local("Liberation Sans"), local("Roboto");
+    font-weight: 100 449;
+    size-adjust: 96.47%;
+    ascent-override: 103.66%;
+    descent-override: 20.73%;
+    line-gap-override: 0%;
+}
+@font-face {
+    font-family: "Barlow Fallback";
+    src: local("Arial"), local("ArialMT"), local("Liberation Sans"), local("Roboto");
+    font-weight: 450 549;
+    size-adjust: 97.44%;
+    ascent-override: 102.63%;
+    descent-override: 20.53%;
+    line-gap-override: 0%;
+}
+@font-face {
+    font-family: "Barlow Fallback";
+    src:
+        local("Arial Bold"), local("Arial-BoldMT"), local("Liberation Sans Bold"),
+        local("Roboto Bold");
+    font-weight: 550 649;
+    size-adjust: 91.37%;
+    ascent-override: 109.44%;
+    descent-override: 21.89%;
+    line-gap-override: 0%;
+}
+@font-face {
+    font-family: "Barlow Fallback";
+    src:
+        local("Arial Bold"), local("Arial-BoldMT"), local("Liberation Sans Bold"),
+        local("Roboto Bold");
+    font-weight: 650 749;
+    size-adjust: 92.33%;
+    ascent-override: 108.3%;
+    descent-override: 21.66%;
+    line-gap-override: 0%;
+}
+@font-face {
+    font-family: "Barlow Fallback";
+    src:
+        local("Arial Bold"), local("Arial-BoldMT"), local("Liberation Sans Bold"),
+        local("Roboto Bold");
+    font-weight: 750 900;
+    size-adjust: 93.36%;
+    ascent-override: 107.11%;
+    descent-override: 21.42%;
+    line-gap-override: 0%;
+}
+@font-face {
+    font-family: "Barlow Condensed Fallback";
+    src:
+        local("Arial Bold"), local("Arial-BoldMT"), local("Liberation Sans Bold"),
+        local("Roboto Bold");
+    font-weight: 100 749;
+    size-adjust: 76.24%;
+    ascent-override: 131.17%;
+    descent-override: 26.23%;
+    line-gap-override: 0%;
+}
+@font-face {
+    font-family: "Barlow Condensed Fallback";
+    src:
+        local("Arial Bold"), local("Arial-BoldMT"), local("Liberation Sans Bold"),
+        local("Roboto Bold");
+    font-weight: 750 900;
+    size-adjust: 78.06%;
+    ascent-override: 128.1%;
+    descent-override: 25.62%;
+    line-gap-override: 0%;
+}
+
 /* The head script resolves the system preference or the saved override. */
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
@@ -141,9 +224,10 @@
 }
 
 @theme inline {
-    --font-sans: "Barlow", ui-sans-serif, system-ui, sans-serif;
+    --font-sans: "Barlow", "Barlow Fallback", ui-sans-serif, system-ui, sans-serif;
     --font-condensed:
-        "Barlow Condensed", "Barlow", ui-sans-serif, system-ui, sans-serif;
+        "Barlow Condensed", "Barlow Condensed Fallback", ui-sans-serif, system-ui,
+        sans-serif;
 
     --radius-sm: calc(var(--radius) - 4px);
     --radius-md: calc(var(--radius) - 2px);

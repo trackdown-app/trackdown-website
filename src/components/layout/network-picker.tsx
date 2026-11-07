@@ -34,15 +34,16 @@ export function NetworkPicker() {
 
     return (
         <Popover open={open} onOpenChange={setOpen}>
-            <PopoverTrigger
-                aria-label={`${m["header.network"]()}: ${currentName}. ${m["header.changeNetwork"]()}`}
-                className="flex h-11 cursor-pointer items-center gap-2 rounded-full border-[1.5px] border-input bg-transparent pr-3 pl-1.5 text-[15px] font-semibold whitespace-nowrap text-foreground hover:bg-muted"
-            >
+            {/* Named by what it shows, so the name starts with the visible
+                text and a voice command "click Netherlands" finds it
+                (WCAG 2.5.3); the code chip is left out for screen readers. */}
+            <PopoverTrigger className="flex h-11 cursor-pointer items-center gap-2 rounded-full border-[1.5px] border-input bg-transparent pr-3 pl-1.5 text-[15px] font-semibold whitespace-nowrap text-foreground hover:bg-muted">
                 <NetworkChip
                     region={current.region}
                     className="px-[7px] py-[3px] text-xs"
                 />
                 {currentName}
+                <span className="sr-only">{`. ${m["header.changeNetwork"]()}`}</span>
                 <ChevronDown
                     aria-hidden="true"
                     className="size-3.5"
