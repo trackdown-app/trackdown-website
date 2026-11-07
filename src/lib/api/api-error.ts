@@ -6,6 +6,7 @@ import { z } from "zod";
 /** What went wrong, for code to branch on. Each code has one HTTP status. */
 export const apiErrorCodeSchema = z.enum([
     "invalid_input",
+    "game_not_over",
     "not_found",
     "method_not_allowed",
     "internal_error",
@@ -15,6 +16,7 @@ export type ApiErrorCode = z.infer<typeof apiErrorCodeSchema>;
 
 export const apiErrorStatus: Record<ApiErrorCode, number> = {
     invalid_input: 400,
+    game_not_over: 403,
     not_found: 404,
     method_not_allowed: 405,
     internal_error: 500,

@@ -5,9 +5,11 @@ import { errorResponse, restGet, restHandlers, restPost } from "@/lib/api/rest";
 import type { RestHandler } from "@/lib/api/rest";
 import { submitGuess } from "@/lib/game/guess";
 import { getMeta } from "@/lib/game/meta";
+import { revealAnswer } from "@/lib/game/reveal";
 import {
     guessInputSchema,
     metaInputSchema,
+    revealInputSchema,
     stationsInputSchema,
     todayPuzzleInputSchema,
 } from "@/lib/game/schemas";
@@ -40,6 +42,16 @@ export const todayPuzzleHandlers = restHandlers({
  */
 export const guessHandlers = restHandlers({
     POST: restPost(guessInputSchema, (input) => submitGuess(input, serviceContext)),
+});
+
+/**
+ * `/api/v1/{network}/puzzles/{n}/reveal`: the `reveal` operation for iOS;
+ * `revealAnswerFn` is the same for the web.
+ */
+export const revealHandlers = restHandlers({
+    POST: restPost(revealInputSchema, (input) =>
+        revealAnswer(input, serviceContext),
+    ),
 });
 
 /**
