@@ -52,26 +52,27 @@ What the repository needs, in its settings (Secrets and variables → Actions):
 | Name | Kind | What it is |
 | --- | --- | --- |
 | `TRACKDOWN_DATA_TOKEN` | Secret | Fine-grained personal access token: resource owner `trackdown-app`, only the `trackdown-data` repository, permission Contents: read-only. |
-| `VERCEL_TOKEN` | Secret | A Vercel access token scoped to the `trackdown-app` team. |
-| `VERCEL_ORG_ID` | Variable | The team ID (`orgId` in `.vercel/project.json` after `vercel link`). |
+| `VERCEL_TOKEN` | Secret | A Vercel access token scoped to `bram-gussekloos-projects`. |
+| `VERCEL_ORG_ID` | Variable | The scope's ID (`orgId` in `.vercel/project.json` after `vercel link`). |
 | `VERCEL_PROJECT_ID` | Variable | The project ID (`projectId` in the same file). |
 
 Neither token is a Vercel environment variable: the data token stays in GitHub, and the build reads the data from the runner's disk.
 
 ## The Vercel project
 
-The project lives in the `trackdown-app` team on Vercel.
+The project is `trackdown-website` in Bram's personal Vercel scope, `bram-gussekloos-projects` (a Hobby account). Its URL is `trackdown-website.vercel.app`.
 
-- **Git builds are off.** `vercel.json` sets `git.deploymentEnabled` to `false`, so a push does not make Vercel build. Deploys come from the deploy workflow (above), which builds with `vercel build` and uploads the result with `vercel deploy --prebuilt`.
+- **Git builds are off.** `vercel.json` sets `git.deploymentEnabled` to `false`, so a push does not make Vercel build. The repository stays connected to the project, which only labels deploys with their commit. Deploys come from the deploy workflow (above), which builds with `vercel build` and uploads the result with `vercel deploy --prebuilt`.
+- **Deployment protection.** Vercel Authentication guards every deploy except those on a custom domain, so `trackdown-website.vercel.app` asks for a Vercel login until the site gets its own domain.
 - **Environments.** Preview (every deploy without `--prod`) and Production (`--prod`). The server reads no runtime environment variables yet: the data and its ref are built in (above). A variable the server needs at runtime is added to both in the project's settings (or with `vercel env add <name> <environment>`) and listed here.
-- **Region.** The function region comes from the build (see above), not from the project settings, because a prebuilt deploy carries its own function config.
+- **Region.** The function region comes from the build (see above), because a prebuilt deploy carries its own function config. `regions` in `vercel.json` sets the project's default to `fra1` as well, so the deploy's own region matches.
 
 ## A manual deploy
 
-With the Vercel CLI (`bunx vercel`) and access to the `trackdown-app` team:
+With the Vercel CLI (`bunx vercel`), logged in as the owner of the scope (`bunx vercel login`):
 
 ```bash
-bunx vercel link --scope trackdown-app
+bunx vercel link --scope bram-gussekloos-projects --project trackdown-website
 bunx vercel pull --environment=preview
 TRACKDOWN_DATA_DIR=../TrackdownData/data TRACKDOWN_DATA_REF=$(git -C ../TrackdownData rev-parse HEAD) bunx vercel build
 bunx vercel deploy --prebuilt
