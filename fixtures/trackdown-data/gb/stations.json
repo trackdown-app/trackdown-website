@@ -1,0 +1,30 @@
+[
+    {
+        "code": "fxa",
+        "name": "Foxtrot Abbey",
+        "province": "Northshire",
+        "lat": 53.4,
+        "lon": -1.5
+    },
+    {
+        "code": "glf",
+        "name": "Golf Lane",
+        "province": "Northshire",
+        "lat": 53.8,
+        "lon": -1.6
+    },
+    {
+        "code": "htl",
+        "name": "Hotel Junction",
+        "province": "Southshire",
+        "lat": 51.5,
+        "lon": -0.1
+    },
+    {
+        "code": "inr",
+        "name": "India Road",
+        "province": "Southshire",
+        "lat": 51.3,
+        "lon": 0.5
+    }
+]

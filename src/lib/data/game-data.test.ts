@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import { checkNetwork } from "@/lib/data/check-data";
 import { createGameData, GameDataError } from "@/lib/data/game-data";
 import type { DataReader } from "@/lib/data/game-data";
+import { networkIds } from "@/lib/data/networks";
 import { readDataDir } from "@/lib/data/read-data-dir";
 
 // Runs on the fixture in `fixtures/trackdown-data/` only, never the real data.
@@ -13,10 +14,20 @@ function fixtureReader() {
 }
 
 describe("the fixture", () => {
-    it("passes every check", async () => {
+    it.each(networkIds)("passes every check for %s", async (network) => {
         const data = createGameData(readDataDir(fixtureDir));
 
-        expect(await checkNetwork(data, "nl")).toEqual([]);
+        expect(await checkNetwork(data, network)).toEqual([]);
+    });
+
+    it("reads a gb trip labelled with train operators", async () => {
+        const data = createGameData(readDataDir(fixtureDir));
+
+        expect((await data.tripsTo("gb", "fxa"))["inr"]).toEqual([
+            { kind: "ride", train: "SE", minutes: 40 },
+            { kind: "change", station: "htl", minutes: 6 },
+            { kind: "ride", train: "EM", minutes: 125 },
+        ]);
     });
 });
 
@@ -147,6 +158,24 @@ describe("checkNetwork", () => {
         expect(await checkNetwork(data, "nl")).toEqual([
             'puzzle 1 (2026-06-18) is station "zzz", which is not in stations.json',
             "to/brv.json has no trip from chr, dlt, ech",
+        ]);
+    });
+
+    it("needs a trips file only for a puzzle's station, and counts them", async () => {
+        const fromDisk = readDataDir(fixtureDir);
+        const data = createGameData(async (path) => {
+            if (path === "gb/puzzles.json") {
+                return [{ n: 1, date: "2026-06-18", station: "glf" }];
+            }
+            if (path === "gb/to/htl.json") {
+                return null;
+            }
+            return fromDisk(path);
+        });
+
+        expect(await checkNetwork(data, "gb")).toEqual([
+            "gb/to/glf.json is missing from the data directory",
+            "meta.json counts 2 mystery stations, to/ has 1 trips files",
         ]);
     });
 });

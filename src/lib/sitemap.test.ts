@@ -6,6 +6,8 @@ describe("sitemapPaths", () => {
         expect(sitemapPaths()).toEqual([
             "/nl",
             "/nl/archief",
+            "/gb",
+            "/gb/archief",
             "/hoe-te-spelen",
             "/over",
             "/privacy",
@@ -23,12 +25,14 @@ describe("sitemapXml", () => {
             "https://trackdown.nl/en/nl",
             "https://trackdown.nl/nl/archief",
             "https://trackdown.nl/en/nl/archief",
+            "https://trackdown.nl/gb",
+            "https://trackdown.nl/en/gb/archief",
             "https://trackdown.nl/hoe-te-spelen",
             "https://trackdown.nl/en/hoe-te-spelen",
         ]) {
             expect(xml).toContain(`<loc>${url}</loc>`);
         }
-        expect(xml.match(/<url>/g)).toHaveLength(12);
+        expect(xml.match(/<url>/g)).toHaveLength(16);
     });
 
     it("names each page's language versions, as its head does", () => {

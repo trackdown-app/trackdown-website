@@ -188,8 +188,12 @@
         "dataIntro": "Trackdown is built on open data. Thanks to the people who publish it.",
         "dataTimetable": "Timetables: OVapi GTFS-NL, NDOV open data,",
         "dataBorders": "Municipal and provincial borders: PDOK Bestuurlijke Gebieden, © Kadaster,",
+        "dataGbIntro": "Great Britain: the network's data is shared under CC BY-SA 4.0 and built from",
+        "dataGbTimetable": "Timetables: Network Rail SCHEDULE data, Network Rail Infrastructure Ltd,",
+        "dataGbStations": "Station locations: NaPTAN, Department for Transport,",
+        "dataGbRegions": "Regions: ITL1 boundaries, Office for National Statistics, contains OS data © Crown copyright and database right,",
         "independentTitle": "Not linked to any railway",
-        "independentBody": "Trackdown is not linked to, or endorsed by, NS or any other railway company. Station and operator names belong to their owners and are only used to describe the real network.",
+        "independentBody": "Trackdown is not linked to, or endorsed by, NS, Network Rail or any other railway company. Station and operator names belong to their owners and are only used to describe the real network.",
         "contactTitle": "Contact"
     },
     "privacy": {
@@ -234,7 +238,7 @@
         "freeTitle": "Free, and as it is",
         "freeBody": "Trackdown is offered free of charge and as it is. I do my best to keep a new puzzle up every day, but I can't promise the site is always online, error-free or that your streak survives every update. I may change the game, pause it or stop it, at any time.",
         "plannerTitle": "A game, not a journey planner",
-        "plannerData": "The routes and travel times are built from open data, OVapi GTFS-NL (NDOV, CC0 1.0) and PDOK Bestuurlijke Gebieden (Kadaster, CC BY 4.0), and simplified for the puzzle. They may be out of date or wrong. Please don't plan a real trip with Trackdown; check your train operator's journey planner instead.",
+        "plannerData": "The routes and travel times are built from open data, OVapi GTFS-NL (NDOV, CC0 1.0) and PDOK Bestuurlijke Gebieden (Kadaster, CC BY 4.0) for the Netherlands, and Network Rail SCHEDULE data (CC BY-SA 4.0), NaPTAN and ONS ITL1 boundaries (both Open Government Licence v3.0) for Great Britain, and simplified for the puzzle. They may be out of date or wrong. Please don't plan a real trip with Trackdown; check your train operator's journey planner instead.",
         "plannerIndependent": "Trackdown is not linked to, or endorsed by, any railway company. Station and operator names belong to their owners and are only used to describe the real network.",
         "fairTitle": "Play fair",
         "fairBody": "Share your results and argue about the answer as much as you like. Please don't scrape the site, flood it with requests, try to break in or get the answer early with tricks, or post today's answer automatically. If someone does, I may block them.",

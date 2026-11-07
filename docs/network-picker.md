@@ -37,7 +37,7 @@ The choice lives in the `trackdown-network` cookie (`src/lib/network-choice.ts`)
 - **To play** lists every network in `networks`: its chip in ink, its name in Barlow Condensed and, on the current one, the design's check in `line-1` with "Gekozen" / "Chosen" for screen readers. Each row links to the network's game; the router marks the current network's link `aria-current="page"`. Following one keeps it as the choice and closes the popup.
 - **Coming next** lists `upcomingNetworks` with soft chips and "Komt later" / "Coming later". They are not links. The design's "Notify me" buttons, network search and "Suggest a network" link are left out: there is nothing behind them yet.
 
-A network's name is its country's, from the runtime's own region names (`regionName` in `src/lib/data/networks.ts`, `Intl.DisplayNames`; `networkName` in `src/lib/game/network-name.ts` for a network): "Nederland" and "Netherlands", "België" and "Belgium", so a new network needs no message.
+A network's name is its country's, from the runtime's own region names (`regionName` in `src/lib/data/networks.ts`, `Intl.DisplayNames`; `networkName` in `src/lib/game/network-name.ts` for a network): "Nederland" and "Netherlands", "België" and "Belgium", so a new network needs no message. `gb`'s region is `GB`, which the runtime names "Verenigd Koninkrijk" / "United Kingdom", though its data covers Great Britain only (Northern Ireland's railway is not in Network Rail's timetable).
 
 ## Adding a network
 
