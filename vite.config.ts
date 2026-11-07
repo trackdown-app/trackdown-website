@@ -17,10 +17,15 @@ const config = defineConfig({
         devtools(),
         tailwindcss(),
         tanstackStart(),
-        // Bundles the Start server into `.output/` with Nitro's default
-        // preset, a Node server started with `bun run start`. Must directly
+        // Bundles the Start server. No fixed preset: Nitro picks it from the
+        // environment, so `vercel build` writes `.vercel/output/` with the
+        // `vercel` preset and a local `bun run build` writes a Node server
+        // into `.output/` for `bun run start` (docs/deploy.md). Must directly
         // follow `tanstackStart()`.
         nitro({
+            // Only read by the `vercel` preset: runs the server function in
+            // Frankfurt, the region closest to the Netherlands.
+            vercel: { functions: { regions: ["fra1"] } },
             // Nitro bundles React's libraries into the server, so rolldown
             // drops the `"use client"` directive at the top of each module
             // and warns about it. The directive means nothing in a server

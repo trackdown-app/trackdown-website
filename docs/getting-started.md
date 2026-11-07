@@ -9,7 +9,7 @@
 See the table in the [README](../README.md#scripts).
 
 - `bun run dev` starts Vite's development server on port 3000, with the TanStack devtools (router and query panels) in the corner of the page.
-- `bun run build` writes the production build to `.output/`: Nitro bundles the Start server with its default preset, a Node server at `.output/server/index.mjs`.
+- `bun run build` writes the production build to `.output/`: Nitro bundles the Start server with the preset it detects, outside Vercel a Node server at `.output/server/index.mjs`. Under `vercel build` it writes `.vercel/output/` instead ([deploy.md](deploy.md)).
 - `bun run start` runs that server with Node, passing `.env` and `.env.local` with `--env-file-if-exists`. `bun run preview` serves the same build through Vite.
 - `bun run typecheck` runs the TypeScript 7 compiler (`typescript-7`, installed as an alias of `typescript@7`) with `--noEmit`. The `typescript` package stays at 6 for ESLint's parser and editors.
 - `bun run lint` runs ESLint with the flat config in `eslint.config.mts`, Prettier included as a rule.
@@ -59,7 +59,7 @@ The design is taller than any style's defaults: its main buttons, input and list
 
 ## Stack
 
-- TanStack Start, Router and Query (React 19) on Vite 8, with Nitro (`nitro/vite`, default preset) bundling the server into `.output/`.
+- TanStack Start, Router and Query (React 19) on Vite 8, with Nitro (`nitro/vite`, preset detected from the environment) bundling the server into `.output/`, or `.vercel/output/` on Vercel. See [deploy.md](deploy.md).
 - Every page renders on the server; the placeholder home page is `src/routes/index.tsx`. Every page sits inside the site shell: skip link, header and footer, with not-found and error pages ([site-shell.md](site-shell.md)).
 - Tailwind CSS 4 (`src/styles.css`) and shadcn/ui (`components.json`). `cn` lives in `src/lib/utils.ts`. See [shadcn/ui](#shadcnui) and [design-system.md](design-system.md) for the tokens and fonts.
 - Strict TypeScript (`tsconfig.json`) with the `@/*` alias for `src/*`.
