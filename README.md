@@ -31,3 +31,5 @@ The site runs on http://localhost:3000.
 - [Data loading](docs/data-loading.md)
 - [Internationalisation](docs/i18n.md)
 - [Design system](docs/design-system.md)
+- [Site shell](docs/site-shell.md)
+- [Deploy](docs/deploy.md)

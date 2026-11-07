@@ -10,5 +10,36 @@
         "label": "Taal",
         "nl": "Nederlands",
         "en": "Engels"
+    },
+    "header": {
+        "skipToContent": "Naar de inhoud",
+        "home": "Trackdown, naar de puzzel van vandaag",
+        "nav": "Hoofdmenu",
+        "archive": "Archief",
+        "howToPlay": "Hoe speel je",
+        "statistics": "Statistieken",
+        "network": "Netwerk",
+        "networkNl": "Nederland"
+    },
+    "footer": {
+        "tagline": "Trackdown, een hobbyproject van Bram Gussekloo",
+        "nav": "Over de site",
+        "about": "Over Trackdown",
+        "privacy": "Privacy",
+        "terms": "Voorwaarden",
+        "cookieSettings": "Cookie-instellingen"
+    },
+    "notFound": {
+        "label": "Fout 404",
+        "title": "Deze pagina bestaat niet",
+        "lead": "Het adres klopt niet, of de pagina is verhuisd. De puzzel van vandaag staat gewoon klaar.",
+        "home": "Naar de puzzel van vandaag"
+    },
+    "error": {
+        "label": "Fout 500",
+        "title": "Er ging iets mis",
+        "lead": "De pagina kon niet laden. Probeer het opnieuw, of ga terug naar de puzzel van vandaag.",
+        "retry": "Opnieuw proberen",
+        "home": "Naar de puzzel van vandaag"
     }
 }

@@ -19,6 +19,9 @@ dist/
 .output/
 .nitro/
 
+# Vercel build output and the local project link (`vercel link`)
+.vercel/
+
 # TypeScript cache
 *.tsbuildinfo
 

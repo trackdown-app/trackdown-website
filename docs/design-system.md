@@ -70,7 +70,7 @@ The body sets `tabular-nums`, so times in a column line up, as the design draws 
 
 | What | Default | Why |
 | --- | --- | --- |
-| Focus ring (`ring`) | `line-1` | The brand sheet's link colour; it passes 3:1 against bg and surface in both modes |
+| Focus ring (`ring`) | `line-1`, a 3px `:focus-visible` outline 3px off the element ([site-shell.md](site-shell.md#focus-ring)) | The brand sheet's link colour; it passes 3:1 against bg and surface in both modes |
 | Links in running text | `line-1` | The same; it passes 4.5:1 on every ground |
 | Errors (`destructive`) | `#B42318` light, `#FF8A7A` dark | The design has no error state; both pass 4.5:1 on bg, surface and soft |
 | Disabled controls | shadcn's `opacity-50` | Disabled text is exempt from contrast rules |
