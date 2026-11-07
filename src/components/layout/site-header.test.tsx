@@ -42,6 +42,14 @@ describe("SiteHeader", () => {
         ]);
     });
 
+    it("marks how to play as the current page on its route, in English too", async () => {
+        overwriteGetLocale(() => "en");
+
+        expect(currentPaths(await renderAt(SiteHeader, "/hoe-te-spelen"))).toEqual([
+            "/en/hoe-te-spelen",
+        ]);
+    });
+
     it("shows the network pill with its name for a screen reader", async () => {
         const html = await renderAt(SiteHeader, "/");
 

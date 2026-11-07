@@ -18,7 +18,7 @@ Every focusable element shows the site-wide `:focus-visible` outline from `src/s
 
 - **The logo**, linking home (a router `<Link to="/">`, so it points at `/en` on an English page): the line mark (`LogoMark`, `src/components/layout/logo-mark.tsx`, the Brand board's SVG drawn in the theme's tokens, so it follows dark mode) and the wordmark in Barlow Condensed 800. Its name starts with the visible "Trackdown" and says where it goes (`header.home`).
 - **The network pill** (`NetworkPill`): an ink-bordered pill with an `NL` chip and "Nederland". The Netherlands is the only network, so the pill is a label for now, not a control, and the design's chevron is left out. Screen readers hear "Netwerk: Nederland". The network picker turns it into the button that opens the picker.
-- **Archive and How to play** in a `<nav>` named `header.nav`. The current page carries `aria-current="page"` and shows underlined and semibold.
+- **Archive and How to play** in a `<nav>` named `header.nav`. The current page carries `aria-current="page"` and shows underlined and semibold. How to play has its route ([how-to-play.md](how-to-play.md)), so it is a router `<Link>`; Archive is still a `PageLink` (see [Page paths](#page-paths)).
 - **The statistics button**, a 44px icon button (Lucide's `ChartNoAxesColumn`) named `header.statistics`. Statistics are not kept yet, so it has nothing to open: it is disabled with Base UI's `focusableWhenDisabled`, so it stays in the Tab order and is announced as unavailable (`aria-disabled="true"`). The statistics work gives it an `onClick` and drops `disabled`.
 - **The language switch** (`LanguageSwitch`, [i18n.md](i18n.md#language-switch)), which the design does not draw; it sits last.
 
@@ -48,7 +48,7 @@ export const Route = createFileRoute("/")({
 
 `src/lib/site-paths.ts` holds the path of every page the shell links to, without a locale: `/archief`, `/hoe-te-spelen`, `/over`, `/privacy` and `/voorwaarden`. Paths are the same in both languages ([i18n.md](i18n.md#locale-routing)), so they are Dutch; `localizeHref` adds `/en` on an English page.
 
-Only the home page has a route yet, so the shell links to the others with `PageLink` (`src/components/layout/page-link.tsx`), a plain `<a href={localizeHref(path)}>` that marks the current page with `aria-current`, rather than a typed `<Link>`. Until a page lands its link shows the not-found page. Switch a link to `<Link>` once its route exists, or keep `PageLink` and change the path here if the page takes another one.
+The home page and How to play have a route, and the shell links to them with a router `<Link>`. It links to the others with `PageLink` (`src/components/layout/page-link.tsx`), a plain `<a href={localizeHref(path)}>` that marks the current page with `aria-current`, rather than a typed `<Link>`. Until a page lands its link shows the not-found page. Switch a link to `<Link>` once its route exists, or keep `PageLink` and change the path here if the page takes another one.
 
 ## Not-found and error pages
 

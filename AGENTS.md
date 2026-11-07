@@ -39,6 +39,7 @@
   - `docs/guess-list.md`: the guess list, its rows and summaries, the trip line's width, segments, change rings and labels, the time grid, the game legend, the screen reader text.
   - `docs/game.md`: the game page at `/`, its route and loader, the progress dots, the game state and the guess mutation, how a game is kept in `localStorage`.
   - `docs/share.md`: the share text and its grid, the Web Share API and clipboard fallback, the Share result button, the "What you'll share" preview.
+  - `docs/how-to-play.md`: the How to play page at `/hoe-te-spelen`, its rules, example trip and legend.
   - `docs/deploy.md`: Nitro's preset detection, the `.vercel/output` layout, the function region, the game data's build-time variables, the deploy workflow and its secrets, the Vercel project and its environments, a manual deploy.
 - A new feature area gets its own `docs/<feature>.md`, an entry in the README's documentation list and a line in the list above.
 
