@@ -18,7 +18,7 @@ Every focusable element shows the site-wide `:focus-visible` outline from `src/s
 
 - **The logo**, linking home (a router `<Link to="/">`, so it points at `/en` on an English page): the line mark (`LogoMark`, `src/components/layout/logo-mark.tsx`, the Brand board's SVG drawn in the theme's tokens, so it follows dark mode) and the wordmark in Barlow Condensed 800. Its name starts with the visible "Trackdown" and says where it goes (`header.home`).
 - **The network pill** (`NetworkPill`): an ink-bordered pill with an `NL` chip and "Nederland". The Netherlands is the only network, so the pill is a label for now, not a control, and the design's chevron is left out. Screen readers hear "Netwerk: Nederland". The network picker turns it into the button that opens the picker.
-- **Archive and How to play** in a `<nav>` named `header.nav`. The current page carries `aria-current="page"` and shows underlined and semibold. How to play has its route ([how-to-play.md](how-to-play.md)), so it is a router `<Link>`; Archive is still a `PageLink` (see [Page paths](#page-paths)).
+- **Archive and How to play** in a `<nav>` named `header.nav`. The current page carries `aria-current="page"` and shows underlined and semibold. Both have their route ([archive.md](archive.md), [how-to-play.md](how-to-play.md)), so both are a router `<Link>`. Archive is also the current page on every puzzle of the archive (`/archief/{number}`).
 - **The statistics button**, a 44px icon button (Lucide's `ChartNoAxesColumn`) named `header.statistics`. It opens the statistics dialog, the player's record at today's network (`StatisticsDialog`, [statistics.md](statistics.md#the-dialog)).
 - **The language switch** (`LanguageSwitch`, [i18n.md](i18n.md#language-switch)), which the design does not draw; it sits last.
 
@@ -48,7 +48,7 @@ export const Route = createFileRoute("/")({
 
 `src/lib/site-paths.ts` holds the path of every page the shell links to, without a locale: `/archief`, `/hoe-te-spelen`, `/over`, `/privacy` and `/voorwaarden`. Paths are the same in both languages ([i18n.md](i18n.md#locale-routing)), so they are Dutch; `localizeHref` adds `/en` on an English page.
 
-The home page and How to play have a route, and the shell links to them with a router `<Link>`. It links to the others with `PageLink` (`src/components/layout/page-link.tsx`), a plain `<a href={localizeHref(path)}>` that marks the current page with `aria-current`, rather than a typed `<Link>`. Until a page lands its link shows the not-found page. Switch a link to `<Link>` once its route exists, or keep `PageLink` and change the path here if the page takes another one.
+The home page, the archive and How to play have a route, and the shell links to them with a router `<Link>`. It links to the others with `PageLink` (`src/components/layout/page-link.tsx`), a plain `<a href={localizeHref(path)}>` that marks the current page with `aria-current`, rather than a typed `<Link>`. Until a page lands its link shows the not-found page. Switch a link to `<Link>` once its route exists, or keep `PageLink` and change the path here if the page takes another one.
 
 ## Not-found and error pages
 
@@ -63,7 +63,7 @@ The router still sends the error's message to the browser in its hydration data 
 
 A route that needs its own not-found or error page sets `notFoundComponent` or `errorComponent`.
 
-`src/router.test.tsx` renders requests through the router's own SSR request handler (`createRequestHandler` from `@tanstack/react-router/ssr/server`): `/` answers 200 inside the header and footer, an unknown path 404 with the not-found page, and a route whose loader throws 500 with the error page and without the error's message in the visible page.
+`src/router.test.tsx` renders requests through the router's own SSR request handler (`createRequestHandler` from `@tanstack/react-router/ssr/server`): `/` answers 200 inside the header and footer, the archive's pages as [archive.md](archive.md#tests) lists, an unknown path 404 with the not-found page, and a route whose loader throws 500 with the error page and without the error's message in the visible page.
 
 ## Messages
 

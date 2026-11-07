@@ -22,12 +22,12 @@ A player's record at one network, after the design's "Your Netherlands record" o
 
 The streak is the number of puzzles in a row, by date, won on their own day in Europe/Amsterdam.
 
-- A puzzle lost, not played, or finished on a later day (from the archive) breaks it.
+- A puzzle lost, not played, or played in the archive after its day breaks it.
 - Today's puzzle breaks nothing while it is still to play, so a streak runs on from yesterday until today's puzzle is lost or the day is over.
 - A day without a puzzle in the schedule is not a day to miss.
 - The best streak is the longest run so far, the current one included.
 
-Which day a game ended is kept with it, as `finishedOn` (`YYYY-MM-DD`, the Amsterdam date by the browser's clock when the last guess comes back). A game kept before statistics has none; the archive could not be played then, so it counts as played on its day.
+A game played in the archive is kept with `"archive": true` ([archive.md](archive.md#the-streak)), read back as `archive`; it still counts as played, won or missed, but not for the streak. A game without the mark was played on the home page, on its own day.
 
 ## The dialog
 
@@ -41,6 +41,6 @@ The dialog is shadcn/ui's (base-vega, on Base UI), split one part per file: `Dia
 
 ## Tests
 
-- `src/lib/game/statistics.test.ts` covers the zeros before a first game, played, won and the guesses needed, a game still on, today's result, and streaks: today's included, kept while today is to play, broken by a skipped day, a missed day, a lost today and a puzzle finished a day late, a game kept without its day, and puzzles in any order.
-- `src/components/game/game-page.test.tsx` wins a game with two earlier ones kept and checks the figures, the rows and today's bar, and that `finishedOn` is kept; and a record that fails to load and is asked again.
+- `src/lib/game/statistics.test.ts` covers the zeros before a first game, played, won and the guesses needed, a game still on, today's result, and streaks: today's included, kept while today is to play, broken by a skipped day, a missed day, a lost today and a puzzle played in the archive, and puzzles in any order.
+- `src/components/game/game-page.test.tsx` wins a game with two earlier ones kept and checks the figures, the rows and today's bar; and a record that fails to load and is asked again.
 - `src/components/layout/statistics-dialog.test.tsx` checks the archive is not read until the dialog opens, the record and the streak inside it, closing it, and its Dutch name.

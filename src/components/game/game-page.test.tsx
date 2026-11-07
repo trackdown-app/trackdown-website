@@ -5,7 +5,11 @@ import { cleanup, render, screen, waitFor, within } from "@testing-library/react
 import userEvent from "@testing-library/user-event";
 import { overwriteGetLocale } from "@/paraglide/runtime";
 import { GamePage } from "@/components/game/game-page";
-import { gameStorageKey, serializeGame } from "@/lib/game/game-state";
+import {
+    gameStorageKey,
+    parseStoredGame,
+    serializeGame,
+} from "@/lib/game/game-state";
 import { createGameStore } from "@/lib/game/game-store";
 import type { GameStore } from "@/lib/game/game-store";
 import type {
@@ -79,7 +83,11 @@ function answer(
     };
 }
 
-function renderGame(store: GameStore, shareTarget: ShareNavigator = {}) {
+function renderGame(
+    store: GameStore,
+    shareTarget: ShareNavigator = {},
+    archive = false,
+) {
     const queryClient = new QueryClient({
         defaultOptions: {
             queries: { retry: false },
@@ -93,6 +101,7 @@ function renderGame(store: GameStore, shareTarget: ShareNavigator = {}) {
                 stations={stations}
                 store={store}
                 shareTarget={shareTarget}
+                archive={archive}
             />
         </QueryClientProvider>,
     );
@@ -223,6 +232,63 @@ describe("GamePage", () => {
         expect(guessedNames()).toEqual(["Utrecht Centraal", "Hilversum"]);
         // Kept guesses do not play their arrival again.
         expect(document.querySelector(".guess-enter")).toBeNull();
+    });
+
+    it("asks in the past tense in the archive and marks the kept game as an archive game", async () => {
+        window.localStorage.setItem(key, serializeGame([miss("hvs")]));
+        submitGuessFn.mockImplementation(({ data }) =>
+            Promise.resolve(answer(data, false)),
+        );
+        const user = renderGame(
+            createGameStore(() => window.localStorage),
+            {},
+            true,
+        );
+
+        expect(
+            screen.getByRole("heading", { name: "Which station was the mystery?" }),
+        ).toBeDefined();
+        expect(parseStoredGame(window.localStorage.getItem(key)).archive).toBe(
+            false,
+        );
+
+        await guess(user, "Utrecht Centraal");
+
+        await waitFor(() => {
+            expect(guessedNames()).toEqual(["Utrecht Centraal", "Hilversum"]);
+        });
+        expect(parseStoredGame(window.localStorage.getItem(key)).archive).toBe(true);
+    });
+
+    it("keeps an archive game an archive game when it is played on", async () => {
+        window.localStorage.setItem(key, serializeGame([miss("hvs")], true));
+        submitGuessFn.mockImplementation(({ data }) =>
+            Promise.resolve(answer(data, false)),
+        );
+        const user = renderGame(createGameStore(() => window.localStorage));
+
+        await guess(user, "Utrecht Centraal");
+
+        await waitFor(() => {
+            expect(guessedNames()).toEqual(["Utrecht Centraal", "Hilversum"]);
+        });
+        expect(parseStoredGame(window.localStorage.getItem(key)).archive).toBe(true);
+    });
+
+    it("names the archive's answer without calling it today's", () => {
+        window.localStorage.setItem(
+            key,
+            serializeGame([
+                { guess: "zl", correct: true, steps: [], totalMinutes: 0 },
+            ]),
+        );
+        renderGame(
+            createGameStore(() => window.localStorage),
+            {},
+            true,
+        );
+
+        expect(screen.getByRole("region", { name: "The answer" })).toBeDefined();
     });
 
     it("names a hidden change on an earlier trip once the player guesses it", async () => {
@@ -420,9 +486,6 @@ describe("GamePage", () => {
                 { guess: "ut", correct: true, steps: [], totalMinutes: 0 },
             ]),
         );
-        // Today's game ends on its own day.
-        vi.useFakeTimers({ toFake: ["Date"] });
-        vi.setSystemTime(new Date("2026-11-06T12:00:00.000Z"));
         window.localStorage.setItem(key, serializeGame([miss("hvs")]));
         submitGuessFn.mockImplementation(({ data }) =>
             Promise.resolve(answer(data, true)),
@@ -461,10 +524,6 @@ describe("GamePage", () => {
             "Missed: 1",
         ]);
         expect(record.querySelectorAll("[data-today]")).toHaveLength(1);
-        expect(window.localStorage.getItem(key)).toContain(
-            '"finishedOn":"2026-11-06"',
-        );
-        vi.useRealTimers();
     });
 
     it("says so when the record does not load, and asks again", async () => {

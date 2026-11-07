@@ -6,11 +6,13 @@
     "game": {
         "dateLine": "{date}, puzzle {number}",
         "title": "Which station is today's mystery?",
+        "archiveTitle": "Which station was the mystery?",
         "intro": "Guess any station. We draw the fastest train trip from there to the mystery station. The shorter the line, the closer you are.",
         "guessFailed": "That guess didn't go through. Try again."
     },
     "gameOver": {
         "label": "Today's answer",
+        "archiveLabel": "The answer",
         "won": "You tracked it down in {count} of {total} guesses",
         "lost": "No guesses left. The mystery station was",
         "loading": "Loading the answer",
@@ -110,6 +112,20 @@
         "exampleCaption": "You change trains once, 17 minutes before the mystery station. Guess the station where you change and its name appears.",
         "legendTitle": "Reading the line",
         "play": "Play today's station"
+    },
+    "archive": {
+        "pageTitle": "Archive · Trackdown",
+        "puzzlePageTitle": "Puzzle {number} · Trackdown",
+        "title": "Archive",
+        "lead": "Every puzzle so far, newest first. Catch up on the ones you missed. Archive puzzles don't count for your streak.",
+        "label": "Puzzles",
+        "empty": "There are no puzzles yet.",
+        "puzzle": "Puzzle {number}",
+        "today": "Today",
+        "unplayed": "Not played yet",
+        "playing": "Guess {number} of {total}",
+        "won": "Found in {count} of {total}",
+        "lost": "Missed"
     },
     "language": {
         "label": "Language",

@@ -20,26 +20,23 @@ function puzzles(count: number): ArchivedPuzzle[] {
     }));
 }
 
-function dateOf(number: number): string {
-    return `2026-11-${String(number).padStart(2, "0")}`;
-}
-
-/** A game won in `count` guesses, finished on its puzzle's day unless told otherwise. */
-function won(
-    number: number,
-    count: number,
-    finishedOn = dateOf(number),
-): StoredGame {
+/** A game won in `count` guesses, on its own day unless played in the archive. */
+function won(count: number, archive = false): StoredGame {
     return {
         guesses: [...Array.from({ length: count - 1 }, () => miss), hit],
-        finishedOn,
+        archive,
     };
 }
 
-function lost(number: number): StoredGame {
+const lost: StoredGame = {
+    guesses: Array.from({ length: 6 }, () => miss),
+    archive: false,
+};
+
+function playing(guessCount: number): StoredGame {
     return {
-        guesses: Array.from({ length: 6 }, () => miss),
-        finishedOn: dateOf(number),
+        guesses: Array.from({ length: guessCount }, () => miss),
+        archive: false,
     };
 }
 
@@ -65,10 +62,10 @@ describe("computeStatistics", () => {
         const statistics = computeStatistics(
             puzzles(4),
             games([
-                [1, won(1, 3)],
-                [2, won(2, 3)],
-                [3, lost(3)],
-                [4, won(4, 5)],
+                [1, won(3)],
+                [2, won(3)],
+                [3, lost],
+                [4, won(5)],
             ]),
             6,
         );
@@ -85,8 +82,8 @@ describe("computeStatistics", () => {
         const statistics = computeStatistics(
             puzzles(2),
             games([
-                [1, won(1, 2)],
-                [2, { guesses: [miss, miss], finishedOn: null }],
+                [1, won(2)],
+                [2, playing(2)],
             ]),
             6,
         );
@@ -96,7 +93,7 @@ describe("computeStatistics", () => {
     });
 
     it("names today's game as missed when it ran out of guesses", () => {
-        expect(computeStatistics(puzzles(1), games([[1, lost(1)]]), 6).today).toBe(
+        expect(computeStatistics(puzzles(1), games([[1, lost]]), 6).today).toBe(
             "missed",
         );
     });
@@ -105,9 +102,9 @@ describe("computeStatistics", () => {
         const statistics = computeStatistics(
             puzzles(3),
             games([
-                [1, won(1, 4)],
-                [2, won(2, 2)],
-                [3, won(3, 6)],
+                [1, won(4)],
+                [2, won(2)],
+                [3, won(6)],
             ]),
             6,
         );
@@ -120,17 +117,17 @@ describe("computeStatistics", () => {
         const notStarted = computeStatistics(
             puzzles(3),
             games([
-                [1, won(1, 4)],
-                [2, won(2, 2)],
+                [1, won(4)],
+                [2, won(2)],
             ]),
             6,
         );
         const onItsWay = computeStatistics(
             puzzles(3),
             games([
-                [1, won(1, 4)],
-                [2, won(2, 2)],
-                [3, { guesses: [miss], finishedOn: null }],
+                [1, won(4)],
+                [2, won(2)],
+                [3, playing(1)],
             ]),
             6,
         );
@@ -143,11 +140,11 @@ describe("computeStatistics", () => {
         const statistics = computeStatistics(
             puzzles(5),
             games([
-                [1, won(1, 3)],
-                [2, won(2, 3)],
-                [3, won(3, 3)],
+                [1, won(3)],
+                [2, won(3)],
+                [3, won(3)],
                 // 4 November skipped.
-                [5, won(5, 3)],
+                [5, won(3)],
             ]),
             6,
         );
@@ -160,9 +157,9 @@ describe("computeStatistics", () => {
         const statistics = computeStatistics(
             puzzles(3),
             games([
-                [1, won(1, 3)],
-                [2, lost(2)],
-                [3, won(3, 3)],
+                [1, won(3)],
+                [2, lost],
+                [3, won(3)],
             ]),
             6,
         );
@@ -172,7 +169,7 @@ describe("computeStatistics", () => {
     });
 
     it("ends the streak once yesterday was skipped, before today is played", () => {
-        const statistics = computeStatistics(puzzles(3), games([[1, won(1, 3)]]), 6);
+        const statistics = computeStatistics(puzzles(3), games([[1, won(3)]]), 6);
 
         expect(statistics.currentStreak).toBe(0);
         expect(statistics.bestStreak).toBe(1);
@@ -182,9 +179,9 @@ describe("computeStatistics", () => {
         const statistics = computeStatistics(
             puzzles(3),
             games([
-                [1, won(1, 3)],
-                [2, won(2, 3)],
-                [3, lost(3)],
+                [1, won(3)],
+                [2, won(3)],
+                [3, lost],
             ]),
             6,
         );
@@ -193,14 +190,14 @@ describe("computeStatistics", () => {
         expect(statistics.bestStreak).toBe(2);
     });
 
-    it("counts a puzzle won on a later day as played, but not for the streak", () => {
+    it("counts a puzzle won in the archive as played, but not for the streak", () => {
         const statistics = computeStatistics(
             puzzles(3),
             games([
-                [1, won(1, 3)],
-                // Played from the archive a day late.
-                [2, won(2, 3, dateOf(3))],
-                [3, won(3, 3)],
+                [1, won(3)],
+                // Played from the archive, after its day.
+                [2, won(3, true)],
+                [3, won(3)],
             ]),
             6,
         );
@@ -210,25 +207,12 @@ describe("computeStatistics", () => {
         expect(statistics.bestStreak).toBe(1);
     });
 
-    it("takes a game kept without its day as played on its day", () => {
-        const statistics = computeStatistics(
-            puzzles(2),
-            games([
-                [1, { guesses: [hit], finishedOn: null }],
-                [2, won(2, 2)],
-            ]),
-            6,
-        );
-
-        expect(statistics.currentStreak).toBe(2);
-    });
-
     it("follows the puzzles' days, not the order they come in", () => {
         const statistics = computeStatistics(
             [...puzzles(3)].reverse(),
             games([
-                [2, won(2, 3)],
-                [3, won(3, 3)],
+                [2, won(3)],
+                [3, won(3)],
             ]),
             6,
         );

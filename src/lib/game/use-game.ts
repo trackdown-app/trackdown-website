@@ -10,7 +10,6 @@ import {
 } from "@/lib/game/game-state";
 import { gameStore } from "@/lib/game/game-store";
 import type { GameStore } from "@/lib/game/game-store";
-import { puzzleDate } from "@/lib/game/puzzle-day";
 import type { TodayPuzzleOutput } from "@/lib/game/schemas";
 
 type GuessVariables = {
@@ -23,11 +22,13 @@ type GuessVariables = {
  * whether it is over, and `guess`, which sends a guess through the `guess`
  * operation and keeps its answer. The server render has no storage, so it
  * renders a game with no guesses; the browser reads the kept ones as it
- * hydrates.
+ * hydrates. With `archive`, every guess marks the kept game as played in the
+ * archive (docs/archive.md#the-streak).
  */
 export function useGame(
     puzzle: Pick<TodayPuzzleOutput, "network" | "number" | "maxGuesses">,
     store: GameStore = gameStore,
+    archive = false,
 ) {
     const key = gameStorageKey(puzzle.network, puzzle.number);
     const raw = useSyncExternalStore(
@@ -35,7 +36,7 @@ export function useGame(
         () => store.read(key),
         () => null,
     );
-    const guesses = useMemo(() => parseStoredGame(raw), [raw]);
+    const guesses = useMemo(() => parseStoredGame(raw).guesses, [raw]);
     const status = gameStatus(guesses, puzzle.maxGuesses);
 
     const mutation = useMutation({
@@ -50,7 +51,7 @@ export function useGame(
         onSuccess: (answer) => {
             // Read again: another tab may have played meanwhile.
             const current = parseStoredGame(store.read(key));
-            if (current.some((kept) => kept.guess === answer.guess)) {
+            if (current.guesses.some((kept) => kept.guess === answer.guess)) {
                 return;
             }
             // The earlier trips again: a change this guess named shows on
@@ -58,18 +59,15 @@ export function useGame(
             const again = new Map(
                 answer.earlierTrips.map((trip) => [trip.guess, trip.steps]),
             );
-            const updated = current.map((kept) => {
+            const updated = current.guesses.map((kept) => {
                 const steps = again.get(kept.guess);
                 return steps == null ? kept : { ...kept, steps };
             });
-            const next = [...updated, answer];
-            // The day the game ends, so a streak counts only puzzles
-            // finished on their own day (docs/statistics.md#streaks).
-            const finishedOn =
-                gameStatus(next, puzzle.maxGuesses) === "playing"
-                    ? null
-                    : puzzleDate(new Date());
-            store.write(key, serializeGame(next, finishedOn));
+            // Once played in the archive, always an archive game.
+            store.write(
+                key,
+                serializeGame([...updated, answer], current.archive || archive),
+            );
         },
     });
 

@@ -5,8 +5,7 @@ import type { ListedGuess } from "@/lib/game/trip-line";
 
 // A player's game at one puzzle, as the page keeps it between visits
 // (docs/game.md#game-state): the guesses so far, each the `guess`
-// operation's answer, and the day the game ended. Holds no data, so it runs
-// in the browser.
+// operation's answer. Holds no data, so it runs in the browser.
 
 /** Where a game is kept: one entry per network and puzzle. */
 export function gameStorageKey(network: NetworkId, number: number): string {
@@ -25,54 +24,49 @@ const storedGameSchema = z.object({
     /** The guesses so far, oldest first. */
     guesses: z.array(storedGuessSchema),
     /**
-     * The puzzle day, `YYYY-MM-DD` in Europe/Amsterdam, on which the game
-     * ended. Games kept before statistics have none.
+     * Set once a guess at this puzzle was made in the archive, after the
+     * puzzle's own day: such a game does not count for the streak. Left out
+     * of a game played only on its day.
      */
-    finishedOn: z.iso.date().optional(),
+    archive: z.literal(true).optional(),
 });
 
-/** A kept game: its guesses, oldest first, and the day it ended, if it did. */
+/** A kept game: its guesses, oldest first, and whether the archive played it. */
 export type StoredGame = {
     guesses: ListedGuess[];
-    finishedOn: string | null;
+    /** A guess was made in the archive, so the game does not count for the streak. */
+    archive: boolean;
 };
+
+const noGame: StoredGame = { guesses: [], archive: false };
 
 /**
  * The game kept in `raw`. Nothing kept, or anything that is not a game this
  * version wrote, is a game with no guesses yet.
  */
-export function readStoredGame(raw: string | null): StoredGame {
-    const empty: StoredGame = { guesses: [], finishedOn: null };
+export function parseStoredGame(raw: string | null): StoredGame {
     if (raw == null) {
-        return empty;
+        return noGame;
     }
     let value: unknown;
     try {
         value = JSON.parse(raw);
     } catch {
-        return empty;
+        return noGame;
     }
     const parsed = storedGameSchema.safeParse(value);
     return parsed.success
-        ? {
-              guesses: parsed.data.guesses,
-              finishedOn: parsed.data.finishedOn ?? null,
-          }
-        : empty;
-}
-
-/** The guesses kept in `raw`, oldest first, as `readStoredGame` reads them. */
-export function parseStoredGame(raw: string | null): ListedGuess[] {
-    return readStoredGame(raw).guesses;
+        ? { guesses: parsed.data.guesses, archive: parsed.data.archive === true }
+        : noGame;
 }
 
 /**
- * `guesses`, oldest first, and the day the game ended, as `readStoredGame`
- * reads them back.
+ * `guesses`, oldest first, as `parseStoredGame` reads them back, marked as
+ * an archive game when `archive` is set.
  */
 export function serializeGame(
     guesses: readonly ListedGuess[],
-    finishedOn: string | null = null,
+    archive = false,
 ): string {
     return JSON.stringify({
         guesses: guesses.map(({ guess, correct, steps, totalMinutes }) => ({
@@ -81,7 +75,7 @@ export function serializeGame(
             steps,
             totalMinutes,
         })),
-        ...(finishedOn == null ? {} : { finishedOn }),
+        ...(archive ? { archive: true } : {}),
     });
 }
 

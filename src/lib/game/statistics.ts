@@ -35,7 +35,6 @@ type Finished = {
 };
 
 function finished(
-    puzzle: ArchivedPuzzle,
     game: StoredGame | undefined,
     maxGuesses: number,
 ): Finished | null {
@@ -49,9 +48,8 @@ function finished(
     return {
         status,
         guessCount: game.guesses.length,
-        // A game kept before statistics has no day; the archive could not be
-        // played then, so it was played on its day.
-        onItsDay: game.finishedOn == null || game.finishedOn === puzzle.date,
+        // A guess made in the archive marks the game (docs/archive.md#the-streak).
+        onItsDay: !game.archive,
     };
 }
 
@@ -61,7 +59,7 @@ function finished(
  * game at each puzzle number.
  *
  * A streak counts puzzles won on their own day in Europe/Amsterdam. A puzzle
- * lost, not played, or finished on a later day breaks it. Today's puzzle
+ * lost, not played, or played in the archive (after its day) breaks it. Today's puzzle
  * breaks nothing while it is still to play, so the streak runs on from
  * yesterday until the day is over.
  */
@@ -81,7 +79,7 @@ export function computeStatistics(
     const last = sorted.at(-1);
 
     for (const puzzle of sorted) {
-        const game = finished(puzzle, games.get(puzzle.number), maxGuesses);
+        const game = finished(games.get(puzzle.number), maxGuesses);
         const isToday = puzzle === last;
 
         if (game?.status === "won") {

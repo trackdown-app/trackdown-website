@@ -1,11 +1,9 @@
 import { Link } from "@tanstack/react-router";
 import { m } from "@/paraglide/messages";
-import { sitePaths } from "@/lib/site-paths";
 import { cn } from "@/lib/utils";
 import { LanguageSwitch } from "@/components/language/language-switch";
 import { LogoMark } from "@/components/layout/logo-mark";
 import { NetworkPill } from "@/components/layout/network-pill";
-import { PageLink } from "@/components/layout/page-link";
 import { shellContainer } from "@/components/layout/shell-container";
 import { StatisticsDialog } from "@/components/layout/statistics-dialog";
 
@@ -44,12 +42,10 @@ export function SiteHeader() {
                 <nav aria-label={m["header.nav"]()}>
                     <ul className="flex items-center gap-1">
                         <li>
-                            <PageLink
-                                path={sitePaths.archive}
-                                className={navLinkClasses}
-                            >
+                            {/* Current on every puzzle of the archive too. */}
+                            <Link to="/archief" className={navLinkClasses}>
                                 {m["header.archive"]()}
-                            </PageLink>
+                            </Link>
                         </li>
                         <li>
                             <Link to="/hoe-te-spelen" className={navLinkClasses}>

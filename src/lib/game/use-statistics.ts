@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useSyncExternalStore } from "react";
 import type { NetworkId } from "@/lib/data/networks";
-import { gameStorageKey, readStoredGame } from "@/lib/game/game-state";
+import { gameStorageKey, parseStoredGame } from "@/lib/game/game-state";
 import type { StoredGame } from "@/lib/game/game-state";
 import { gameStore } from "@/lib/game/game-store";
 import type { GameStore } from "@/lib/game/game-store";
@@ -44,7 +44,7 @@ export function useStatistics(network: NetworkId, store: GameStore = gameStore) 
         numbers.forEach((number, index) => {
             const entry = kept[index];
             if (entry != null && entry !== "") {
-                games.set(number, readStoredGame(entry));
+                games.set(number, parseStoredGame(entry));
             }
         });
         return computeStatistics(archive.data.puzzles, games, maxGuesses);

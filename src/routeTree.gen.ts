@@ -11,6 +11,8 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as HoeTeSpelenRouteImport } from './routes/hoe-te-spelen'
+import { Route as ArchiefIndexRouteImport } from './routes/archief/index'
+import { Route as ArchiefNumberRouteImport } from './routes/archief/$number'
 import { Route as ApiV1SplatRouteImport } from './routes/api/v1/$'
 import { Route as ApiV1MetaRouteImport } from './routes/api/v1/meta'
 import { Route as ApiV1OpenapiDotjsonRouteImport } from './routes/api/v1/openapi[.]json'
@@ -28,6 +30,16 @@ const IndexRoute = IndexRouteImport.update({
 const HoeTeSpelenRoute = HoeTeSpelenRouteImport.update({
   id: '/hoe-te-spelen',
   path: '/hoe-te-spelen',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ArchiefIndexRoute = ArchiefIndexRouteImport.update({
+  id: '/archief/',
+  path: '/archief/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ArchiefNumberRoute = ArchiefNumberRouteImport.update({
+  id: '/archief/$number',
+  path: '/archief/$number',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiV1SplatRoute = ApiV1SplatRouteImport.update({
@@ -78,6 +90,8 @@ const ApiV1NetworkPuzzlesNumberRevealRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/hoe-te-spelen': typeof HoeTeSpelenRoute
+  '/archief/$number': typeof ArchiefNumberRoute
+  '/archief/': typeof ArchiefIndexRoute
   '/api/v1/$': typeof ApiV1SplatRoute
   '/api/v1/meta': typeof ApiV1MetaRoute
   '/api/v1/openapi.json': typeof ApiV1OpenapiDotjsonRoute
@@ -90,6 +104,8 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/hoe-te-spelen': typeof HoeTeSpelenRoute
+  '/archief/$number': typeof ArchiefNumberRoute
+  '/archief': typeof ArchiefIndexRoute
   '/api/v1/$': typeof ApiV1SplatRoute
   '/api/v1/meta': typeof ApiV1MetaRoute
   '/api/v1/openapi.json': typeof ApiV1OpenapiDotjsonRoute
@@ -103,6 +119,8 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/hoe-te-spelen': typeof HoeTeSpelenRoute
+  '/archief/$number': typeof ArchiefNumberRoute
+  '/archief/': typeof ArchiefIndexRoute
   '/api/v1/$': typeof ApiV1SplatRoute
   '/api/v1/meta': typeof ApiV1MetaRoute
   '/api/v1/openapi.json': typeof ApiV1OpenapiDotjsonRoute
@@ -117,6 +135,8 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/hoe-te-spelen'
+    | '/archief/$number'
+    | '/archief/'
     | '/api/v1/$'
     | '/api/v1/meta'
     | '/api/v1/openapi.json'
@@ -129,6 +149,8 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/hoe-te-spelen'
+    | '/archief/$number'
+    | '/archief'
     | '/api/v1/$'
     | '/api/v1/meta'
     | '/api/v1/openapi.json'
@@ -141,6 +163,8 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/hoe-te-spelen'
+    | '/archief/$number'
+    | '/archief/'
     | '/api/v1/$'
     | '/api/v1/meta'
     | '/api/v1/openapi.json'
@@ -154,6 +178,8 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   HoeTeSpelenRoute: typeof HoeTeSpelenRoute
+  ArchiefNumberRoute: typeof ArchiefNumberRoute
+  ArchiefIndexRoute: typeof ArchiefIndexRoute
   ApiV1SplatRoute: typeof ApiV1SplatRoute
   ApiV1MetaRoute: typeof ApiV1MetaRoute
   ApiV1OpenapiDotjsonRoute: typeof ApiV1OpenapiDotjsonRoute
@@ -178,6 +204,20 @@ declare module '@tanstack/react-router' {
       path: '/hoe-te-spelen'
       fullPath: '/hoe-te-spelen'
       preLoaderRoute: typeof HoeTeSpelenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/archief/': {
+      id: '/archief/'
+      path: '/archief'
+      fullPath: '/archief/'
+      preLoaderRoute: typeof ArchiefIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/archief/$number': {
+      id: '/archief/$number'
+      path: '/archief/$number'
+      fullPath: '/archief/$number'
+      preLoaderRoute: typeof ArchiefNumberRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/v1/$': {
@@ -242,6 +282,8 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   HoeTeSpelenRoute: HoeTeSpelenRoute,
+  ArchiefNumberRoute: ArchiefNumberRoute,
+  ArchiefIndexRoute: ArchiefIndexRoute,
   ApiV1SplatRoute: ApiV1SplatRoute,
   ApiV1MetaRoute: ApiV1MetaRoute,
   ApiV1OpenapiDotjsonRoute: ApiV1OpenapiDotjsonRoute,

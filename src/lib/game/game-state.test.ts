@@ -4,7 +4,6 @@ import {
     gameStatus,
     gameStorageKey,
     parseStoredGame,
-    readStoredGame,
     serializeGame,
 } from "@/lib/game/game-state";
 import { createGameStore } from "@/lib/game/game-store";
@@ -24,25 +23,26 @@ describe("game state", () => {
     });
 
     it("reads back what it writes", () => {
-        expect(parseStoredGame(serializeGame([miss, hit]))).toEqual([miss, hit]);
+        expect(parseStoredGame(serializeGame([miss, hit]))).toEqual({
+            guesses: [miss, hit],
+            archive: false,
+        });
     });
 
-    it("keeps the day a game ended, and reads an older game without one", () => {
-        expect(readStoredGame(serializeGame([miss, hit], "2026-11-06"))).toEqual({
-            guesses: [miss, hit],
-            finishedOn: "2026-11-06",
-        });
-        expect(readStoredGame(serializeGame([miss]))).toEqual({
+    it("marks a game played in the archive, and only that one", () => {
+        expect(serializeGame([miss])).not.toContain("archive");
+        expect(parseStoredGame(serializeGame([miss], true))).toEqual({
             guesses: [miss],
-            finishedOn: null,
+            archive: true,
         });
-        expect(serializeGame([miss])).not.toContain("finishedOn");
     });
 
     it("reads nothing, broken JSON or another shape as no guesses", () => {
-        expect(parseStoredGame(null)).toEqual([]);
-        expect(parseStoredGame("{")).toEqual([]);
-        expect(parseStoredGame('{"guesses":[{"guess":1}]}')).toEqual([]);
+        const none = { guesses: [], archive: false };
+        expect(parseStoredGame(null)).toEqual(none);
+        expect(parseStoredGame("{")).toEqual(none);
+        expect(parseStoredGame('{"guesses":[{"guess":1}]}')).toEqual(none);
+        expect(parseStoredGame('{"guesses":[],"archive":"yes"}')).toEqual(none);
     });
 
     it("is won at a correct guess and lost after the last", () => {

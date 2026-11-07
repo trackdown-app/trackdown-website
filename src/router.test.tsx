@@ -32,6 +32,29 @@ vi.mock("@/lib/game/stations.functions", () => ({
             ],
         }),
 }));
+// The archive up to today, by this machine's clock in Amsterdam: puzzle 142
+// two days ago, 143 yesterday and 144 today.
+vi.mock("@/lib/game/puzzle-archive.functions", async () => {
+    const { puzzleDate } = await import("@/lib/game/puzzle-day");
+    function dayBefore(date: string): string {
+        const day = new Date(`${date}T00:00:00Z`);
+        day.setUTCDate(day.getUTCDate() - 1);
+        return day.toISOString().slice(0, 10);
+    }
+    const today = puzzleDate(new Date());
+    const yesterday = dayBefore(today);
+    return {
+        getPuzzleArchiveFn: () =>
+            Promise.resolve({
+                network: "nl",
+                puzzles: [
+                    { number: 142, date: dayBefore(yesterday) },
+                    { number: 143, date: yesterday },
+                    { number: 144, date: today },
+                ],
+            }),
+    };
+});
 vi.mock("@/lib/game/guess.functions", () => ({
     submitGuessFn: () => Promise.reject(new Error("not in this test")),
 }));
@@ -103,6 +126,55 @@ describe("the site's router", () => {
         // No legend in the footer here: the page carries it.
         expect(html).toContain("Trackdown, een hobbyproject van Bram Gussekloo");
     });
+
+    it("answers the archive with every puzzle up to today's, newest first", async () => {
+        const { status, html } = await respondAt(getRouter, "/archief");
+
+        expect(status).toBe(200);
+        expect(html).toContain("<title>Archief · Trackdown</title>");
+        const links = [...html.matchAll(/href="(\/archief\/\d+)"/g)].map(
+            (match) => match[1],
+        );
+        expect(links).toEqual(["/archief/143", "/archief/142"]);
+        expect(html).toContain("Puzzel 144");
+        expect(html).toContain("<header");
+    });
+
+    it("plays an earlier puzzle on its own page, with the legend in the footer", async () => {
+        const { status, html } = await respondAt(getRouter, "/archief/142");
+
+        expect(status).toBe(200);
+        expect(html).toContain("<title>Puzzel 142 · Trackdown</title>");
+        expect(html).toContain("puzzel 142");
+        expect(html).toContain("Welk station was het mysterie?");
+        expect(html).toContain("Legenda");
+        // The countdown is today's puzzle's, not this one's.
+        expect(html).not.toContain("Volgend station over");
+    });
+
+    it("sends today's puzzle in the archive to the home page", async () => {
+        const handler = createRequestHandler({
+            request: new Request("http://localhost/archief/144"),
+            createRouter: getRouter,
+        });
+        const response = await handler(defaultRenderHandler);
+
+        expect(response.status).toBe(307);
+        expect(
+            new URL(response.headers.get("location") ?? "", "http://localhost")
+                .pathname,
+        ).toBe("/");
+    });
+
+    it.each(["/archief/145", "/archief/0", "/archief/0142", "/archief/abc"])(
+        "answers %s, not a puzzle up to today's, with 404",
+        async (pathname) => {
+            const { status, html } = await respondAt(getRouter, pathname);
+
+            expect(status).toBe(404);
+            expect(html).toContain("Deze pagina bestaat niet");
+        },
+    );
 
     it("answers an unknown path with 404 and the not-found page", async () => {
         const { status, html } = await respondAt(getRouter, "/geen-station");

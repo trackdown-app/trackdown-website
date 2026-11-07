@@ -41,6 +41,7 @@
   - `docs/statistics.md`: the player's record (played, won, streaks, guesses needed), how it is worked out from kept games, the streak rules, the record on the solved screen, the statistics dialog and its dialog parts in `src/components/ui/`.
   - `docs/share.md`: the share text and its grid, the Web Share API and clipboard fallback, the Share result button, the "What you'll share" preview.
   - `docs/how-to-play.md`: the How to play page at `/hoe-te-spelen`, its rules, example trip and legend.
+  - `docs/archive.md`: the archive at `/archief` and its list, playing an earlier puzzle at `/archief/{number}`, the 404 for a future puzzle, the archive mark that keeps a game out of the streak.
   - `docs/deploy.md`: Nitro's preset detection, the `.vercel/output` layout, the function region, the game data's build-time variables, the deploy workflow and its secrets, the Vercel project and its environments, a manual deploy.
 - A new feature area gets its own `docs/<feature>.md`, an entry in the README's documentation list and a line in the list above.
 
