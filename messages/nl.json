@@ -30,9 +30,8 @@
         "spokenGuess": "Gok {number}, {station}: {duration} naar het mysteriestation. {steps}.",
         "spokenFound": "Gok {number}, {station}: het mysteriestation.",
         "grid30": "30 min",
-        "grid60": "1 u",
-        "grid90": "1 u 30",
-        "grid120": "2 u"
+        "gridHours": "{hours} u",
+        "gridHoursHalf": "{hours} u 30"
     },
     "trip": {
         "minutes": "{minutes}m",

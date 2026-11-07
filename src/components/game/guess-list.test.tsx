@@ -116,6 +116,33 @@ describe("GuessList", () => {
         }
     });
 
+    it("widens the grid for a trip past 2h 30, on one scale for every row", () => {
+        render(
+            <GuessList
+                guesses={[
+                    ...guesses,
+                    {
+                        guess: "vs",
+                        correct: false,
+                        steps: [{ kind: "ride", train: "IC", minutes: 183 }],
+                        totalMinutes: 183,
+                    },
+                ]}
+                stations={[...stations, { code: "vs", name: "Vlissingen" }]}
+            />,
+        );
+
+        // Seven columns of 30 minutes: only the whole hours are labelled.
+        const labels = [
+            ...document.querySelectorAll("[aria-hidden] .absolute.top-2"),
+        ];
+        expect(labels.map((label) => label.textContent)).toEqual([
+            "1 u",
+            "2 u",
+            "3 u",
+        ]);
+    });
+
     it("speaks Dutch by default", () => {
         render(<GuessList guesses={guesses} stations={stations} />);
 

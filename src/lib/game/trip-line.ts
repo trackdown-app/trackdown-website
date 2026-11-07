@@ -15,14 +15,57 @@ export type ListedGuess = Pick<
     "guess" | "correct" | "steps" | "totalMinutes"
 >;
 
-/** The trip's minutes that fill the whole track: 2 h 30, five grid columns. */
+/**
+ * The fewest minutes the track spans: 2 h 30, five grid columns. A board
+ * with a longer trip spans more (`boardMinutes`).
+ */
 export const trackMinutes = 150;
 
 /** The grid behind the line: one column per 30 minutes. */
 export const gridMinutes = 30;
 
-/** The shortest line, as a share of the track, so a short trip still shows. */
-const minWidthPercent = 14;
+/** The shortest line, so a short trip's dot and a bit of line show beside the bar. */
+const minLinePx = 48;
+
+/** More columns than this, and only the whole hours are labelled, so labels never crowd at phone width. */
+const maxLabelledColumns = 6;
+
+/**
+ * The grid's labelled rules on a track spanning `scaleMinutes`: every
+ * half hour between the mystery bar and the track's far end, or only the
+ * whole hours once the board has more than six columns. Each with its
+ * minutes from the bar and its place, in percent of the track from the
+ * right.
+ */
+export function gridMarks(
+    scaleMinutes: number,
+): { minutes: number; percent: number }[] {
+    const columns = Math.round(scaleMinutes / gridMinutes);
+    const step = columns > maxLabelledColumns ? 2 : 1;
+    const marks: { minutes: number; percent: number }[] = [];
+    for (let column = step; column < columns; column += step) {
+        marks.push({
+            minutes: column * gridMinutes,
+            percent: (column / columns) * 100,
+        });
+    }
+    return marks;
+}
+
+/**
+ * The minutes the whole board's track spans: 2 h 30, or the longest trip
+ * rounded up to the next half hour. Every row shares it, so the same
+ * minutes take the same width on every row, however long the longest trip.
+ */
+export function boardMinutes(
+    guesses: readonly Pick<ListedGuess, "totalMinutes">[],
+): number {
+    const longest = guesses.reduce(
+        (most, guess) => Math.max(most, guess.totalMinutes),
+        0,
+    );
+    return Math.max(trackMinutes, Math.ceil(longest / gridMinutes) * gridMinutes);
+}
 
 /**
  * The narrowest track, at phone width: what the labels are sized for until
@@ -113,13 +156,13 @@ export function trainReachesMs(widthPercent: number, atPercent: number): number 
 }
 
 /**
- * How `guess`'s trip is drawn on a track `trackPx` wide. Every minute takes
- * the same width, 150 minutes the whole track, so a ride is as wide as it is
- * long on every row, and the grid behind it reads true. The guess dot sits
- * at the trip's total time; each change ring sits where the next ride
- * starts, the change's own minutes drawn in the colour of the ride before
- * it. Only a trip shorter than 21 minutes (stretched to 14%, so it shows)
- * or longer than 2h 30 (squeezed into the track) leaves that scale.
+ * How `guess`'s trip is drawn on a track `trackPx` wide that spans
+ * `scaleMinutes` (the board's, `boardMinutes`). Every minute takes the same
+ * width, so a ride is as wide as it is long on every row, and the grid
+ * behind it reads true. The guess dot sits at the trip's total time; each
+ * change ring sits where the next ride starts, the change's own minutes
+ * drawn in the colour of the ride before it. Only a line shorter than 48px
+ * is stretched to that, so its dot shows beside the mystery bar.
  * `formatMinutes` writes a time the way the label shows it, such as
  * `2h 02m`.
  */
@@ -127,10 +170,14 @@ export function tripLineLayout(
     guess: Pick<ListedGuess, "steps" | "totalMinutes">,
     formatMinutes: (minutes: number) => string,
     trackPx: number = narrowTrackPx,
+    scaleMinutes: number = trackMinutes,
 ): TripLineLayout {
-    const widthPercent = Math.max(
-        minWidthPercent,
-        Math.min(100, (guess.totalMinutes / trackMinutes) * 100),
+    const widthPercent = Math.min(
+        100,
+        Math.max(
+            (minLinePx / trackPx) * 100,
+            (guess.totalMinutes / scaleMinutes) * 100,
+        ),
     );
     function percentOf(minutes: number): number {
         return guess.totalMinutes > 0

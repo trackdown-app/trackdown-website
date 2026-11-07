@@ -30,9 +30,8 @@
         "spokenGuess": "Guess {number}, {station}: {duration} to the mystery station. {steps}.",
         "spokenFound": "Guess {number}, {station}: the mystery station.",
         "grid30": "30 min",
-        "grid60": "1 h",
-        "grid90": "1 h 30",
-        "grid120": "2 h"
+        "gridHours": "{hours} h",
+        "gridHoursHalf": "{hours} h 30"
     },
     "trip": {
         "minutes": "{minutes}m",

@@ -16,8 +16,15 @@ const lineColours: Record<TripLineRide["line"], string> = {
     3: "bg-line-3",
 };
 
+/**
+ * Glides a part to its new place when the board's scale changes, as when a
+ * longer trip arrives and every row draws smaller.
+ */
+const rescale =
+    "transition-[right,width] duration-500 ease-[cubic-bezier(0.37,0,0.63,1)] motion-reduce:transition-none";
+
 /** Centres a dot or ring on its place, given as `right`. */
-const marker = "absolute top-1/2 z-1 -translate-y-1/2 translate-x-1/2 rounded-full";
+const marker = `absolute top-1/2 z-1 -translate-y-1/2 translate-x-1/2 rounded-full ${rescale}`;
 
 /**
  * One guess's trip as the design draws it (Web · Playing): the guess dot,
@@ -34,12 +41,15 @@ const marker = "absolute top-1/2 z-1 -translate-y-1/2 translate-x-1/2 rounded-fu
  */
 export function TripLine({
     guess,
+    scaleMinutes,
 }: {
     guess: Pick<ListedGuess, "steps" | "totalMinutes">;
+    /** The minutes the board's track spans, shared by every row (`boardMinutes`). */
+    scaleMinutes: number;
 }) {
     const trackRef = useRef<HTMLDivElement>(null);
     const trackPx = useElementWidth(trackRef, narrowTrackPx);
-    const layout = tripLineLayout(guess, formatMinutes, trackPx);
+    const layout = tripLineLayout(guess, formatMinutes, trackPx, scaleMinutes);
     const timing: CSSProperties & Record<`--${string}`, string> = {
         "--trip-ms": `${tripRunMs(layout.widthPercent)}ms`,
         "--trip-width": `${layout.widthPercent}%`,
@@ -53,7 +63,7 @@ export function TripLine({
                         <span
                             // The steps never reorder, so their place is their key.
                             key={index}
-                            className={`absolute top-1/2 flex h-[22px] -translate-y-1/2 items-center justify-center overflow-hidden text-on-line ${lineColours[part.line]}`}
+                            className={`absolute top-1/2 flex h-[22px] -translate-y-1/2 items-center justify-center overflow-hidden text-on-line ${rescale} ${lineColours[part.line]}`}
                             style={{
                                 right: `${part.endPercent}%`,
                                 width: `${part.startPercent - part.endPercent}%`,

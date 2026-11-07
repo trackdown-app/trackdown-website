@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { trainReachesMs, tripLineLayout, tripRunMs } from "@/lib/game/trip-line";
+import {
+    boardMinutes,
+    gridMarks,
+    trainReachesMs,
+    tripLineLayout,
+    tripRunMs,
+} from "@/lib/game/trip-line";
 import type { ListedGuess } from "@/lib/game/trip-line";
 
 function format(minutes: number): string {
@@ -33,9 +39,48 @@ describe("tripLineLayout", () => {
         ).toBeCloseTo(96.67, 1);
     });
 
-    it("keeps a short trip visible and a long one inside the track", () => {
-        expect(tripLineLayout(trip(ride(13)), format).widthPercent).toBe(14);
+    it("stretches only a line shorter than 48px, so its dot shows", () => {
+        // 13 minutes of 150 is 29px on a 340px track; 48px is 14.1%.
+        expect(tripLineLayout(trip(ride(13)), format).widthPercent).toBeCloseTo(
+            (48 / 340) * 100,
+        );
+        // On a 1000px track the same trip is 87px: on scale.
+        expect(
+            tripLineLayout(trip(ride(13)), format, 1000).widthPercent,
+        ).toBeCloseTo((13 / 150) * 100);
+    });
+
+    it("draws a long trip on the board's longer scale, never past the track", () => {
+        expect(tripLineLayout(trip(ride(240)), format, 340, 240).widthPercent).toBe(
+            100,
+        );
+        expect(tripLineLayout(trip(ride(120)), format, 340, 240).widthPercent).toBe(
+            50,
+        );
         expect(tripLineLayout(trip(ride(240)), format).widthPercent).toBe(100);
+    });
+
+    it("keeps 29 minutes one width on a board stretched by a long trip", () => {
+        // The case from the design review: Vlissingen, 3h 03m, on the board.
+        const scale = boardMinutes([{ totalMinutes: 183 }, { totalMinutes: 29 }]);
+        function lastRide(layout: ReturnType<typeof tripLineLayout>): number {
+            const part = layout.parts.at(-1);
+            return part?.kind === "ride" ? part.startPercent - part.endPercent : 0;
+        }
+        // A desktop track: at phone width 29 minutes of 3h 30 is under 48px,
+        // the one case a line is stretched.
+        const trackPx = 1000;
+
+        const long = tripLineLayout(
+            trip(ride(88), change(null, 9), ride(37), change("ut", 20), ride(29)),
+            format,
+            trackPx,
+            scale,
+        );
+        const direct = tripLineLayout(trip(ride(29)), format, trackPx, scale);
+
+        expect(lastRide(long)).toBeCloseTo(lastRide(direct));
+        expect(lastRide(direct)).toBeCloseTo((29 / 210) * 100);
     });
 
     it("places each ride by its minutes, the wait at a change in the ride before", () => {
@@ -153,5 +198,29 @@ describe("a new guess's run", () => {
         expect(trainReachesMs(60, 0)).toBe(tripRunMs(60));
         // A quarter of the way takes a third of the time: it pulls away slowly.
         expect(trainReachesMs(60, 45)).toBe(Math.round(tripRunMs(60) / 3));
+    });
+});
+
+describe("the board's scale", () => {
+    it("spans 2h 30, or the longest trip rounded up to the half hour", () => {
+        expect(boardMinutes([])).toBe(150);
+        expect(boardMinutes([{ totalMinutes: 145 }])).toBe(150);
+        expect(boardMinutes([{ totalMinutes: 29 }, { totalMinutes: 183 }])).toBe(
+            210,
+        );
+        expect(boardMinutes([{ totalMinutes: 240 }])).toBe(240);
+    });
+
+    it("labels every half hour on five columns, only whole hours past six", () => {
+        expect(gridMarks(150)).toEqual([
+            { minutes: 30, percent: 20 },
+            { minutes: 60, percent: 40 },
+            { minutes: 90, percent: 60 },
+            { minutes: 120, percent: 80 },
+        ]);
+        expect(gridMarks(180).map((mark) => mark.minutes)).toEqual([
+            30, 60, 90, 120, 150,
+        ]);
+        expect(gridMarks(210).map((mark) => mark.minutes)).toEqual([60, 120, 180]);
     });
 });
