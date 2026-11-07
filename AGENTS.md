@@ -43,6 +43,7 @@
   - `docs/how-to-play.md`: the How to play page at `/hoe-te-spelen`, its rules, example trip and legend.
   - `docs/archive.md`: the archive at `/archief` and its list, playing an earlier puzzle at `/archief/{number}`, the 404 for a future puzzle, the archive mark that keeps a game out of the streak.
   - `docs/deploy.md`: Nitro's preset detection, the `.vercel/output` layout, the function region, the game data's build-time variables, the deploy workflow and its secrets, the Vercel project and its environments, a manual deploy.
+  - `docs/logging.md`: server logs and traces, PostHog EU, startup validation, Vercel flushing, privacy filtering, and the telemetry tests.
 - A new feature area gets its own `docs/<feature>.md`, an entry in the README's documentation list and a line in the list above.
 
 ## Strict Boolean Expressions

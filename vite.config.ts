@@ -37,6 +37,7 @@ const config = defineConfig(({ mode }) => {
             // Node server into `.output/` for `bun run start`
             // (docs/deploy.md). Must directly follow `tanstackStart()`.
             nitro({
+                plugins: ["src/config/telemetry.ts"],
                 // Only read by the `vercel` preset: runs the server function
                 // in Frankfurt, the region closest to the Netherlands.
                 vercel: { functions: { regions: ["fra1"] } },
