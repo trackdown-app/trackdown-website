@@ -67,6 +67,9 @@
         "changeKnown": "Change, station known",
         "changeHidden": "Change, guess it to reveal"
     },
+    "countdown": {
+        "nextStation": "Next station in"
+    },
     "language": {
         "label": "Language",
         "nl": "Dutch",

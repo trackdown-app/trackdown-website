@@ -2,7 +2,7 @@
 
 `GuessList` (`src/components/game/guess-list.tsx`) is the list of guesses on the design's Web · Playing board: one row per guess, newest first, with the trip from the guessed station to the mystery station drawn as a line. The shorter the line, the closer the guess.
 
-The game page mounts it with the game's state, with the progress dots in its header row, and names `GameLegend` as its footer legend ([game.md](game.md)).
+The game page mounts it with the game's state, with the progress dots in its header row, and shows `GameLegend` in its footer ([game.md](game.md)).
 
 ## Props
 
@@ -59,7 +59,7 @@ On the solved and missed screen ([game.md](game.md#solved-and-missed)) the list 
 
 ## Legend
 
-`GameLegend` (`src/components/game/game-legend.tsx`) is the key the playing page's footer shows ([site-shell.md](site-shell.md#footer)): the guess dot "Your guess", a `line-1` swatch "Train and ride time", an empty ring "Change, station known" and a `?` ring "Change, guess it to reveal". It is a list named "Legend" / "Legenda"; the swatches are hidden from screen readers. The countdown to the next station that the design sets beside it comes with the countdown.
+`GameLegend` (`src/components/game/game-legend.tsx`) is the key the playing page's footer shows ([site-shell.md](site-shell.md#footer)): the guess dot "Your guess", a `line-1` swatch "Train and ride time", an empty ring "Change, station known" and a `?` ring "Change, guess it to reveal". It is a list named "Legend" / "Legenda"; the swatches are hidden from screen readers. `PlayingFooterLegend` sets the countdown to the next station beside it ([game.md](game.md#countdown)).
 
 ## Screen readers
 
