@@ -1,0 +1,66 @@
+# Game data
+
+The stations, puzzles and trips come from the private `trackdown-app/trackdown-data` repository. `src/lib/data/` reads them on the server, checks every file against a zod schema and keeps what it read in memory. How the files get into the build is in [deploy.md](deploy.md#the-game-data).
+
+## Files
+
+Each network has a folder of its own in trackdown-data's `data/`:
+
+| File | Schema (`src/lib/data/data-schema.ts`) | What it holds |
+| --- | --- | --- |
+| `stations.json` | `stationsFileSchema` | Every station a player can guess: `code`, `name`, `province`, `lat`, `lon`. Codes are lower-case letters and digits and appear once. |
+| `puzzles.json` | `puzzlesFileSchema` | The daily schedule: `n`, `date` (`YYYY-MM-DD`), `station`. No number or date appears twice. |
+| `meta.json` | `metaFileSchema` | The feed, its service dates, the build parameters and when it was built. |
+| `to/<code>.json` | `tripsFileSchema` | The fastest trip to `<code>` from every other station, by origin code. |
+
+A trip is stored as `[string, minutes]` entries that alternate between a ride and a change, starting and ending with a ride: `[["IC", 116], ["ut", 10], ["IC", 13]]`. `tripSchema` parses it into `TripStep`s, so code reading a trip never counts entries:
+
+```ts
+[
+    { kind: "ride", train: "IC", minutes: 116 },
+    { kind: "change", station: "ut", minutes: 10 },
+    { kind: "ride", train: "IC", minutes: 13 },
+];
+```
+
+A ride's train is one of `IC`, `ICD`, `SPR`, `ST`, `SNT`, `ICE`, `EC` (`trainTypeSchema`); a new train type in the data fails the check until it is added there. A change's station may be one outside the network's `stations.json` (Aachen, Antwerpen), so it is only checked to be a code.
+
+The schemas hold no data, so `data-schema.ts` may be imported anywhere, the browser included.
+
+## Networks
+
+`src/lib/data/networks.ts` lists the networks: `networkIdSchema` (a zod enum, now `nl` only) and `networks`, which gives each its folder in `data/`. Adding a network adds its id to the enum and its entry to `networks`; TypeScript refuses the one without the other.
+
+## The loader
+
+`gameData` (`src/lib/data/trackdown-data.ts`) is what server code reads:
+
+```ts
+const stations = await gameData.stations("nl");
+const puzzles = await gameData.puzzles("nl");
+const meta = await gameData.meta("nl");
+const trips = await gameData.tripsTo("nl", puzzle.station);
+```
+
+- **Server-only.** `trackdown-data.ts`, `game-data.ts`, `read-data-dir.ts` and `check-data.ts` import `@tanstack/react-start/server-only`, so importing any of them from code that reaches the browser fails the build ("Import denied in client environment"). Call them from a server function's handler ([data-loading.md](data-loading.md#the-pieces)).
+- **Where it reads.** `gameData` reads through Nitro's `assets:trackdown-data` storage, the data directory `vite.config.ts` mounts from `TRACKDOWN_DATA_DIR` ([deploy.md](deploy.md#the-game-data)). In development that is the folder on disk; in a build each file is a lazy import inside the server function. Without `TRACKDOWN_DATA_DIR` every read fails with "is missing from the data directory".
+- **Lazy, then cached.** Nothing is read when the server starts. Each file is read and checked on its first use and kept in memory for as long as the process lives: on Vercel, a warm function instance. `tripsTo` reads only `to/<code>.json` for the station asked for, so a puzzle costs one trips file (about 25 KB) on top of `stations.json`. Concurrent first calls share one read. A read that fails is not cached and is tried again on the next call.
+- **Errors.** A missing file or one that does not match its schema throws a `GameDataError` that names the file and, for a schema error, every issue zod found. `tripsTo` with a code that is not in `stations.json` throws one before any file is read, so a code from a request never becomes a path of its own.
+
+`createGameData(read)` (`src/lib/data/game-data.ts`) builds a loader over any `DataReader`, a function from a path inside the data directory (`nl/to/ut.json`) to its parsed JSON, or `null` when the file is missing. `gameData` is the one over Nitro's storage; `readDataDir(dir)` (`read-data-dir.ts`) reads a folder on disk, for the tests and `data:check`.
+
+## The fixture
+
+`fixtures/trackdown-data/nl/` is a made-up network of five stations (Alfastad Centraal, Bravodorp, Charlieveen, Deltahaven, Echoburg) in the real files' format, with a trips file for every station. It holds no real data, so it is committed. The unit tests (`src/lib/data/*.test.ts`) run on it only, never on the real data, so CI needs no access to trackdown-data. A test that needs a broken file builds it in the test, over a `DataReader` of its own.
+
+Pointing `TRACKDOWN_DATA_DIR` at `fixtures/trackdown-data` builds or runs the site with the fixture.
+
+## Checking the data
+
+`bun run data:check [dir]` reads every file of every network in `dir` (default `TRACKDOWN_DATA_DIR`, which Bun reads from `.env.local`) through the same loader, and also checks what the schemas cannot see on their own: every puzzle's station is a station, `meta.json` counts the stations `stations.json` has, and every trips file has a trip from every other station. It prints what is wrong and exits with 1, or prints the counts:
+
+```text
+nl: 395 stations, 1095 puzzles, all valid
+```
+
+The deploy workflow runs it on its trackdown-data checkout before it builds, so data that does not match never reaches a deploy ([deploy.md](deploy.md#the-deploy-workflow)). A unit test runs the same checks on the fixture.

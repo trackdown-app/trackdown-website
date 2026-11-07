@@ -16,6 +16,7 @@ See the table in the [README](../README.md#scripts).
 - `bun run lint` runs ESLint with the flat config in `eslint.config.mts`, Prettier included as a rule.
 - `bun run test` runs Vitest once.
 - `typecheck`, `lint` and `test` each run `bun run paraglide:compile` first, which compiles the messages into `src/paraglide/` (skipped when nothing changed). See [i18n.md](i18n.md#compiling).
+- `bun run data:check [dir]` reads every file of a trackdown-data `data/` folder through the loader and lists what does not match ([data.md](data.md#checking-the-data)).
 - `bun run format` writes Prettier's formatting; `bun run check` only reports files that differ.
 
 ## Unit tests
@@ -66,4 +67,5 @@ The design is taller than any style's defaults: its main buttons, input and list
 - Strict TypeScript (`tsconfig.json`) with the `@/*` alias for `src/*`.
 - ESLint and Prettier (`eslint.config.mts`, `.prettierrc`), Vitest (`vitest.config.ts`).
 - Data loading through server functions and TanStack Query. See [data-loading.md](data-loading.md).
+- The game data read by a server-only loader with zod schemas (`src/lib/data/`). See [data.md](data.md).
 - Paraglide JS for Dutch (base, at `/`) and English (under `/en`). See [i18n.md](i18n.md).

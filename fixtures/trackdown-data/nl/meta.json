@@ -1,0 +1,11 @@
+{
+    "source": "Fixture data for tests, made up by hand",
+    "feed": "fixture",
+    "serviceDates": ["20261203"],
+    "departureWindow": [540, 600],
+    "minChangeMinutes": 3,
+    "changePenaltyMinutes": 5,
+    "stations": 5,
+    "mysteryStations": 5,
+    "builtAt": "2026-11-07T12:00:00.000Z"
+}
