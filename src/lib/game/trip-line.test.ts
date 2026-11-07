@@ -38,7 +38,7 @@ describe("tripLineLayout", () => {
         expect(tripLineLayout(trip(ride(240)), format).widthPercent).toBe(100);
     });
 
-    it("labels a ride with its train and time when both fit", () => {
+    it("places each ride by its minutes, the wait at a change in the ride before", () => {
         const layout = tripLineLayout(
             trip(ride(72), change("asd", 9), ride(36)),
             format,
@@ -50,24 +50,54 @@ describe("tripLineLayout", () => {
                 train: "IC",
                 minutes: 72,
                 line: 1,
+                startPercent: 78,
+                endPercent: 24,
+                insetStartPx: 11,
+                insetEndPx: 15,
                 label: "IC 1h 12m",
-                last: false,
             },
-            { kind: "change", known: true },
+            { kind: "change", known: true, atPercent: 24 },
             {
                 kind: "ride",
                 train: "IC",
                 minutes: 36,
                 line: 2,
+                startPercent: 24,
+                endPercent: 0,
+                insetStartPx: 15,
+                insetEndPx: 13,
                 label: "IC 36m",
-                last: true,
             },
+        ]);
+    });
+
+    it("draws the same minutes the same width, with a change before them or not", () => {
+        const direct = tripLineLayout(trip(ride(29)), format).parts.at(-1);
+        const changed = tripLineLayout(
+            trip(ride(14), change("ut", 4), ride(29)),
+            format,
+        ).parts.at(-1);
+
+        for (const part of [direct, changed]) {
+            expect(part?.kind === "ride" && part.startPercent).toBeCloseTo(
+                (29 / 150) * 100,
+            );
+            expect(part).toMatchObject({ endPercent: 0 });
+        }
+    });
+
+    it("sizes the labels for the track it is drawn on", () => {
+        expect(tripLineLayout(trip(ride(29)), format).parts).toMatchObject([
+            { label: "29m" },
+        ]);
+        expect(tripLineLayout(trip(ride(29)), format, 900).parts).toMatchObject([
+            { label: "IC 29m" },
         ]);
     });
 
     it("drops the train, then the time, as the ride gets short", () => {
         const [timeOnly] = tripLineLayout(trip(ride(30)), format).parts;
-        expect(timeOnly).toMatchObject({ label: "30m", last: true });
+        expect(timeOnly).toMatchObject({ label: "30m", endPercent: 0 });
 
         const parts = tripLineLayout(
             trip(ride(122), change(null, 6), ride(17)),
@@ -87,7 +117,7 @@ describe("tripLineLayout", () => {
             format,
         ).parts;
 
-        expect(parts[1]).toEqual({ kind: "change", known: false });
+        expect(parts[1]).toMatchObject({ kind: "change", known: false });
     });
 
     it("colours the rides in order of the changes, the fourth back in line 1", () => {

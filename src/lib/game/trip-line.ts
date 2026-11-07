@@ -2,8 +2,9 @@ import type { TrainType } from "@/lib/data/data-schema";
 import type { GuessOutput } from "@/lib/game/schemas";
 
 // How a guess's trip is drawn as a line (docs/guess-list.md#the-trip-line):
-// its width, the colour of each ride and which label fits inside it. Holds no
-// data and no messages, so it runs in the browser and tests without a locale.
+// where each ride, change and the guess dot sit on the track, the colour of
+// each ride and which label fits inside it. Holds no data and no messages, so
+// it runs in the browser and tests without a locale.
 
 /**
  * One guess as the list shows it: the `guess` operation's answer, or a
@@ -24,38 +25,54 @@ export const gridMinutes = 30;
 const minWidthPercent = 14;
 
 /**
- * Labels are sized for the narrowest track, at phone width, so they never
- * spill out of their ride at any width.
+ * The narrowest track, at phone width: what the labels are sized for until
+ * the page has measured the real one.
  */
-const narrowTrackPx = 340;
-/** The guess dot, less the 4px a ride runs under it. */
-const dotPx = 18;
-/** A change ring, less the 3px each side a ride runs under it. */
-const changePx = 24;
-/** The last ride runs this far under the mystery bar. */
-const underBarPx = 13;
+export const narrowTrackPx = 340;
+/** Half the guess dot, which covers the start of the first ride. */
+const dotHalfPx = 11;
+/** Half a change ring, which covers the end of one ride and the start of the next. */
+const ringHalfPx = 15;
+/** Half the mystery bar, which covers the end of the last ride. */
+const barHalfPx = 13;
 /** A label's width: Barlow bold at 13px, about 7.2px a character, plus padding. */
 const labelCharPx = 7.2;
 const labelPaddingPx = 10;
 
-/** One ride of the line: its train, minutes, colour and label. */
+/**
+ * One ride of the line. Its place is in percent of the track, counted from
+ * the right, where the mystery bar is: it runs from `startPercent` (further
+ * from the bar) to `endPercent`.
+ */
 export type TripLineRide = {
     kind: "ride";
     train: TrainType;
     minutes: number;
     /** Which line colour: 1 for the first train, 2 after one change, … */
     line: 1 | 2 | 3;
+    startPercent: number;
+    endPercent: number;
+    /** How far the dot or ring at its start covers it, in px. */
+    insetStartPx: number;
+    /** How far the ring or mystery bar at its end covers it, in px. */
+    insetEndPx: number;
     /** What fits inside: train and time, the time alone, or nothing. */
     label: string | null;
-    /** The last ride, which runs under the mystery bar. */
-    last: boolean;
 };
 
-/** One change of the line: a ring, empty when its station is known. */
-export type TripLineChange = { kind: "change"; known: boolean };
+/**
+ * One change of the line: a ring where the next ride starts, empty when its
+ * station is known.
+ */
+export type TripLineChange = {
+    kind: "change";
+    known: boolean;
+    /** The ring's centre, in percent of the track from the right. */
+    atPercent: number;
+};
 
 export type TripLineLayout = {
-    /** The line's width, as a share of the track, from the mystery bar. */
+    /** The line's width, and the guess dot's centre, in percent of the track from the right. */
     widthPercent: number;
     parts: (TripLineRide | TripLineChange)[];
 };
@@ -67,56 +84,85 @@ function labelPx(text: string): number {
 }
 
 /**
- * How `guess`'s trip is drawn: the line's width by its total time, each ride
- * as wide as its share of the ride time, and the longest label that fits each
- * ride at phone width. `formatMinutes` writes a time the way the label shows
- * it, such as `2h 02m`.
+ * How `guess`'s trip is drawn on a track `trackPx` wide. Every minute takes
+ * the same width, 150 minutes the whole track, so a ride is as wide as it is
+ * long on every row, and the grid behind it reads true. The guess dot sits
+ * at the trip's total time; each change ring sits where the next ride
+ * starts, the change's own minutes drawn in the colour of the ride before
+ * it. Only a trip shorter than 21 minutes (stretched to 14%, so it shows)
+ * or longer than 2h 30 (squeezed into the track) leaves that scale.
+ * `formatMinutes` writes a time the way the label shows it, such as
+ * `2h 02m`.
  */
 export function tripLineLayout(
     guess: Pick<ListedGuess, "steps" | "totalMinutes">,
     formatMinutes: (minutes: number) => string,
+    trackPx: number = narrowTrackPx,
 ): TripLineLayout {
     const widthPercent = Math.max(
         minWidthPercent,
         Math.min(100, (guess.totalMinutes / trackMinutes) * 100),
     );
-    const rideMinutes = guess.steps.reduce(
-        (total, step) => total + (step.kind === "ride" ? step.minutes : 0),
-        0,
-    );
-    const changes = guess.steps.filter((step) => step.kind === "change");
-    const ridesPx =
-        (widthPercent / 100) * narrowTrackPx - dotPx - changes.length * changePx;
-    const lastRide = guess.steps.reduce(
-        (last, step, index) => (step.kind === "ride" ? index : last),
-        -1,
-    );
+    function percentOf(minutes: number): number {
+        return guess.totalMinutes > 0
+            ? (minutes / guess.totalMinutes) * widthPercent
+            : 0;
+    }
 
+    // Minutes still to go to the mystery station, from the guess.
+    let remaining = guess.totalMinutes;
     let rideIndex = 0;
-    const parts = guess.steps.map((step, index): TripLineRide | TripLineChange => {
+    const parts: (TripLineRide | TripLineChange)[] = [];
+    for (const step of guess.steps) {
+        const startPercent = percentOf(remaining);
+        remaining -= step.minutes;
+        const endPercent = percentOf(remaining);
+        const previous = parts.at(-1);
+
         if (step.kind === "change") {
-            return { kind: "change", known: step.station != null };
+            // The wait at the change runs on in the ride before it.
+            if (previous?.kind === "ride") {
+                previous.endPercent = endPercent;
+                previous.insetEndPx = ringHalfPx;
+            }
+            parts.push({
+                kind: "change",
+                known: step.station != null,
+                atPercent: endPercent,
+            });
+            continue;
         }
-        const line = lines[rideIndex % lines.length] ?? 1;
-        rideIndex += 1;
-        const last = index === lastRide;
-        const roomPx =
-            rideMinutes > 0
-                ? (ridesPx * step.minutes) / rideMinutes - (last ? underBarPx : 0)
-                : 0;
-        const time = formatMinutes(step.minutes);
-        const full = `${step.train} ${time}`;
-        const label =
-            labelPx(full) <= roomPx ? full : labelPx(time) <= roomPx ? time : null;
-        return {
+
+        parts.push({
             kind: "ride",
             train: step.train,
             minutes: step.minutes,
-            line,
-            label,
-            last,
-        };
-    });
+            line: lines[rideIndex % lines.length] ?? 1,
+            startPercent,
+            endPercent,
+            insetStartPx: previous == null ? dotHalfPx : ringHalfPx,
+            insetEndPx: barHalfPx,
+            label: null,
+        });
+        rideIndex += 1;
+    }
+
+    for (const part of parts) {
+        if (part.kind === "ride") {
+            const roomPx =
+                ((part.startPercent - part.endPercent) / 100) * trackPx -
+                part.insetStartPx -
+                part.insetEndPx;
+            const time = formatMinutes(part.minutes);
+            const full = `${part.train} ${time}`;
+            part.label =
+                labelPx(full) <= roomPx
+                    ? full
+                    : labelPx(time) <= roomPx
+                      ? time
+                      : null;
+        }
+    }
 
     return { widthPercent, parts };
 }
