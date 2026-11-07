@@ -112,7 +112,10 @@ export function StationSearch({
                 <div
                     ref={boxRef}
                     data-slot="combobox-box"
-                    className="flex items-center gap-2.5 rounded-xl border-2 border-input bg-surface py-1.5 pr-1.5 pl-4.5 has-[input:focus-visible]:outline-3 has-[input:focus-visible]:outline-offset-3 has-[input:focus-visible]:outline-ring has-[input:focus-visible]:outline-solid"
+                    // The site's focus ring goes round the whole box, for the
+                    // input and the Guess button alike: the button sits flush
+                    // in the box, so its own ring would cut across the border.
+                    className="flex items-center gap-2.5 rounded-xl border-2 border-input bg-surface py-1.5 pr-1.5 pl-4.5 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-3 has-[:focus-visible]:outline-ring has-[:focus-visible]:outline-solid"
                 >
                     <SearchIcon
                         aria-hidden="true"
@@ -130,7 +133,13 @@ export function StationSearch({
                         })}
                         className="h-12 flex-1 text-xl font-medium"
                     />
-                    <Button type="submit" size="lg">
+                    <Button
+                        type="submit"
+                        size="lg"
+                        // Inside the box's ring, which way focus is: a ring in
+                        // the button's own text colour, inset.
+                        className="focus-visible:outline-primary-foreground focus-visible:outline-offset-[-6px]"
+                    >
                         {m["stationSearch.submit"]()}
                     </Button>
                 </div>
