@@ -14,6 +14,7 @@
     "typecheck": "bun run paraglide:compile && node_modules/typescript-7/bin/tsc --noEmit",
     "paraglide:compile": "bun run scripts/compile-paraglide.ts",
     "data:check": "bun run scripts/check-data.ts",
+    "build:guard": "bun run scripts/check-build-output.ts",
     "postinstall": "bun run paraglide:compile --force"
   },
   "dependencies": {

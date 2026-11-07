@@ -17,6 +17,7 @@ See the table in the [README](../README.md#scripts).
 - `bun run test` runs Vitest once.
 - `typecheck`, `lint` and `test` each run `bun run paraglide:compile` first, which compiles the messages into `src/paraglide/` (skipped when nothing changed). See [i18n.md](i18n.md#compiling).
 - `bun run data:check [dir]` reads every file of a trackdown-data `data/` folder through the loader and lists what does not match ([data.md](data.md#checking-the-data)).
+- `bun run build:guard [dir]` runs after a build and fails when a file, puzzle, station or trip of a trackdown-data `data/` folder shows up in the static output ([data.md](data.md#the-build-guard)).
 - `bun run format` writes Prettier's formatting; `bun run check` only reports files that differ.
 
 ## Unit tests
@@ -40,6 +41,7 @@ bun run build
 
 - Install runs `bun install --frozen-lockfile` and caches `node_modules`, keyed on `bun.lock`. The other four jobs restore that cache and fail if it is missing; they install only the Bun binary, at the version in `.bun-version`.
 - Every action is pinned to a commit SHA, with its release in a trailing comment.
+- Build builds with the fixture as the game data (`TRACKDOWN_DATA_DIR=fixtures/trackdown-data`), then runs `bun run build:guard` on it, so a change that would put data in the static output fails the check ([data.md](data.md#the-build-guard)).
 - The jobs read only this repository. The build needs no private data, so CI holds no token or secret for another repository. Deploys, which do bring in the data, are a separate workflow ([deploy.md](deploy.md#the-deploy-workflow)).
 
 `.github/dependabot.yml` proposes weekly updates for the packages (the `bun` ecosystem, which updates `bun.lock`, with a three-day cooldown like `bunfig.toml`) and for the pinned actions.

@@ -24,6 +24,7 @@ The site runs on http://localhost:3000.
 | `bun run test` | Compiles messages, then runs Vitest |
 | `bun run paraglide:compile` | Compiles `messages/` into `src/paraglide/` (also on `postinstall`) |
 | `bun run data:check [dir]` | Checks a trackdown-data `data/` folder (default `TRACKDOWN_DATA_DIR`) against the loader's schemas |
+| `bun run build:guard [dir]` | After a build, fails when anything from a trackdown-data `data/` folder (default `TRACKDOWN_DATA_DIR`) is in the static output |
 | `bun run format` / `check` | Formats / checks formatting with Prettier |
 
 ## Documentation

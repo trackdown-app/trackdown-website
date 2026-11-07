@@ -86,6 +86,12 @@ jobs:
         # `VERCEL_PROD_FLAG` is empty or `--prod`, so it stays unquoted.
         run: bunx vercel build $VERCEL_PROD_FLAG --token="$VERCEL_TOKEN"
 
+      # Fails the deploy before anything is uploaded when a data file, a
+      # puzzle or a trip shows up in `.vercel/output/static`
+      # (docs/data.md#the-build-guard).
+      - name: Guard the static output
+        run: bun run build:guard "$GITHUB_WORKSPACE/.trackdown-data/data"
+
       # Uploads `.vercel/output/` only; the checkouts stay on the runner.
       - name: Deploy
         id: deploy

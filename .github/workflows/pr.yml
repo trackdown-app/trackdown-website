@@ -115,4 +115,10 @@ jobs:
           path: ${{ env.CACHE_PATH }}
           key: ${{ needs.install.outputs.cache-key }}
           fail-on-cache-miss: true
+      # Builds with the committed fixture as the game data, then fails when
+      # any of it reaches the static output (docs/data.md#the-build-guard).
       - run: bun run build
+        env:
+          TRACKDOWN_DATA_DIR: fixtures/trackdown-data
+      - name: Guard the static output
+        run: bun run build:guard fixtures/trackdown-data
