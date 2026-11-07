@@ -1,0 +1,89 @@
+name: Deploy
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+# Every action is pinned to a commit SHA, with its release in a trailing
+# comment, so a moved tag cannot change what runs. Dependabot
+# (.github/dependabot.yml) proposes updates.
+permissions:
+  contents: read
+
+# A newer push to a pull request replaces its running preview deploy.
+# Production deploys queue and never cancel one another mid-upload.
+concurrency:
+  group: deploy-${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || 'production' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  deploy:
+    name: Deploy
+    # `pull_request` (never `pull_request_target`) gives a fork's pull request
+    # no secrets, and neither has Dependabot's. Their runs skip this job
+    # instead of failing; their code never runs next to a secret.
+    if: >-
+      github.event_name == 'push' ||
+      (github.event.pull_request.head.repo.full_name == github.repository &&
+      github.actor != 'dependabot[bot]')
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.event_name == 'push' && 'Production' || 'Preview' }}
+      url: ${{ steps.deploy.outputs.url }}
+    env:
+      VERCEL_ENVIRONMENT: ${{ github.event_name == 'push' && 'production' || 'preview' }}
+      VERCEL_PROD_FLAG: ${{ github.event_name == 'push' && '--prod' || '' }}
+      VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # The private data, at the tip of its `main`, into a Git-ignored folder
+      # outside `public/`. The token is read-only for that one repository and
+      # only this step sees it; `persist-credentials: false` keeps it out of
+      # `.trackdown-data/.git/config`. Only `data/` is checked out.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: trackdown-app/trackdown-data
+          ref: main
+          token: ${{ secrets.TRACKDOWN_DATA_TOKEN }}
+          path: .trackdown-data
+          sparse-checkout: data
+          persist-credentials: false
+
+      # Pins the deploy to the commit just checked out. The build writes it
+      # in for `/api/v1/meta` (docs/deploy.md#the-game-data).
+      - id: data
+        run: echo "ref=$(git -C .trackdown-data rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version-file: .bun-version
+      - run: bun install --frozen-lockfile
+
+      # The Vercel CLI is the `vercel` dev dependency in `package.json`.
+      - name: Pull the Vercel environment
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: bunx vercel pull --yes --environment="$VERCEL_ENVIRONMENT" --token="$VERCEL_TOKEN"
+
+      - name: Build
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          TRACKDOWN_DATA_DIR: ${{ github.workspace }}/.trackdown-data/data
+          TRACKDOWN_DATA_REF: ${{ steps.data.outputs.ref }}
+        # `VERCEL_PROD_FLAG` is empty or `--prod`, so it stays unquoted.
+        run: bunx vercel build $VERCEL_PROD_FLAG --token="$VERCEL_TOKEN"
+
+      # Uploads `.vercel/output/` only; the checkouts stay on the runner.
+      - name: Deploy
+        id: deploy
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          url=$(bunx vercel deploy --prebuilt $VERCEL_PROD_FLAG --token="$VERCEL_TOKEN")
+          echo "url=$url" >> "$GITHUB_OUTPUT"
+          echo "Deployed $url with trackdown-data ${{ steps.data.outputs.ref }}" >> "$GITHUB_STEP_SUMMARY"

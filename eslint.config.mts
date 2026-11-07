@@ -32,6 +32,8 @@ export default defineConfig([
             // Nitro server build output (see vite.config.ts)
             ".output/**",
             ".nitro/**",
+            // The deploy workflow's trackdown-data checkout (docs/deploy.md)
+            ".trackdown-data/**",
             // Paraglide JS compiler output (see paraglide.config.ts)
             "src/paraglide/**",
             // TanStack Router generated route tree (owned by the tanstackStart()

@@ -22,6 +22,9 @@ dist/
 # Vercel build output and the local project link (`vercel link`)
 .vercel/
 
+# The private trackdown-data checkout of the deploy workflow (docs/deploy.md)
+.trackdown-data/
+
 # TypeScript cache
 *.tsbuildinfo
 
