@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiV1SplatRouteImport } from './routes/api/v1/$'
 import { Route as ApiV1MetaRouteImport } from './routes/api/v1/meta'
+import { Route as ApiV1NetworkStationsRouteImport } from './routes/api/v1/$network/stations'
 import { Route as ApiV1NetworkPuzzlesTodayRouteImport } from './routes/api/v1/$network/puzzles/today'
 
 const IndexRoute = IndexRouteImport.update({
@@ -29,6 +30,11 @@ const ApiV1MetaRoute = ApiV1MetaRouteImport.update({
   path: '/api/v1/meta',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiV1NetworkStationsRoute = ApiV1NetworkStationsRouteImport.update({
+  id: '/api/v1/$network/stations',
+  path: '/api/v1/$network/stations',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiV1NetworkPuzzlesTodayRoute =
   ApiV1NetworkPuzzlesTodayRouteImport.update({
     id: '/api/v1/$network/puzzles/today',
@@ -40,12 +46,14 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/api/v1/$': typeof ApiV1SplatRoute
   '/api/v1/meta': typeof ApiV1MetaRoute
+  '/api/v1/$network/stations': typeof ApiV1NetworkStationsRoute
   '/api/v1/$network/puzzles/today': typeof ApiV1NetworkPuzzlesTodayRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/api/v1/$': typeof ApiV1SplatRoute
   '/api/v1/meta': typeof ApiV1MetaRoute
+  '/api/v1/$network/stations': typeof ApiV1NetworkStationsRoute
   '/api/v1/$network/puzzles/today': typeof ApiV1NetworkPuzzlesTodayRoute
 }
 export interface FileRoutesById {
@@ -53,19 +61,30 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/api/v1/$': typeof ApiV1SplatRoute
   '/api/v1/meta': typeof ApiV1MetaRoute
+  '/api/v1/$network/stations': typeof ApiV1NetworkStationsRoute
   '/api/v1/$network/puzzles/today': typeof ApiV1NetworkPuzzlesTodayRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/api/v1/$' | '/api/v1/meta' | '/api/v1/$network/puzzles/today'
+    | '/'
+    | '/api/v1/$'
+    | '/api/v1/meta'
+    | '/api/v1/$network/stations'
+    | '/api/v1/$network/puzzles/today'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/api/v1/$' | '/api/v1/meta' | '/api/v1/$network/puzzles/today'
+  to:
+    | '/'
+    | '/api/v1/$'
+    | '/api/v1/meta'
+    | '/api/v1/$network/stations'
+    | '/api/v1/$network/puzzles/today'
   id:
     | '__root__'
     | '/'
     | '/api/v1/$'
     | '/api/v1/meta'
+    | '/api/v1/$network/stations'
     | '/api/v1/$network/puzzles/today'
   fileRoutesById: FileRoutesById
 }
@@ -73,6 +92,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ApiV1SplatRoute: typeof ApiV1SplatRoute
   ApiV1MetaRoute: typeof ApiV1MetaRoute
+  ApiV1NetworkStationsRoute: typeof ApiV1NetworkStationsRoute
   ApiV1NetworkPuzzlesTodayRoute: typeof ApiV1NetworkPuzzlesTodayRoute
 }
 
@@ -99,6 +119,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiV1MetaRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/v1/$network/stations': {
+      id: '/api/v1/$network/stations'
+      path: '/api/v1/$network/stations'
+      fullPath: '/api/v1/$network/stations'
+      preLoaderRoute: typeof ApiV1NetworkStationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/v1/$network/puzzles/today': {
       id: '/api/v1/$network/puzzles/today'
       path: '/api/v1/$network/puzzles/today'
@@ -113,6 +140,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ApiV1SplatRoute: ApiV1SplatRoute,
   ApiV1MetaRoute: ApiV1MetaRoute,
+  ApiV1NetworkStationsRoute: ApiV1NetworkStationsRoute,
   ApiV1NetworkPuzzlesTodayRoute: ApiV1NetworkPuzzlesTodayRoute,
 }
 export const routeTree = rootRouteImport

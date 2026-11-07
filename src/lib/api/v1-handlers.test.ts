@@ -4,10 +4,15 @@ import { apiErrorBodySchema } from "@/lib/api/api-error";
 import type { RestHandler } from "@/lib/api/rest";
 import {
     metaHandlers,
+    stationsHandlers,
     todayPuzzleHandlers,
     unknownOperationHandlers,
 } from "@/lib/api/v1-handlers";
-import { metaOutputSchema, todayPuzzleOutputSchema } from "@/lib/game/schemas";
+import {
+    metaOutputSchema,
+    stationsOutputSchema,
+    todayPuzzleOutputSchema,
+} from "@/lib/game/schemas";
 import { serviceContext } from "@/lib/game/service-context";
 
 // The REST routes over the fixture, never the real data: the services get
@@ -156,6 +161,76 @@ describe("GET /api/v1/{network}/puzzles/today", () => {
 
     it("answers 405 method_not_allowed for another method", async () => {
         const response = await call(todayPuzzleHandlers.ANY, path, "POST", {
+            network: "nl",
+        });
+
+        expect(response.status).toBe(405);
+        expect(response.headers.get("Allow")).toBe("GET");
+    });
+});
+
+describe("GET /api/v1/{network}/stations", () => {
+    const path = "/api/v1/nl/stations";
+
+    it("answers 200 with every guessable station, kept by the CDN", async () => {
+        const response = await call(stationsHandlers.GET, path, "GET", {
+            network: "nl",
+        });
+
+        expect(response.status).toBe(200);
+        expect(response.headers.get("Cache-Control")).toBe("public, max-age=86400");
+        expect(response.headers.get("Vercel-CDN-Cache-Control")).toBe(
+            "public, max-age=31536000",
+        );
+        const body = stationsOutputSchema.parse(await response.json());
+        expect(body.locale).toBe("nl");
+        expect(body.stations).toHaveLength(5);
+    });
+
+    it("reads the locale from the query string", async () => {
+        const response = await call(
+            stationsHandlers.GET,
+            `${path}?locale=en`,
+            "GET",
+            { network: "nl" },
+        );
+
+        expect(response.status).toBe(200);
+        expect(stationsOutputSchema.parse(await response.json()).locale).toBe("en");
+    });
+
+    it("answers 400 invalid_input, never kept, for a locale the site does not have", async () => {
+        const response = await call(
+            stationsHandlers.GET,
+            `${path}?locale=de`,
+            "GET",
+            { network: "nl" },
+        );
+
+        expect(response.status).toBe(400);
+        expect(response.headers.get("Cache-Control")).toBe("no-store");
+        expect(response.headers.get("Vercel-CDN-Cache-Control")).toBeNull();
+        const body = apiErrorBodySchema.parse(await response.json());
+        expect(body.error.code).toBe("invalid_input");
+        expect(body.error.message).toContain("locale");
+    });
+
+    it("answers 500 internal_error, never kept, when the data fails", async () => {
+        vi.spyOn(console, "error").mockImplementation(() => {});
+        vi.spyOn(serviceContext.data, "stations").mockRejectedValue(
+            new Error("nl/stations.json is missing from the data directory"),
+        );
+
+        const response = await call(stationsHandlers.GET, path, "GET", {
+            network: "nl",
+        });
+
+        expect(response.status).toBe(500);
+        expect(response.headers.get("Cache-Control")).toBe("no-store");
+    });
+
+    it("answers 405 method_not_allowed for another method", async () => {
+        const response = await call(stationsHandlers.ANY, path, "POST", {
             network: "nl",
         });
 
