@@ -70,4 +70,5 @@ The design is taller than any style's defaults: its main buttons, input and list
 - ESLint and Prettier (`eslint.config.mts`, `.prettierrc`), Vitest (`vitest.config.ts`).
 - Data loading through server functions and TanStack Query. See [data-loading.md](data-loading.md).
 - The game data read by a server-only loader with zod schemas (`src/lib/data/`). See [data.md](data.md).
+- TanStack Pacer for the API's rate limit per IP (`src/lib/api/rate-limit.ts`). See [api.md](api.md#abuse-protection).
 - Paraglide JS for Dutch (base, at `/`) and English (under `/en`). See [i18n.md](i18n.md).

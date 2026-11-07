@@ -1,7 +1,13 @@
 // Marks this module server-only: its handlers read the game data.
 import "@tanstack/react-start/server-only";
 import { ApiError } from "@/lib/api/api-error";
-import { errorResponse, restGet, restHandlers, restPost } from "@/lib/api/rest";
+import {
+    errorResponse,
+    rateLimited,
+    restGet,
+    restHandlers,
+    restPost,
+} from "@/lib/api/rest";
 import type { RestHandler } from "@/lib/api/rest";
 import { submitGuess } from "@/lib/game/guess";
 import { getMeta } from "@/lib/game/meta";
@@ -30,11 +36,18 @@ export const metaHandlers = restHandlers({
 
 /**
  * `/api/v1/{network}/puzzles/today`: the `todayPuzzle` operation for iOS;
- * `getTodayPuzzleFn` is the same for the web.
+ * `getTodayPuzzleFn` is the same for the web. It holds until the next puzzle
+ * starts, so the CDN keeps it until then (docs/api.md#caching).
  */
 export const todayPuzzleHandlers = restHandlers({
-    GET: restGet(todayPuzzleInputSchema, (input) =>
-        getTodayPuzzle(input, serviceContext),
+    GET: restGet(
+        todayPuzzleInputSchema,
+        (input) => getTodayPuzzle(input, serviceContext),
+        (output) => ({
+            maxAge:
+                (Date.parse(output.nextPuzzleAt) - serviceContext.now().getTime()) /
+                1000,
+        }),
     ),
 });
 
@@ -54,7 +67,9 @@ export const puzzleArchiveHandlers = restHandlers({
  * `submitGuessFn` is the same for the web.
  */
 export const guessHandlers = restHandlers({
-    POST: restPost(guessInputSchema, (input) => submitGuess(input, serviceContext)),
+    POST: rateLimited(
+        restPost(guessInputSchema, (input) => submitGuess(input, serviceContext)),
+    ),
 });
 
 /**
@@ -62,8 +77,8 @@ export const guessHandlers = restHandlers({
  * `revealAnswerFn` is the same for the web.
  */
 export const revealHandlers = restHandlers({
-    POST: restPost(revealInputSchema, (input) =>
-        revealAnswer(input, serviceContext),
+    POST: rateLimited(
+        restPost(revealInputSchema, (input) => revealAnswer(input, serviceContext)),
     ),
 });
 
