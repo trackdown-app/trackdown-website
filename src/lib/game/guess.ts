@@ -16,7 +16,9 @@ import type { ServiceContext } from "@/lib/game/service-context";
  * before hidden. The `guess` operation's one service: the server function and
  * `POST /api/v1/{network}/puzzles/{n}/guesses` both answer with what it
  * returns. It never answers the mystery station, and a correct guess carries
- * no trip.
+ * no trip. It also answers the earlier guesses' trips again, their changes
+ * named by every guess so far, so a change the player has just guessed
+ * shows on the trips before it too.
  */
 export async function submitGuess(
     input: GuessInput,
@@ -30,10 +32,30 @@ export async function submitGuess(
         context,
     );
 
+    // The earlier trips again, every change the player has now guessed
+    // named, this guess included. `checkGuesses` made sure none of them
+    // solved the puzzle, so each has a trip.
+    const known = new Set([...input.earlierGuesses, input.guess]);
+    const earlierTrips = await Promise.all(
+        input.earlierGuesses.map(async (earlierGuess) => {
+            const trip = await tripFrom(
+                input.network,
+                puzzle,
+                earlierGuess,
+                context,
+            );
+            return {
+                guess: earlierGuess,
+                steps: trip.map((step) => redact(step, known)),
+            };
+        }),
+    );
+
     const result = {
         network: input.network,
         number: puzzle.n,
         guess: input.guess,
+        earlierTrips,
     };
     if (input.guess === puzzle.station) {
         return { ...result, correct: true, steps: [], totalMinutes: 0 };

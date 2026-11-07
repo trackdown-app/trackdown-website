@@ -44,10 +44,15 @@ function miss(code: string, minutes = 17): ListedGuess {
     };
 }
 
-function answer(input: GuessInput, correct: boolean): GuessOutput {
+function answer(
+    input: GuessInput,
+    correct: boolean,
+    earlierTrips: GuessOutput["earlierTrips"] = [],
+): GuessOutput {
     return {
         network: input.network,
         number: input.number,
+        earlierTrips,
         ...(correct
             ? { guess: input.guess, correct, steps: [], totalMinutes: 0 }
             : miss(input.guess)),
@@ -144,6 +149,45 @@ describe("GamePage", () => {
         expect(guessedNames()).toEqual(["Utrecht Centraal", "Hilversum"]);
         // Kept guesses do not play their arrival again.
         expect(document.querySelector(".guess-enter")).toBeNull();
+    });
+
+    it("names a hidden change on an earlier trip once the player guesses it", async () => {
+        // The design's case: Amsterdam changes at a hidden station, which
+        // the next guess, Utrecht Centraal, turns out to be.
+        const hidden: ListedGuess = {
+            guess: "asd",
+            correct: false,
+            steps: [
+                { kind: "ride", train: "IC", minutes: 27 },
+                { kind: "change", station: null, minutes: 4 },
+                { kind: "ride", train: "SPR", minutes: 29 },
+            ],
+            totalMinutes: 60,
+        };
+        window.localStorage.setItem(key, serializeGame([hidden]));
+        submitGuessFn.mockImplementation(({ data }) =>
+            Promise.resolve(
+                answer(data, false, [
+                    {
+                        guess: "asd",
+                        steps: [
+                            { kind: "ride", train: "IC", minutes: 27 },
+                            { kind: "change", station: "ut", minutes: 4 },
+                            { kind: "ride", train: "SPR", minutes: 29 },
+                        ],
+                    },
+                ]),
+            ),
+        );
+        const user = renderGame(createGameStore(() => window.localStorage));
+        expect(screen.getByText("1h 00m, change at a hidden station")).toBeDefined();
+
+        await guess(user, "Utrecht Centraal");
+
+        expect(
+            await screen.findByText("1h 00m, change at Utrecht Centraal"),
+        ).toBeDefined();
+        expect(window.localStorage.getItem(key)).toContain('"station":"ut"');
     });
 
     it("plays without storage, keeping nothing", async () => {

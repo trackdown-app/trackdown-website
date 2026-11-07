@@ -20,6 +20,13 @@ const extraStations = ["fox", "gol", "hot", "ind", "jul"];
 
 const data = createGameData(async (path) => {
     const value = await readFixture(path);
+    // Real data has a trip from every station, the extra ones included.
+    if (path === "nl/to/ech.json" && typeof value === "object" && value != null) {
+        return {
+            ...value,
+            ...Object.fromEntries(extraStations.map((code) => [code, [["IC", 40]]])),
+        };
+    }
     if (path !== "nl/stations.json" || !Array.isArray(value)) {
         return value;
     }
@@ -77,6 +84,7 @@ describe("submitGuess", () => {
                 { kind: "ride", train: "ICD", minutes: 30 },
             ],
             totalMinutes: 69,
+            earlierTrips: [],
         });
     });
 
@@ -131,7 +139,39 @@ describe("submitGuess", () => {
             correct: true,
             steps: [],
             totalMinutes: 0,
+            // dlt's changes at chr and alf, neither guessed.
+            earlierTrips: [
+                {
+                    guess: "dlt",
+                    steps: [
+                        { kind: "ride", train: "SPR", minutes: 12 },
+                        { kind: "change", station: null, minutes: 4 },
+                        { kind: "ride", train: "SPR", minutes: 15 },
+                        { kind: "change", station: null, minutes: 8 },
+                        { kind: "ride", train: "ICD", minutes: 30 },
+                    ],
+                },
+            ],
         });
+    });
+
+    it("answers the earlier trips again, naming a change this guess just found", async () => {
+        // dlt was answered with both changes hidden; guessing chr now names
+        // its first change. alf stays hidden.
+        const answer = await guess({ guess: "chr", earlierGuesses: ["dlt"] });
+
+        expect(answer.earlierTrips).toEqual([
+            {
+                guess: "dlt",
+                steps: [
+                    { kind: "ride", train: "SPR", minutes: 12 },
+                    { kind: "change", station: "chr", minutes: 4 },
+                    { kind: "ride", train: "SPR", minutes: 15 },
+                    { kind: "change", station: null, minutes: 8 },
+                    { kind: "ride", train: "ICD", minutes: 30 },
+                ],
+            },
+        ]);
     });
 
     it("never answers the mystery station on a wrong guess", async () => {

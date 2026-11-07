@@ -10,6 +10,7 @@ import { trainTypeSchema } from "@/lib/data/data-schema";
 import { networkIdSchema } from "@/lib/data/networks";
 import {
     archivedPuzzleSchema,
+    earlierTripSchema,
     guessableStationSchema,
     guessChangeSchema,
     guessInputSchema,
@@ -53,6 +54,7 @@ outputs.add(archivedPuzzleSchema, { id: "ArchivedPuzzle" });
 outputs.add(puzzleArchiveOutputSchema, { id: "PuzzleArchive" });
 outputs.add(guessRideSchema, { id: "Ride" });
 outputs.add(guessChangeSchema, { id: "HiddenChange" });
+outputs.add(earlierTripSchema, { id: "EarlierTrip" });
 outputs.add(guessOutputSchema, { id: "GuessResult" });
 outputs.add(revealedChangeSchema, { id: "Change" });
 outputs.add(revealedGuessSchema, { id: "RevealedGuess" });

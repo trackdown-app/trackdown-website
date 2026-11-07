@@ -52,7 +52,16 @@ export function useGame(
             if (current.some((kept) => kept.guess === answer.guess)) {
                 return;
             }
-            store.write(key, serializeGame([...current, answer]));
+            // The earlier trips again: a change this guess named shows on
+            // them too.
+            const again = new Map(
+                answer.earlierTrips.map((trip) => [trip.guess, trip.steps]),
+            );
+            const updated = current.map((kept) => {
+                const steps = again.get(kept.guess);
+                return steps == null ? kept : { ...kept, steps };
+            });
+            store.write(key, serializeGame([...updated, answer]));
         },
     });
 

@@ -34,7 +34,7 @@ Beside the dots, in 16px semibold: "Guess 5 of 6, newest first", "Found in 4 of 
 
 - **Guesses.** Each one the `guess` operation's answer (`guess`, `correct`, `steps`, `totalMinutes`), oldest first, read from the store.
 - **Status.** `gameStatus` (`src/lib/game/game-state.ts`): `won` once a guess is correct, `lost` once the puzzle's `maxGuesses` (6) guesses are made, else `playing`.
-- **A guess.** Goes through a `useMutation` that calls `submitGuessFn` with the earlier guesses, so the server can check the game and name the changes the player already guessed ([api.md](api.md#a-guess)). On success the answer is added to the kept game. A guess is ignored while one is on its way or once the game is over.
+- **A guess.** Goes through a `useMutation` that calls `submitGuessFn` with the earlier guesses, so the server can check the game and name the changes the player already guessed ([api.md](api.md#a-guess)). On success the answer is added to the kept game, and each kept guess takes its steps from the answer's `earlierTrips`, so a change hidden on an earlier trip shows its station once the player guesses it ("change at a hidden station" becomes "change at Utrecht Centraal"). A guess is ignored while one is on its way or once the game is over.
 - **Screen readers.** A polite live region reads out the answer to each guess made on the page, as the guess list's sentence for that row. Kept guesses a reload shows are not read out.
 - **Arrival.** The same answer's row plays the train ride of [guess-list.md](guess-list.md#a-new-guess); kept guesses do not move.
 
@@ -49,5 +49,5 @@ A game is kept in `localStorage` under `trackdown:game:v1:{network}:{number}`, o
 ## Tests
 
 - `src/lib/game/game-state.test.ts` covers the key, writing and reading back a game, broken entries, the status, and the store with storage and without.
-- `src/components/game/game-page.test.tsx` renders the page in `happy-dom` with `submitGuessFn` mocked: the day line, kept guesses and progress, a guess sent with the earlier ones and kept over a reload, a game without storage, winning, losing, a guess that fails, Dutch.
+- `src/components/game/game-page.test.tsx` renders the page in `happy-dom` with `submitGuessFn` mocked: the day line, kept guesses and progress, a guess sent with the earlier ones and kept over a reload, a hidden change on an earlier trip named once it is guessed, a game without storage, winning, losing, a guess that fails, Dutch.
 - `src/router.test.tsx` renders `/` through the router with the server functions mocked.
