@@ -9,6 +9,7 @@ import { SiteHeader } from "@/components/layout/site-header";
 import { SkipLink, contentId } from "@/components/layout/skip-link";
 import { themeInitScript } from "@/lib/theme";
 import { CookieBanner } from "@/components/consent/cookie-banner";
+import { BrowserAnalytics } from "@/components/consent/browser-analytics";
 
 /**
  * The document around every page, the root route's `shellComponent`: the
@@ -34,6 +35,7 @@ export function RootDocument({ children }: { children: ReactNode }) {
                 </div>
                 <SiteFooter />
                 <CookieBanner consent={data?.consent ?? null} />
+                <BrowserAnalytics consent={data?.consent ?? null} />
                 {/* The Vite devtools plugin strips this from production builds. */}
                 <TanStackDevtools
                     config={{ position: "bottom-right" }}
