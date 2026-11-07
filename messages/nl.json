@@ -60,6 +60,18 @@
         "spokenChangeAt": "overstap in {station}, {duration}",
         "spokenChangeHidden": "overstap op een verborgen station, {duration}"
     },
+    "share": {
+        "header": "Trackdown {network} {number}, {score}/{total}",
+        "won": "Gevonden in {count}",
+        "lost": "Niet gevonden",
+        "url": "https://trackdown.nl",
+        "minutes": "{minutes}m",
+        "hoursMinutes": "{hours}u{minutes}",
+        "copied": "Gekopieerd. Plak het waar je maar wilt.",
+        "failed": "Kopiëren lukte niet. Selecteer de tekst onder „Wat je deelt” en kopieer hem zelf.",
+        "previewTitle": "Wat je deelt",
+        "previewNote": "Je lijnen in de volgorde waarin je gokte, zonder stationsnamen. Vrienden zien hoe je dichterbij kwam, niet het antwoord."
+    },
     "legend": {
         "label": "Legenda",
         "guess": "Jouw gok",

@@ -60,6 +60,18 @@
         "spokenChangeAt": "change at {station}, {duration}",
         "spokenChangeHidden": "change at a hidden station, {duration}"
     },
+    "share": {
+        "header": "Trackdown {network} {number}, {score}/{total}",
+        "won": "Tracked down in {count}",
+        "lost": "Not tracked down",
+        "url": "https://trackdown.nl/en",
+        "minutes": "{minutes}m",
+        "hoursMinutes": "{hours}h{minutes}",
+        "copied": "Copied. Paste it wherever you like.",
+        "failed": "Couldn't copy. Select the text under “What you'll share” and copy it yourself.",
+        "previewTitle": "What you'll share",
+        "previewNote": "Your lines in the order you guessed, without station names. Friends see how you closed in, not the answer."
+    },
     "legend": {
         "label": "Legend",
         "guess": "Your guess",

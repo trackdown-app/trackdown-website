@@ -1,5 +1,4 @@
 import { useQuery } from "@tanstack/react-query";
-import { Share } from "lucide-react";
 import { useEffect, useMemo, useRef } from "react";
 import { m } from "@/paraglide/messages";
 import { localizeHref } from "@/paraglide/runtime";
@@ -7,8 +6,12 @@ import { cn } from "@/lib/utils";
 import { sitePaths } from "@/lib/site-paths";
 import { AnswerPlate } from "@/components/game/answer-plate";
 import { GuessList } from "@/components/game/guess-list";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { ShareButton } from "@/components/game/share-button";
+import { SharePreview } from "@/components/game/share-preview";
+import { buttonVariants } from "@/components/ui/button";
 import { revealQueryOptions } from "@/lib/game/reveal.queries";
+import type { ShareNavigator } from "@/lib/game/share-result";
+import { shareText } from "@/lib/game/share-text";
 import type { GuessableStation, TodayPuzzleOutput } from "@/lib/game/schemas";
 import type { ListedGuess } from "@/lib/game/trip-line";
 
@@ -22,16 +25,17 @@ type GameOverProps = {
     status: "won" | "lost";
     /** The guess that ended the game, when it was made on this page. */
     enteringGuess?: string | undefined;
-    /** Shares the result; wired by the share feature. */
-    onShare?: () => void;
+    /** Where the result is shared; the browser's `navigator` unless a test hands its own. */
+    shareTarget?: ShareNavigator | undefined;
 };
 
 /**
  * The finished game, after the design's Web · Solved board
  * (docs/game.md#solved-and-missed): the answer plate, the buttons to share
- * the result and play an older puzzle, and "How you got there", every guess
- * with every change named. The answer only ever comes from the `reveal`
- * operation, asked once the game is over.
+ * the result and play an older puzzle, "How you got there", every guess
+ * with every change named, and "What you'll share" (docs/share.md). The
+ * answer only ever comes from the `reveal` operation, asked once the game is
+ * over; the shared text never needs it.
  */
 export function GameOver({
     puzzle,
@@ -39,8 +43,15 @@ export function GameOver({
     guesses,
     status,
     enteringGuess,
-    onShare,
+    shareTarget,
 }: GameOverProps) {
+    const share = shareText({
+        network: puzzle.network,
+        number: puzzle.number,
+        maxGuesses: puzzle.maxGuesses,
+        guesses,
+        status,
+    });
     const codes = useMemo(() => guesses.map((kept) => kept.guess), [guesses]);
     const reveal = useQuery(
         revealQueryOptions(puzzle.network, puzzle.number, codes),
@@ -87,10 +98,7 @@ export function GameOver({
                     headingRef={headingRef}
                 />
                 <div className="flex flex-wrap gap-3">
-                    <Button size="lg" className="rounded-lg" onClick={onShare}>
-                        <Share aria-hidden="true" className="size-[18px]" />
-                        {m["gameOver.share"]()}
-                    </Button>
+                    <ShareButton text={share} target={shareTarget} />
                     <a
                         href={localizeHref(sitePaths.archive)}
                         className={cn(
@@ -110,6 +118,7 @@ export function GameOver({
                     revealed
                 />
             )}
+            <SharePreview text={share} />
         </div>
     );
 }
