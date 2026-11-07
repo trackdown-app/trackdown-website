@@ -5,6 +5,7 @@ import type { RestHandler } from "@/lib/api/rest";
 import {
     guessHandlers,
     metaHandlers,
+    puzzleArchiveHandlers,
     revealHandlers,
     stationsHandlers,
     todayPuzzleHandlers,
@@ -13,6 +14,7 @@ import {
 import {
     guessOutputSchema,
     metaOutputSchema,
+    puzzleArchiveOutputSchema,
     revealOutputSchema,
     stationsOutputSchema,
     todayPuzzleOutputSchema,
@@ -165,6 +167,53 @@ describe("GET /api/v1/{network}/puzzles/today", () => {
 
     it("answers 405 method_not_allowed for another method", async () => {
         const response = await call(todayPuzzleHandlers.ANY, path, "POST", {
+            network: "nl",
+        });
+
+        expect(response.status).toBe(405);
+        expect(response.headers.get("Allow")).toBe("GET");
+    });
+});
+
+describe("GET /api/v1/{network}/puzzles", () => {
+    const path = "/api/v1/nl/puzzles";
+
+    it("answers 200 with every puzzle up to today's, never kept", async () => {
+        const response = await call(puzzleArchiveHandlers.GET, path, "GET", {
+            network: "nl",
+        });
+
+        expect(response.status).toBe(200);
+        expect(response.headers.get("Cache-Control")).toBe("no-store");
+        const json: unknown = await response.json();
+        expect(puzzleArchiveOutputSchema.parse(json)).toEqual({
+            network: "nl",
+            puzzles: [
+                { number: 1, date: "2026-06-18" },
+                { number: 2, date: "2026-06-19" },
+            ],
+        });
+        // Puzzle 1's and 2's mystery stations.
+        expect(JSON.stringify(json)).not.toContain("chr");
+        expect(JSON.stringify(json)).not.toContain("ech");
+    });
+
+    it("answers 400 invalid_input for a network the game has no data for", async () => {
+        const response = await call(
+            puzzleArchiveHandlers.GET,
+            "/api/v1/be/puzzles",
+            "GET",
+            { network: "be" },
+        );
+
+        expect(response.status).toBe(400);
+        expect(apiErrorBodySchema.parse(await response.json()).error.code).toBe(
+            "invalid_input",
+        );
+    });
+
+    it("answers 405 method_not_allowed for another method", async () => {
+        const response = await call(puzzleArchiveHandlers.ANY, path, "POST", {
             network: "nl",
         });
 

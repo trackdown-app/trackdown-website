@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiV1SplatRouteImport } from './routes/api/v1/$'
 import { Route as ApiV1MetaRouteImport } from './routes/api/v1/meta'
 import { Route as ApiV1NetworkStationsRouteImport } from './routes/api/v1/$network/stations'
+import { Route as ApiV1NetworkPuzzlesIndexRouteImport } from './routes/api/v1/$network/puzzles/index'
 import { Route as ApiV1NetworkPuzzlesTodayRouteImport } from './routes/api/v1/$network/puzzles/today'
 import { Route as ApiV1NetworkPuzzlesNumberGuessesRouteImport } from './routes/api/v1/$network/puzzles/$number/guesses'
 import { Route as ApiV1NetworkPuzzlesNumberRevealRouteImport } from './routes/api/v1/$network/puzzles/$number/reveal'
@@ -37,6 +38,12 @@ const ApiV1NetworkStationsRoute = ApiV1NetworkStationsRouteImport.update({
   path: '/api/v1/$network/stations',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiV1NetworkPuzzlesIndexRoute =
+  ApiV1NetworkPuzzlesIndexRouteImport.update({
+    id: '/api/v1/$network/puzzles/',
+    path: '/api/v1/$network/puzzles/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiV1NetworkPuzzlesTodayRoute =
   ApiV1NetworkPuzzlesTodayRouteImport.update({
     id: '/api/v1/$network/puzzles/today',
@@ -62,6 +69,7 @@ export interface FileRoutesByFullPath {
   '/api/v1/meta': typeof ApiV1MetaRoute
   '/api/v1/$network/stations': typeof ApiV1NetworkStationsRoute
   '/api/v1/$network/puzzles/today': typeof ApiV1NetworkPuzzlesTodayRoute
+  '/api/v1/$network/puzzles/': typeof ApiV1NetworkPuzzlesIndexRoute
   '/api/v1/$network/puzzles/$number/guesses': typeof ApiV1NetworkPuzzlesNumberGuessesRoute
   '/api/v1/$network/puzzles/$number/reveal': typeof ApiV1NetworkPuzzlesNumberRevealRoute
 }
@@ -71,6 +79,7 @@ export interface FileRoutesByTo {
   '/api/v1/meta': typeof ApiV1MetaRoute
   '/api/v1/$network/stations': typeof ApiV1NetworkStationsRoute
   '/api/v1/$network/puzzles/today': typeof ApiV1NetworkPuzzlesTodayRoute
+  '/api/v1/$network/puzzles': typeof ApiV1NetworkPuzzlesIndexRoute
   '/api/v1/$network/puzzles/$number/guesses': typeof ApiV1NetworkPuzzlesNumberGuessesRoute
   '/api/v1/$network/puzzles/$number/reveal': typeof ApiV1NetworkPuzzlesNumberRevealRoute
 }
@@ -81,6 +90,7 @@ export interface FileRoutesById {
   '/api/v1/meta': typeof ApiV1MetaRoute
   '/api/v1/$network/stations': typeof ApiV1NetworkStationsRoute
   '/api/v1/$network/puzzles/today': typeof ApiV1NetworkPuzzlesTodayRoute
+  '/api/v1/$network/puzzles/': typeof ApiV1NetworkPuzzlesIndexRoute
   '/api/v1/$network/puzzles/$number/guesses': typeof ApiV1NetworkPuzzlesNumberGuessesRoute
   '/api/v1/$network/puzzles/$number/reveal': typeof ApiV1NetworkPuzzlesNumberRevealRoute
 }
@@ -92,6 +102,7 @@ export interface FileRouteTypes {
     | '/api/v1/meta'
     | '/api/v1/$network/stations'
     | '/api/v1/$network/puzzles/today'
+    | '/api/v1/$network/puzzles/'
     | '/api/v1/$network/puzzles/$number/guesses'
     | '/api/v1/$network/puzzles/$number/reveal'
   fileRoutesByTo: FileRoutesByTo
@@ -101,6 +112,7 @@ export interface FileRouteTypes {
     | '/api/v1/meta'
     | '/api/v1/$network/stations'
     | '/api/v1/$network/puzzles/today'
+    | '/api/v1/$network/puzzles'
     | '/api/v1/$network/puzzles/$number/guesses'
     | '/api/v1/$network/puzzles/$number/reveal'
   id:
@@ -110,6 +122,7 @@ export interface FileRouteTypes {
     | '/api/v1/meta'
     | '/api/v1/$network/stations'
     | '/api/v1/$network/puzzles/today'
+    | '/api/v1/$network/puzzles/'
     | '/api/v1/$network/puzzles/$number/guesses'
     | '/api/v1/$network/puzzles/$number/reveal'
   fileRoutesById: FileRoutesById
@@ -120,6 +133,7 @@ export interface RootRouteChildren {
   ApiV1MetaRoute: typeof ApiV1MetaRoute
   ApiV1NetworkStationsRoute: typeof ApiV1NetworkStationsRoute
   ApiV1NetworkPuzzlesTodayRoute: typeof ApiV1NetworkPuzzlesTodayRoute
+  ApiV1NetworkPuzzlesIndexRoute: typeof ApiV1NetworkPuzzlesIndexRoute
   ApiV1NetworkPuzzlesNumberGuessesRoute: typeof ApiV1NetworkPuzzlesNumberGuessesRoute
   ApiV1NetworkPuzzlesNumberRevealRoute: typeof ApiV1NetworkPuzzlesNumberRevealRoute
 }
@@ -154,6 +168,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiV1NetworkStationsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/v1/$network/puzzles/': {
+      id: '/api/v1/$network/puzzles/'
+      path: '/api/v1/$network/puzzles'
+      fullPath: '/api/v1/$network/puzzles/'
+      preLoaderRoute: typeof ApiV1NetworkPuzzlesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/v1/$network/puzzles/today': {
       id: '/api/v1/$network/puzzles/today'
       path: '/api/v1/$network/puzzles/today'
@@ -184,6 +205,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiV1MetaRoute: ApiV1MetaRoute,
   ApiV1NetworkStationsRoute: ApiV1NetworkStationsRoute,
   ApiV1NetworkPuzzlesTodayRoute: ApiV1NetworkPuzzlesTodayRoute,
+  ApiV1NetworkPuzzlesIndexRoute: ApiV1NetworkPuzzlesIndexRoute,
   ApiV1NetworkPuzzlesNumberGuessesRoute: ApiV1NetworkPuzzlesNumberGuessesRoute,
   ApiV1NetworkPuzzlesNumberRevealRoute: ApiV1NetworkPuzzlesNumberRevealRoute,
 }
