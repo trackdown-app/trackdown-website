@@ -21,8 +21,8 @@
 @import "@fontsource/barlow-condensed/700.css";
 @import "@fontsource/barlow-condensed/800.css";
 
-/* Dark mode follows the operating system; the site has no theme toggle. */
-@custom-variant dark (@media (prefers-color-scheme: dark));
+/* The head script resolves the system preference or the saved override. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
 /*
  * The design canvas's tokens (Web · Playing, its `t` object), light first.
@@ -85,8 +85,35 @@
     --ring: var(--td-line-1);
 }
 
+:root[data-theme="dark"] {
+    color-scheme: dark;
+
+    --td-bg: #14181d;
+    --td-surface: #1d2329;
+    --td-rule: #2e363e;
+    --td-ink: #eef1ee;
+    --td-muted: #a3abb3;
+    --td-soft: #262d35;
+    --td-empty: #4a535c;
+    --td-grid: #262d35;
+    --td-line-1: #8394ff;
+    --td-line-2: #f27ab6;
+    --td-line-3: #4fd3a0;
+    --td-on-line: #14181d;
+    --td-action: #eef1ee;
+    --td-on-action: #14181d;
+    --td-shadow: rgb(0 0 0 / 0.5);
+    --td-plate: #eef1ee;
+    --td-on-plate: #14181d;
+    --td-plate-muted: #3e454c;
+    --td-plate-line-1: #2f45d8;
+    --td-plate-line-2: #b8236f;
+    --td-danger: #ff8a7a;
+}
+
+/* Preserve system dark mode when JavaScript is disabled. */
 @media (prefers-color-scheme: dark) {
-    :root {
+    :root:not([data-theme]) {
         color-scheme: dark;
 
         --td-bg: #14181d;
