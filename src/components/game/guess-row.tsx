@@ -1,23 +1,9 @@
-import type { CSSProperties } from "react";
 import { m } from "@/paraglide/messages";
 import { cn } from "@/lib/utils";
-import { TripLine } from "@/components/game/trip-line";
-import { gridMinutes } from "@/lib/game/trip-line";
+import { GuessTrack } from "@/components/game/guess-track";
 import type { ListedGuess } from "@/lib/game/trip-line";
 import { spokenGuess, tripSummary } from "@/lib/game/trip-text";
 import type { StationNames } from "@/lib/game/trip-text";
-
-/**
- * The 30-minute grid behind a trip line on a track spanning `scaleMinutes`:
- * a 1px `grid` rule every half hour, counted from the mystery bar at the
- * right (a fifth of the track at 2 h 30).
- */
-function gridBackground(scaleMinutes: number): CSSProperties {
-    const step = `${(gridMinutes / scaleMinutes) * 100}%`;
-    return {
-        backgroundImage: `repeating-linear-gradient(to left, transparent 0, transparent calc(${step} - 1px), var(--td-grid) calc(${step} - 1px), var(--td-grid) ${step})`,
-    };
-}
 
 type GuessRowProps = {
     guess: ListedGuess;
@@ -113,19 +99,12 @@ export function GuessRow({
                     </div>
                 </div>
             </div>
-            <div
-                aria-hidden="true"
-                data-trip-end
-                className={cn(
-                    "flex min-w-0 flex-[999_1_320px] items-center justify-end bg-clip-content bg-origin-content pr-3",
-                    revealed ? "min-h-16" : "min-h-[72px]",
-                )}
-                style={revealed ? undefined : gridBackground(scaleMinutes)}
-            >
-                {!guess.correct && (
-                    <TripLine guess={guess} scaleMinutes={scaleMinutes} />
-                )}
-            </div>
+            <GuessTrack
+                guess={guess}
+                names={names}
+                scaleMinutes={scaleMinutes}
+                revealed={revealed}
+            />
         </li>
     );
 }

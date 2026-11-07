@@ -92,6 +92,23 @@
         "spokenChangeAt": "change at {station}, {duration}",
         "spokenChangeHidden": "change at a hidden station, {duration}"
     },
+    "tripDetails": {
+        "open": "Trip from {station}, ride by ride",
+        "title": "From {station}",
+        "total": "{duration} to the mystery station",
+        "wait": "{duration} to change",
+        "hiddenStation": "Hidden station",
+        "mysteryStation": "Mystery station"
+    },
+    "trains": {
+        "IC": "Intercity",
+        "ICD": "Intercity direct",
+        "SPR": "Sprinter",
+        "ST": "Stopping train",
+        "SNT": "Semi-fast train",
+        "ICE": "ICE high-speed train",
+        "EC": "EuroCity"
+    },
     "share": {
         "header": "Trackdown {network} {number}, {score}/{total}",
         "won": "Tracked down in {count}",

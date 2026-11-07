@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
-import { afterEach, describe, expect, it } from "vitest";
-import { cleanup, render, screen, within } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { overwriteGetLocale } from "@/paraglide/runtime";
 import { GuessList } from "@/components/game/guess-list";
 import type { ListedGuess } from "@/lib/game/trip-line";
@@ -50,7 +50,18 @@ const guesses: ListedGuess[] = [
 
 afterEach(() => {
     cleanup();
+    vi.unstubAllGlobals();
 });
+
+/** Makes the page a mouse's (`true`) or a touch screen's (`false`). */
+function stubHover(canHover: boolean) {
+    vi.stubGlobal("matchMedia", (query: string) => ({
+        matches: canHover && query.includes("hover: hover"),
+        media: query,
+        addEventListener: () => undefined,
+        removeEventListener: () => undefined,
+    }));
+}
 
 function rows(): HTMLElement[] {
     return within(screen.getByRole("list", { name: "Your guesses" })).getAllByRole(
@@ -79,14 +90,73 @@ describe("GuessList", () => {
         render(<GuessList guesses={guesses} stations={stations} />);
 
         for (const row of rows()) {
-            const drawn = [...row.children].filter(
+            const [text, track, ...rest] = [...row.children].filter(
                 (child) => !child.classList.contains("sr-only"),
             );
-            expect(drawn.length).toBe(2);
-            for (const child of drawn) {
-                expect(child.getAttribute("aria-hidden")).toBe("true");
-            }
+            expect(rest).toEqual([]);
+            expect(text?.getAttribute("aria-hidden")).toBe("true");
+            // The track is the button that opens the details; its line is drawn only.
+            const line = track?.querySelector("button > span");
+            expect(line?.getAttribute("aria-hidden")).toBe("true");
         }
+        expect(
+            screen
+                .getAllByRole("button", { name: /^Trip from / })
+                .map((button) => button.getAttribute("aria-label")),
+        ).toEqual([
+            "Trip from Maastricht, ride by ride",
+            "Trip from Den Helder, ride by ride",
+            "Trip from Utrecht Centraal, ride by ride",
+            "Trip from Hilversum, ride by ride",
+        ]);
+    });
+
+    it("opens a trip's details in the row on a touch screen", () => {
+        overwriteGetLocale(() => "en");
+        stubHover(false);
+        render(<GuessList guesses={guesses} stations={stations} />);
+
+        const button = screen.getByRole("button", {
+            name: "Trip from Den Helder, ride by ride",
+        });
+        expect(button.getAttribute("aria-expanded")).toBe("false");
+        fireEvent.click(button);
+        expect(button.getAttribute("aria-expanded")).toBe("true");
+
+        const panelId = button.getAttribute("aria-controls") ?? "";
+        const panel = document.getElementById(panelId);
+        expect(panel?.closest("li")?.textContent).toContain("Den Helder");
+        expect(
+            within(panel ?? document.body)
+                .getAllByRole("listitem")
+                .map((item) => item.textContent),
+        ).toEqual([
+            "Den Helder",
+            "ICIntercity1h 12m",
+            "?Hidden station9m to change",
+            "ICIntercity36m",
+            "?Mystery station",
+        ]);
+
+        fireEvent.click(button);
+        expect(document.getElementById(panelId)).toBeNull();
+    });
+
+    it("opens a trip's details in a popover with a mouse, in Dutch", async () => {
+        overwriteGetLocale(() => "nl");
+        stubHover(true);
+        render(<GuessList guesses={guesses} stations={stations} />);
+
+        fireEvent.click(
+            screen.getByRole("button", {
+                name: "Reis vanaf Maastricht, rit voor rit",
+            }),
+        );
+        const popup = await screen.findByRole("dialog");
+        expect(popup.textContent).toContain("Vanaf Maastricht");
+        expect(popup.textContent).toContain("2u 25m naar het mysteriestation");
+        expect(popup.textContent).toContain("Utrecht Centraal6m overstaptijd");
+        expect(popup.textContent).not.toContain("?Verborgen");
     });
 
     it("shows the summary, the ride labels that fit and a ? for a hidden change", () => {

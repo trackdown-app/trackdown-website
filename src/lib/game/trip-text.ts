@@ -1,4 +1,5 @@
 import { m } from "@/paraglide/messages";
+import type { TrainType } from "@/lib/data/data-schema";
 import type { ListedGuess } from "@/lib/game/trip-line";
 
 // A guess's trip in words, in the page's locale (docs/guess-list.md#text):
@@ -10,6 +11,26 @@ export type StationNames = ReadonlyMap<string, string>;
 
 function nameOf(code: string, names: StationNames): string {
     return names.get(code) ?? code;
+}
+
+/** A train type's name in words, for a player who does not know the code: `SPR` is "Sprinter". */
+export function trainName(train: TrainType): string {
+    switch (train) {
+        case "IC":
+            return m["trains.IC"]();
+        case "ICD":
+            return m["trains.ICD"]();
+        case "SPR":
+            return m["trains.SPR"]();
+        case "ST":
+            return m["trains.ST"]();
+        case "SNT":
+            return m["trains.SNT"]();
+        case "ICE":
+            return m["trains.ICE"]();
+        case "EC":
+            return m["trains.EC"]();
+    }
 }
 
 /** A time as the list shows it: `2h 05m`, or `17m` under an hour. */

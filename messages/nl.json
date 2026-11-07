@@ -92,6 +92,23 @@
         "spokenChangeAt": "overstap in {station}, {duration}",
         "spokenChangeHidden": "overstap op een verborgen station, {duration}"
     },
+    "tripDetails": {
+        "open": "Reis vanaf {station}, rit voor rit",
+        "title": "Vanaf {station}",
+        "total": "{duration} naar het mysteriestation",
+        "wait": "{duration} overstaptijd",
+        "hiddenStation": "Verborgen station",
+        "mysteryStation": "Mysteriestation"
+    },
+    "trains": {
+        "IC": "Intercity",
+        "ICD": "Intercity direct",
+        "SPR": "Sprinter",
+        "ST": "Stoptrein",
+        "SNT": "Sneltrein",
+        "ICE": "ICE hogesnelheidstrein",
+        "EC": "EuroCity"
+    },
     "share": {
         "header": "Trackdown {network} {number}, {score}/{total}",
         "won": "Gevonden in {count}",
