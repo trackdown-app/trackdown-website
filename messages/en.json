@@ -6,6 +6,13 @@
     "home": {
         "comingSoon": "Coming soon."
     },
+    "stationSearch": {
+        "label": "Guess a station",
+        "placeholder": "Guess station {number} of {total}",
+        "submit": "Guess",
+        "list": "Matching stations",
+        "noMatch": "No station matches “{query}”"
+    },
     "language": {
         "label": "Language",
         "nl": "Dutch",
