@@ -23,18 +23,19 @@ The function runs in `fra1` (Frankfurt), the Vercel region closest to the Nether
 
 ## The Vercel project
 
-The project lives in the `trackdown-app` team on Vercel.
+The project is `trackdown-website` in Bram's personal Vercel scope, `bram-gussekloos-projects` (a Hobby account). Its URL is `trackdown-website.vercel.app`.
 
-- **Git builds are off.** `vercel.json` sets `git.deploymentEnabled` to `false`, so a push does not make Vercel build. Deploys come from GitHub Actions, which build with `vercel build` and upload the result with `vercel deploy --prebuilt`.
+- **Git builds are off.** `vercel.json` sets `git.deploymentEnabled` to `false`, so a push does not make Vercel build. The repository stays connected to the project, which only labels deploys with their commit. Deploys come from GitHub Actions, which build with `vercel build` and upload the result with `vercel deploy --prebuilt`.
+- **Deployment protection.** Vercel Authentication guards every deploy except those on a custom domain, so `trackdown-website.vercel.app` asks for a Vercel login until the site gets its own domain.
 - **Environments.** Preview (every deploy without `--prod`) and Production (`--prod`). The site reads no environment variables yet; a variable the server needs is added to both in the project's settings (or with `vercel env add <name> <environment>`) and listed here.
-- **Region.** The function region comes from the build (see above), not from the project settings, because a prebuilt deploy carries its own function config.
+- **Region.** The function region comes from the build (see above), because a prebuilt deploy carries its own function config. `regions` in `vercel.json` sets the project's default to `fra1` as well, so the deploy's own region matches.
 
 ## A manual deploy
 
-With the Vercel CLI (`bunx vercel`) and access to the `trackdown-app` team:
+With the Vercel CLI (`bunx vercel`), logged in as the owner of the scope (`bunx vercel login`):
 
 ```bash
-bunx vercel link --scope trackdown-app
+bunx vercel link --scope bram-gussekloos-projects --project trackdown-website
 bunx vercel pull --environment=preview
 bunx vercel build
 bunx vercel deploy --prebuilt
