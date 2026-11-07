@@ -60,7 +60,10 @@ export function GuessRow({
 
     if (revealed && guess.correct) {
         return (
-            <li className="flex min-h-20 items-center justify-between gap-4 border-b border-rule pr-10">
+            <li
+                data-trip-end
+                className="flex min-h-20 items-center justify-between gap-4 border-b border-rule pr-10"
+            >
                 {spoken}
                 <div aria-hidden="true" className="flex items-baseline gap-3">
                     {numberLabel}
@@ -112,6 +115,7 @@ export function GuessRow({
             </div>
             <div
                 aria-hidden="true"
+                data-trip-end
                 className={cn(
                     "flex min-w-0 flex-[999_1_320px] items-center justify-end bg-clip-content bg-origin-content pr-3",
                     revealed ? "min-h-16" : "min-h-[72px]",

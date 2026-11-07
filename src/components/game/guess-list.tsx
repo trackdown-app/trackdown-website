@@ -1,8 +1,8 @@
-import { useMemo } from "react";
+import { useMemo, useRef } from "react";
 import type { ReactNode } from "react";
 import { m } from "@/paraglide/messages";
-import { cn } from "@/lib/utils";
 import { GuessRow } from "@/components/game/guess-row";
+import { MysteryBar } from "@/components/game/mystery-bar";
 import type { GuessableStation } from "@/lib/game/schemas";
 import { boardMinutes, gridMarks } from "@/lib/game/trip-line";
 import type { ListedGuess } from "@/lib/game/trip-line";
@@ -52,6 +52,7 @@ export function GuessList({
     enteringGuess,
     revealed = false,
 }: GuessListProps) {
+    const listRef = useRef<HTMLOListElement>(null);
     const names = useMemo(
         () => new Map(stations.map((station) => [station.code, station.name])),
         [stations],
@@ -98,6 +99,7 @@ export function GuessList({
             {header}
             <div className="relative">
                 <ol
+                    ref={listRef}
                     aria-label={m["guessList.label"]()}
                     className="border-t border-rule"
                 >
@@ -113,15 +115,10 @@ export function GuessList({
                         />
                     ))}
                 </ol>
-                <span
-                    aria-hidden="true"
-                    className={cn(
-                        "absolute right-0 z-2 w-[26px] rounded-[13px]",
-                        // Found or missed, the mystery station is known: the bar fills.
-                        revealed
-                            ? "top-3.5 bottom-[30px] bg-ink"
-                            : "top-[33px] bottom-[33px] border-4 border-ink bg-surface",
-                    )}
+                <MysteryBar
+                    listRef={listRef}
+                    guesses={guesses}
+                    revealed={revealed}
                 />
             </div>
             {!revealed && (
