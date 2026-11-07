@@ -58,8 +58,16 @@ export function GuessTrack({
     const [open, setOpen] = useState(false);
     const panelId = useId();
     const station = names.get(guess.guess) ?? guess.guess;
-    const label = m["tripDetails.open"]({ station });
-    const line = <TripLine guess={guess} scaleMinutes={scaleMinutes} />;
+    // Named by text inside it, not `aria-label`: the line's ride labels are
+    // drawn text that is no part of the name, and axe's
+    // label-content-name-mismatch flags an `aria-label` that leaves out
+    // visible text. The line itself stays hidden from screen readers.
+    const line = (
+        <>
+            <span className="sr-only">{m["tripDetails.open"]({ station })}</span>
+            <TripLine guess={guess} scaleMinutes={scaleMinutes} />
+        </>
+    );
 
     let trigger = null;
     if (!guess.correct) {
@@ -69,7 +77,6 @@ export function GuessTrack({
                     openOnHover
                     delay={150}
                     closeDelay={100}
-                    aria-label={label}
                     className={triggerClasses}
                 >
                     {line}
@@ -96,7 +103,6 @@ export function GuessTrack({
         ) : (
             <button
                 type="button"
-                aria-label={label}
                 aria-expanded={open}
                 aria-controls={panelId}
                 onClick={() => {

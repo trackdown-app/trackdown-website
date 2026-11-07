@@ -96,19 +96,26 @@ describe("GuessList", () => {
             expect(rest).toEqual([]);
             expect(text?.getAttribute("aria-hidden")).toBe("true");
             // The track is the button that opens the details; its line is drawn only.
-            const line = track?.querySelector("button > span");
-            expect(line?.getAttribute("aria-hidden")).toBe("true");
+            const button = track?.querySelector("button");
+            expect(
+                button?.querySelector(':scope > span[aria-hidden="true"]'),
+            ).not.toBeNull();
+            // Named by its text, never `aria-label`, which would leave out the
+            // ride labels drawn on the line (axe's label-content-name-mismatch).
+            expect(button?.hasAttribute("aria-label")).toBe(false);
         }
-        expect(
-            screen
-                .getAllByRole("button", { name: /^Trip from / })
-                .map((button) => button.getAttribute("aria-label")),
-        ).toEqual([
-            "Trip from Maastricht, ride by ride",
-            "Trip from Den Helder, ride by ride",
-            "Trip from Utrecht Centraal, ride by ride",
-            "Trip from Hilversum, ride by ride",
-        ]);
+        for (const station of [
+            "Maastricht",
+            "Den Helder",
+            "Utrecht Centraal",
+            "Hilversum",
+        ]) {
+            expect(
+                screen.getByRole("button", {
+                    name: `Trip from ${station}, ride by ride`,
+                }),
+            ).toBeDefined();
+        }
     });
 
     it("opens a trip's details in the row on a touch screen", () => {
