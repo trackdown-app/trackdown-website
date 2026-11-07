@@ -7,6 +7,7 @@ import { getLocale } from "@/paraglide/runtime";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { SkipLink, contentId } from "@/components/layout/skip-link";
+import { themeInitScript } from "@/lib/theme";
 
 /**
  * The document around every page, the root route's `shellComponent`: the
@@ -17,8 +18,9 @@ export function RootDocument({ children }: { children: ReactNode }) {
     return (
         // The request's locale on the server (`src/server.ts`), the URL's in
         // the browser.
-        <html lang={getLocale()}>
+        <html lang={getLocale()} suppressHydrationWarning>
             <head>
+                <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
                 <HeadContent />
             </head>
             <body className="flex min-h-svh flex-col">

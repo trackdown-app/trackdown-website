@@ -6,6 +6,7 @@ import { LogoMark } from "@/components/layout/logo-mark";
 import { NetworkPill } from "@/components/layout/network-pill";
 import { shellContainer } from "@/components/layout/shell-container";
 import { StatisticsDialog } from "@/components/layout/statistics-dialog";
+import { ThemeToggle } from "@/components/layout/theme-toggle";
 
 const navLinkClasses =
     "inline-flex min-h-11 items-center px-2 text-base font-medium text-foreground no-underline underline-offset-[0.3em] hover:underline aria-[current=page]:font-semibold aria-[current=page]:underline sm:px-3";
@@ -13,7 +14,7 @@ const navLinkClasses =
 /**
  * The header every page shares, after the design's Web · Playing board: the
  * logo linking home and the network pill on the left; Archive, How to play,
- * the statistics button and the language switch on the right. Both halves
+ * statistics, the theme toggle and the language switch on the right. Both halves
  * wrap, so it fits a 320px screen without scrolling sideways.
  */
 export function SiteHeader() {
@@ -55,6 +56,7 @@ export function SiteHeader() {
                     </ul>
                 </nav>
                 <StatisticsDialog />
+                <ThemeToggle />
                 <LanguageSwitch />
             </div>
         </header>

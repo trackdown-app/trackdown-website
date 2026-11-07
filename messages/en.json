@@ -140,7 +140,8 @@
         "howToPlay": "How to play",
         "statistics": "Statistics",
         "network": "Network",
-        "networkNl": "Netherlands"
+        "networkNl": "Netherlands",
+        "darkMode": "Dark mode"
     },
     "footer": {
         "tagline": "Trackdown, a hobby project by Bram Gussekloo",
