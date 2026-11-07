@@ -5,6 +5,7 @@ import type { RestHandler } from "@/lib/api/rest";
 import {
     guessHandlers,
     metaHandlers,
+    revealHandlers,
     stationsHandlers,
     todayPuzzleHandlers,
     unknownOperationHandlers,
@@ -12,6 +13,7 @@ import {
 import {
     guessOutputSchema,
     metaOutputSchema,
+    revealOutputSchema,
     stationsOutputSchema,
     todayPuzzleOutputSchema,
 } from "@/lib/game/schemas";
@@ -243,6 +245,80 @@ describe("POST /api/v1/{network}/puzzles/{n}/guesses", () => {
         const response = await call(
             guessHandlers.ANY,
             "/api/v1/nl/puzzles/2/guesses",
+            "GET",
+            { network: "nl", number: "2" },
+        );
+
+        expect(response.status).toBe(405);
+        expect(response.headers.get("Allow")).toBe("POST");
+    });
+});
+
+describe("POST /api/v1/{network}/puzzles/{n}/reveal", () => {
+    /** A POST of `body` to puzzle `number`'s reveal. */
+    function post(body: string, number = "2"): Promise<Response> {
+        return revealHandlers.POST({
+            request: new Request(
+                new URL(`/api/v1/nl/puzzles/${number}/reveal`, "http://localhost"),
+                {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body,
+                },
+            ),
+            params: { network: "nl", number },
+        });
+    }
+
+    it("answers 200 with the station and full trips of a finished game", async () => {
+        const response = await post(JSON.stringify({ guesses: ["dlt", "ech"] }));
+
+        expect(response.status).toBe(200);
+        expect(response.headers.get("Cache-Control")).toBe("no-store");
+        const json: unknown = await response.json();
+        expect(revealOutputSchema.parse(json)).toMatchObject({
+            number: 2,
+            station: "ech",
+            solved: true,
+            guesses: [
+                {
+                    guess: "dlt",
+                    steps: [
+                        { kind: "ride" },
+                        { kind: "change", station: "chr" },
+                        { kind: "ride" },
+                        { kind: "change", station: "alf" },
+                        { kind: "ride" },
+                    ],
+                    totalMinutes: 69,
+                },
+                { guess: "ech", correct: true },
+            ],
+        });
+    });
+
+    it("answers 403 game_not_over and no answer before the game is over", async () => {
+        const response = await post(
+            JSON.stringify({ guesses: ["alf", "brv", "chr", "dlt"] }),
+        );
+
+        expect(response.status).toBe(403);
+        const json: unknown = await response.json();
+        expect(apiErrorBodySchema.parse(json).error.code).toBe("game_not_over");
+        // Puzzle 2's mystery station.
+        expect(JSON.stringify(json)).not.toContain("ech");
+    });
+
+    it("answers 404 not_found for a puzzle after today's", async () => {
+        const response = await post(JSON.stringify({ guesses: ["alf"] }), "3");
+
+        expect(response.status).toBe(404);
+    });
+
+    it("answers 405 method_not_allowed for another method", async () => {
+        const response = await call(
+            revealHandlers.ANY,
+            "/api/v1/nl/puzzles/2/reveal",
             "GET",
             { network: "nl", number: "2" },
         );

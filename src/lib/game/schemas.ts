@@ -110,6 +110,59 @@ export const guessOutputSchema = z.strictObject({
 
 export type GuessOutput = z.output<typeof guessOutputSchema>;
 
+/**
+ * `reveal`: a finished game at a puzzle. The network and the puzzle's number
+ * come from the path, the number coerced like the guess's. Whether the game
+ * is over is the service's to check: it needs the answer.
+ */
+export const revealInputSchema = z.object({
+    network: networkIdSchema,
+    number: z.coerce.number().int().positive(),
+    /** Every guess the player made at this puzzle, oldest first. */
+    guesses: z.array(stationCodeSchema),
+});
+
+export type RevealInput = z.output<typeof revealInputSchema>;
+
+/** `reveal`: one change of a guess's trip, its station always named. */
+export const revealedChangeSchema = z.strictObject({
+    kind: z.literal("change"),
+    station: stationCodeSchema,
+    minutes: z.number().int().nonnegative(),
+});
+
+/**
+ * `reveal`: one guess of the game with its whole trip. A correct guess has
+ * no trip (`steps` is empty and `totalMinutes` 0), as in the guess's answer.
+ */
+export const revealedGuessSchema = z.strictObject({
+    guess: stationCodeSchema,
+    correct: z.boolean(),
+    steps: z.array(
+        z.discriminatedUnion("kind", [guessRideSchema, revealedChangeSchema]),
+    ),
+    totalMinutes: z.number().int().nonnegative(),
+});
+
+export type RevealedGuess = z.output<typeof revealedGuessSchema>;
+
+/**
+ * `reveal`: the mystery station and every guess's trip, every change named.
+ * Only answered once the game is over.
+ */
+export const revealOutputSchema = z.strictObject({
+    network: networkIdSchema,
+    number: z.number().int().positive(),
+    /** The mystery station's code. */
+    station: stationCodeSchema,
+    /** Whether the last guess was the mystery station. */
+    solved: z.boolean(),
+    /** The input's guesses, in its order. */
+    guesses: z.array(revealedGuessSchema),
+});
+
+export type RevealOutput = z.output<typeof revealOutputSchema>;
+
 /** A site locale: `nl` or `en`. Without one, the base locale, `nl`. */
 export const localeSchema = z.enum(locales).default(baseLocale);
 

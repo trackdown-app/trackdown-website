@@ -15,6 +15,7 @@ import { Route as ApiV1MetaRouteImport } from './routes/api/v1/meta'
 import { Route as ApiV1NetworkStationsRouteImport } from './routes/api/v1/$network/stations'
 import { Route as ApiV1NetworkPuzzlesTodayRouteImport } from './routes/api/v1/$network/puzzles/today'
 import { Route as ApiV1NetworkPuzzlesNumberGuessesRouteImport } from './routes/api/v1/$network/puzzles/$number/guesses'
+import { Route as ApiV1NetworkPuzzlesNumberRevealRouteImport } from './routes/api/v1/$network/puzzles/$number/reveal'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -48,6 +49,12 @@ const ApiV1NetworkPuzzlesNumberGuessesRoute =
     path: '/api/v1/$network/puzzles/$number/guesses',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiV1NetworkPuzzlesNumberRevealRoute =
+  ApiV1NetworkPuzzlesNumberRevealRouteImport.update({
+    id: '/api/v1/$network/puzzles/$number/reveal',
+    path: '/api/v1/$network/puzzles/$number/reveal',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -56,6 +63,7 @@ export interface FileRoutesByFullPath {
   '/api/v1/$network/stations': typeof ApiV1NetworkStationsRoute
   '/api/v1/$network/puzzles/today': typeof ApiV1NetworkPuzzlesTodayRoute
   '/api/v1/$network/puzzles/$number/guesses': typeof ApiV1NetworkPuzzlesNumberGuessesRoute
+  '/api/v1/$network/puzzles/$number/reveal': typeof ApiV1NetworkPuzzlesNumberRevealRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -64,6 +72,7 @@ export interface FileRoutesByTo {
   '/api/v1/$network/stations': typeof ApiV1NetworkStationsRoute
   '/api/v1/$network/puzzles/today': typeof ApiV1NetworkPuzzlesTodayRoute
   '/api/v1/$network/puzzles/$number/guesses': typeof ApiV1NetworkPuzzlesNumberGuessesRoute
+  '/api/v1/$network/puzzles/$number/reveal': typeof ApiV1NetworkPuzzlesNumberRevealRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -73,6 +82,7 @@ export interface FileRoutesById {
   '/api/v1/$network/stations': typeof ApiV1NetworkStationsRoute
   '/api/v1/$network/puzzles/today': typeof ApiV1NetworkPuzzlesTodayRoute
   '/api/v1/$network/puzzles/$number/guesses': typeof ApiV1NetworkPuzzlesNumberGuessesRoute
+  '/api/v1/$network/puzzles/$number/reveal': typeof ApiV1NetworkPuzzlesNumberRevealRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -83,6 +93,7 @@ export interface FileRouteTypes {
     | '/api/v1/$network/stations'
     | '/api/v1/$network/puzzles/today'
     | '/api/v1/$network/puzzles/$number/guesses'
+    | '/api/v1/$network/puzzles/$number/reveal'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -91,6 +102,7 @@ export interface FileRouteTypes {
     | '/api/v1/$network/stations'
     | '/api/v1/$network/puzzles/today'
     | '/api/v1/$network/puzzles/$number/guesses'
+    | '/api/v1/$network/puzzles/$number/reveal'
   id:
     | '__root__'
     | '/'
@@ -99,6 +111,7 @@ export interface FileRouteTypes {
     | '/api/v1/$network/stations'
     | '/api/v1/$network/puzzles/today'
     | '/api/v1/$network/puzzles/$number/guesses'
+    | '/api/v1/$network/puzzles/$number/reveal'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -108,6 +121,7 @@ export interface RootRouteChildren {
   ApiV1NetworkStationsRoute: typeof ApiV1NetworkStationsRoute
   ApiV1NetworkPuzzlesTodayRoute: typeof ApiV1NetworkPuzzlesTodayRoute
   ApiV1NetworkPuzzlesNumberGuessesRoute: typeof ApiV1NetworkPuzzlesNumberGuessesRoute
+  ApiV1NetworkPuzzlesNumberRevealRoute: typeof ApiV1NetworkPuzzlesNumberRevealRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -154,6 +168,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiV1NetworkPuzzlesNumberGuessesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/v1/$network/puzzles/$number/reveal': {
+      id: '/api/v1/$network/puzzles/$number/reveal'
+      path: '/api/v1/$network/puzzles/$number/reveal'
+      fullPath: '/api/v1/$network/puzzles/$number/reveal'
+      preLoaderRoute: typeof ApiV1NetworkPuzzlesNumberRevealRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -164,6 +185,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiV1NetworkStationsRoute: ApiV1NetworkStationsRoute,
   ApiV1NetworkPuzzlesTodayRoute: ApiV1NetworkPuzzlesTodayRoute,
   ApiV1NetworkPuzzlesNumberGuessesRoute: ApiV1NetworkPuzzlesNumberGuessesRoute,
+  ApiV1NetworkPuzzlesNumberRevealRoute: ApiV1NetworkPuzzlesNumberRevealRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

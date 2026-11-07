@@ -15,6 +15,7 @@ iOS:  GET /api/v1/meta ── metaHandlers.GET ──────────┘
 | `meta` | `getMeta` (`src/lib/game/meta.ts`) | `getMetaFn`, `metaQueryOptions(network)` | `GET /api/v1/meta` | `metaInputSchema`: `network` (query string), default `nl` | `metaOutputSchema`: the network's `meta.json`, with `network` and `dataRef` |
 | `todayPuzzle` | `getTodayPuzzle` (`src/lib/game/today-puzzle.ts`) | `getTodayPuzzleFn`, `todayPuzzleQueryOptions(network)` | `GET /api/v1/{network}/puzzles/today` | `todayPuzzleInputSchema`: `network` (path), required | `todayPuzzleOutputSchema`: `network`, `number`, `date`, `maxGuesses`, `nextPuzzleAt`; never the station |
 | `guess` | `submitGuess` (`src/lib/game/guess.ts`) | `submitGuessFn` (`POST`, through a `useMutation`) | `POST /api/v1/{network}/puzzles/{n}/guesses` | `guessInputSchema`: `network`, `number` (path), `guess`, `earlierGuesses` (JSON body; default `[]`) | `guessOutputSchema`: `network`, `number`, `guess`, `correct`, `steps`, `totalMinutes`; never the station |
+| `reveal` | `revealAnswer` (`src/lib/game/reveal.ts`) | `revealAnswerFn` (`POST`, through a `useMutation`) | `POST /api/v1/{network}/puzzles/{n}/reveal` | `revealInputSchema`: `network`, `number` (path), `guesses` (JSON body), required | `revealOutputSchema`: `network`, `number`, `station`, `solved`, `guesses` (`guess`, `correct`, `steps`, `totalMinutes`); only once the game is over |
 | `stations` | `getStations` (`src/lib/game/stations.ts`) | `getStationsFn`, `stationsQueryOptions(network, locale)` | `GET /api/v1/{network}/stations` | `stationsInputSchema`: `network` (path), required; `locale` (query string), `nl` or `en`, default `nl` | `stationsOutputSchema`: `network`, `locale`, `stations` (`code`, `name`, `province`); no coordinates, no trips |
 
 `dataRef` is the trackdown-data commit the build was made from, or `local` ([deploy.md](deploy.md#the-game-data)).
@@ -63,10 +64,33 @@ POST /api/v1/nl/puzzles/142/guesses
 
 - **The trip** is the guess's entry in the mystery station's `to/<code>.json` ([data.md](data.md#files)): rides (`train`, `minutes`) and changes (`minutes`) in order. `totalMinutes` adds up every ride and change.
 - **A change's station** is its code only when it is among `earlierGuesses`; otherwise `null`, the design's hidden `?`. A trip never names a station the player has not named first, and never the mystery station.
-- **A correct guess** answers `correct: true` with no trip (`steps: []`, `totalMinutes: 0`). The whole trip list is the reveal, an operation of its own.
+- **A correct guess** answers `correct: true` with no trip (`steps: []`, `totalMinutes: 0`). The whole trip list is [the reveal](#the-reveal), an operation of its own.
 - **The puzzle** is any puzzle up to today's ([Today's puzzle](#todays-puzzle)), so an earlier day can still be played. A puzzle after today's answers `not_found`, the same as one that does not exist, so the schedule's future stays hidden.
 - **Rejected** with `invalid_input`: a guess or an earlier guess that is not a station of the network, a guess that is among the earlier guesses, earlier guesses that repeat a station, a guess beyond `maxGuesses` (a seventh), and a guess after an earlier one already solved the puzzle. The puzzle is checked first, so a future puzzle answers `not_found` whatever the guesses.
 - **The REST route** reads `network` and `number` from the path and the rest from the JSON body (`restPost`, below); a body that is not a JSON object is `invalid_input`. A guess's answer is never kept (`Cache-Control: no-store`).
+- **The checks** it shares with the reveal (the puzzle, the stations, repeats, `maxGuesses`, a guess after the solve) live in `src/lib/game/played-puzzle.ts`, with the trip lookup.
+
+### The reveal
+
+The solved and missed screen: once the game is over, the mystery station and every guess's trip with all its changes named.
+
+```text
+POST /api/v1/nl/puzzles/142/reveal
+{"guesses":["dlt","ech"]}
+
+200 {"network":"nl","number":142,"station":"ech","solved":true,
+     "guesses":[{"guess":"dlt","correct":false,
+                 "steps":[{"kind":"ride","train":"SPR","minutes":12},
+                          {"kind":"change","station":"chr","minutes":4},…],
+                 "totalMinutes":69},
+                {"guess":"ech","correct":true,"steps":[],"totalMinutes":0}]}
+```
+
+- **The game is over** when its last guess is the mystery station (`solved: true`) or it has `maxGuesses` guesses (6), all wrong (`solved: false`). Before that it answers `game_not_over` (403), whose message names nothing of the puzzle. The server keeps no game state, so the client sends every guess it made, oldest first.
+- **The guesses** are checked as a guess's are ([A guess](#a-guess)): a puzzle after today's or one that does not exist is `not_found`, checked first; a station that is not the network's, a repeat, more than `maxGuesses` guesses or a guess after the solve is `invalid_input`.
+- **Every trip** is the guess's whole trip from `to/<code>.json`, every change with its station, in the input's order. A correct guess has no trip, as in its guess's answer.
+- **`station`** is the mystery station's code; the client names it from [Stations](#stations).
+- **Never kept** (`Cache-Control: no-store`), like a guess.
 
 ### Stations
 
@@ -91,7 +115,7 @@ GET /api/v1/nl/stations?locale=en
 - **Services** (`src/lib/game/<operation>.ts`, server-only): one function per operation, `(input, context) => Promise<output>`. The input is already checked. Everything else it reads comes from the `ServiceContext` it is given (`src/lib/game/service-context.ts`): the game data, the data's commit and the current time (`now()`). The server function and the REST route pass `serviceContext`, which reads the real data; a test passes the fixture. A service throws an `ApiError` for an answer that is the caller's fault (a puzzle that does not exist yet); any other error is a server error.
 - **Server functions** (`src/lib/game/<operation>.functions.ts`) and **query options** (`<operation>.queries.ts`): the web's side, as in [data-loading.md](data-loading.md#the-pieces). The validator is the operation's input schema, the handler calls the service with `serviceContext`.
 - **REST handlers** (`src/lib/api/v1-handlers.ts`, server-only): the iOS side. `restGet(inputSchema, run)` (`src/lib/api/rest.ts`) reads the input from the query string and the route's path parameters (a path parameter wins over a query field of the same name), checks it, calls the service and answers JSON. `restGet(inputSchema, run, "deploy")` lets the CDN keep a successful answer ([Caching](#caching)); without it every answer is `Cache-Control: no-store`. `restPost(inputSchema, run)` does the same with the JSON body in place of the query string, and is never kept. `restHandlers` adds an `ANY` handler that answers every other method 405, with `Allow` naming the route's own methods.
-- **REST routes** (`src/routes/api/v1/<operation>.ts`, or a nested path such as `$network/puzzles/today.ts` for `/api/v1/{network}/puzzles/today` and `$network/puzzles/$number/guesses.ts` for `/api/v1/{network}/puzzles/{n}/guesses`): a file route with only `server.handlers`, the operation's handlers from `v1-handlers.ts`. `src/routes/api/v1/$.ts` answers every other path under `/api/v1` 404 in the error format, not with the site's not-found page.
+- **REST routes** (`src/routes/api/v1/<operation>.ts`, or a nested path such as `$network/puzzles/today.ts` for `/api/v1/{network}/puzzles/today` and `$network/puzzles/$number/guesses.ts` for `/api/v1/{network}/puzzles/{n}/guesses` and `$network/puzzles/$number/reveal.ts` for its reveal): a file route with only `server.handlers`, the operation's handlers from `v1-handlers.ts`. `src/routes/api/v1/$.ts` answers every other path under `/api/v1` 404 in the error format, not with the site's not-found page.
 
 ## Errors
 
@@ -104,6 +128,7 @@ Every error a REST route answers has one shape (`apiErrorBodySchema`, `src/lib/a
 | Code | Status | When |
 | --- | --- | --- |
 | `invalid_input` | 400 | The input does not match the operation's schema; the message lists zod's issues. |
+| `game_not_over` | 403 | A reveal before the game is over ([The reveal](#the-reveal)). |
 | `not_found` | 404 | No operation at that path, or a service's `ApiError` for something that does not exist. |
 | `method_not_allowed` | 405 | A method other than the operation's (`Allow` names it). |
 | `internal_error` | 500 | Any error that is not an `ApiError`. It is logged to the server's console; the answer carries a generic message, never the error's own (a file path, a schema issue). |
@@ -139,4 +164,4 @@ The router's locale rewrite also matches `/en/api/v1/…` ([i18n.md](i18n.md#loc
 
 ## Tests
 
-`src/lib/game/meta.test.ts` runs the service and its schemas on the fixture. `src/lib/game/today-puzzle.test.ts` runs `getTodayPuzzle` at fixed instants on the fixture with its schedule carried on for 400 days: puzzle 142 on 6 November 2026, the switch at Amsterdam midnight in winter and summer, both clock changes, no station in the answer and a day without a puzzle. `src/lib/game/stations.test.ts` runs `getStations` on the fixture: every station with its code, name and province, nothing its strict schema does not name, no station that is only a change in a trip, the English province names and the input's defaults. `src/lib/game/guess.test.ts` runs `submitGuess` on the fixture's puzzle 2, with five stations added so a seventh guess can be made: the redaction of change stations by the earlier guesses, a correct guess without a trip, no mystery station in a wrong guess's answer, an earlier puzzle, and every rejection. `src/lib/api/v1-handlers.test.ts` calls the REST handlers with a `Request` and path parameters, as Start does, with `serviceContext` mocked to read the fixture at a fixed time: the answer, a bad input, a body that is not a JSON object, a server error that keeps its message to itself, a day without a puzzle, a guess at a future puzzle (404), the cache headers of a kept answer and of its errors, another method and an unknown path.
+`src/lib/game/meta.test.ts` runs the service and its schemas on the fixture. `src/lib/game/today-puzzle.test.ts` runs `getTodayPuzzle` at fixed instants on the fixture with its schedule carried on for 400 days: puzzle 142 on 6 November 2026, the switch at Amsterdam midnight in winter and summer, both clock changes, no station in the answer and a day without a puzzle. `src/lib/game/stations.test.ts` runs `getStations` on the fixture: every station with its code, name and province, nothing its strict schema does not name, no station that is only a change in a trip, the English province names and the input's defaults. `src/lib/game/guess.test.ts` runs `submitGuess` on the fixture's puzzle 2, with five stations added so a seventh guess can be made: the redaction of change stations by the earlier guesses, a correct guess without a trip, no mystery station in a wrong guess's answer, an earlier puzzle, and every rejection. `src/lib/game/reveal.test.ts` runs `revealAnswer` on the same puzzle, its five added stations given trips so a game can run to six wrong guesses: a solved game's station and full trips, a solve on the first and the sixth guess, a missed game, an earlier puzzle, `game_not_over` without the answer for a game that is not over, and every rejection. `src/lib/api/v1-handlers.test.ts` calls the REST handlers with a `Request` and path parameters, as Start does, with `serviceContext` mocked to read the fixture at a fixed time: the answer, a bad input, a body that is not a JSON object, a server error that keeps its message to itself, a day without a puzzle, a guess at a future puzzle (404), a reveal of a finished game and of one not over (403), the cache headers of a kept answer and of its errors, another method and an unknown path.
