@@ -15,7 +15,7 @@ Top to bottom, in the shell's 1080px column:
 - **The search.** `StationSearch` ([station-search.md](station-search.md)), told which guess this is and which stations were guessed. When a guess does not go through (a network error, the rate limit), an alert under it says so; nothing is kept and the player can guess again.
 - **The guesses.** `GuessList` ([guess-list.md](guess-list.md)), newest first, with the progress dots in its header row opposite "Mystery station". Before the first guess the list, and so the progress, is not shown.
 
-Once the game is over the search gives way to one line: "You tracked it down in N of 6." or "No guesses left. A new mystery station comes at midnight." The Solved and Missed screen will replace that line.
+Once the game is over the search gives way to one line: "You tracked it down in N of 6." or "No guesses left. A new mystery station comes at midnight." Under it is the Share result button, and under the guesses the "What you'll share" preview ([share.md](share.md)). The Solved and Missed screen will replace that line.
 
 ## Progress
 
@@ -49,5 +49,5 @@ A game is kept in `localStorage` under `trackdown:game:v1:{network}:{number}`, o
 ## Tests
 
 - `src/lib/game/game-state.test.ts` covers the key, writing and reading back a game, broken entries, the status, and the store with storage and without.
-- `src/components/game/game-page.test.tsx` renders the page in `happy-dom` with `submitGuessFn` mocked: the day line, kept guesses and progress, a guess sent with the earlier ones and kept over a reload, a hidden change on an earlier trip named once it is guessed, a game without storage, winning, losing, a guess that fails, Dutch.
+- `src/components/game/game-page.test.tsx` renders the page in `happy-dom` with `submitGuessFn` mocked: the day line, kept guesses and progress, a guess sent with the earlier ones and kept over a reload, a hidden change on an earlier trip named once it is guessed, a game without storage, winning, losing, a guess that fails, Dutch, and sharing the result ([share.md](share.md#tests)).
 - `src/router.test.tsx` renders `/` through the router with the server functions mocked.

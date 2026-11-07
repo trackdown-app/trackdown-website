@@ -5,9 +5,13 @@ import { cn } from "@/lib/utils";
 import { shellContainer } from "@/components/layout/shell-container";
 import { GameProgress } from "@/components/game/game-progress";
 import { GuessList } from "@/components/game/guess-list";
+import { ShareButton } from "@/components/game/share-button";
+import { SharePreview } from "@/components/game/share-preview";
 import { StationSearch } from "@/components/game/station-search";
 import { puzzleDateLabel } from "@/lib/game/puzzle-date-label";
 import type { GameStore } from "@/lib/game/game-store";
+import type { ShareNavigator } from "@/lib/game/share-result";
+import { shareText } from "@/lib/game/share-text";
 import type { StationOption } from "@/lib/game/station-search";
 import type { TodayPuzzleOutput } from "@/lib/game/schemas";
 import { spokenGuess } from "@/lib/game/trip-text";
@@ -20,6 +24,8 @@ type GamePageProps = {
     stations: readonly StationOption[];
     /** Where the game is kept; the page's `localStorage` store unless a test hands its own. */
     store?: GameStore;
+    /** Where a result is shared; the browser's `navigator` unless a test hands its own. */
+    shareTarget?: ShareNavigator;
 };
 
 /**
@@ -27,9 +33,10 @@ type GamePageProps = {
  * puzzle's day, the question, the station search, the progress dots and the
  * guesses so far, newest first. The guesses survive a reload on the same
  * device. Once the game is over the search gives way to a line saying how
- * it went.
+ * it went and the Share result button, and the text it shares shows under
+ * the guesses (docs/share.md).
  */
-export function GamePage({ puzzle, stations, store }: GamePageProps) {
+export function GamePage({ puzzle, stations, store, shareTarget }: GamePageProps) {
     const game = useGame(puzzle, store);
     const names = useMemo(
         () => new Map(stations.map((station) => [station.code, station.name])),
@@ -49,6 +56,16 @@ export function GamePage({ puzzle, stations, store }: GamePageProps) {
     } else if (game.status === "lost") {
         outcome = m["game.lost"]();
     }
+    const share =
+        game.status === "playing"
+            ? null
+            : shareText({
+                  network: puzzle.network,
+                  number: puzzle.number,
+                  maxGuesses: puzzle.maxGuesses,
+                  guesses: game.guesses,
+                  status: game.status,
+              });
 
     return (
         <main className={cn(shellContainer, "flex flex-col pt-10 pb-16")}>
@@ -76,9 +93,14 @@ export function GamePage({ puzzle, stations, store }: GamePageProps) {
                         }}
                     />
                 ) : (
-                    <p className="font-condensed text-[30px] leading-tight font-bold">
-                        {outcome}
-                    </p>
+                    <div className="flex flex-col gap-5">
+                        <p className="font-condensed text-[30px] leading-tight font-bold">
+                            {outcome}
+                        </p>
+                        {share != null && (
+                            <ShareButton text={share} target={shareTarget} />
+                        )}
+                    </div>
                 )}
                 {game.isError && (
                     <p role="alert" className="mt-3 text-base text-destructive">
@@ -107,6 +129,11 @@ export function GamePage({ puzzle, stations, store }: GamePageProps) {
                     }
                 />
             </div>
+            {share != null && (
+                <div className="mt-14">
+                    <SharePreview text={share} />
+                </div>
+            )}
         </main>
     );
 }
