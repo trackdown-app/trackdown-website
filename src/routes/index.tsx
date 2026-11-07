@@ -1,13 +1,11 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { getLocale } from "@/paraglide/runtime";
-import { GameLegend } from "@/components/game/game-legend";
 import { GamePage } from "@/components/game/game-page";
+import { PlayingFooterLegend } from "@/components/game/playing-footer-legend";
 import { stationsQueryOptions } from "@/lib/game/stations.queries";
+import { todayNetwork as network } from "@/lib/game/today-network";
 import { todayPuzzleQueryOptions } from "@/lib/game/today-puzzle.queries";
-
-/** Today's puzzle on the Dutch network, until the network picker lands. */
-const network = "nl";
 
 export const Route = createFileRoute("/")({
     loader: async ({ context }) => {
@@ -18,7 +16,7 @@ export const Route = createFileRoute("/")({
             ),
         ]);
     },
-    staticData: { footerLegend: GameLegend },
+    staticData: { footerLegend: PlayingFooterLegend },
     component: TodayGame,
 });
 

@@ -79,9 +79,12 @@
         "changeKnown": "Overstap, station bekend",
         "changeHidden": "Overstap, raad hem om te onthullen"
     },
+    "countdown": {
+        "nextStation": "Volgend station over"
+    },
     "howToPlay": {
-        "pageTitle": "Hoe te spelen · Trackdown",
-        "title": "Hoe te spelen",
+        "pageTitle": "Hoe speel je · Trackdown",
+        "title": "Hoe speel je",
         "rule1": "Raad een station in Nederland.",
         "rule2": "Wij tekenen de snelste treinreis van je gok naar het mysteriestation.",
         "rule3": "Hoe korter de lijn, hoe dichterbij. Vind het in zes gokken.",

@@ -84,6 +84,10 @@ describe("the site's router", () => {
         expect(html).toContain("Welk station is het mysterie van vandaag?");
         // The footer's legend replaces its tagline on the game page.
         expect(html).toContain("Legenda");
+        // And the countdown to the next puzzle, rendered on the server.
+        expect(html).toMatch(
+            /Volgend station over(<!-- -->)? <time[^>]*>\d\d:\d\d:\d\d</,
+        );
         expect(html).toContain("<header");
         expect(html).toContain("<footer");
         expect(html).toContain('href="#content"');
@@ -93,7 +97,7 @@ describe("the site's router", () => {
         const { status, html } = await respondAt(getRouter, "/hoe-te-spelen");
 
         expect(status).toBe(200);
-        expect(html).toContain("<title>Hoe te spelen · Trackdown</title>");
+        expect(html).toContain("<title>Hoe speel je · Trackdown</title>");
         expect(html).toContain("Raad een station in Nederland.");
         expect(html).toContain("<header");
         // No legend in the footer here: the page carries it.

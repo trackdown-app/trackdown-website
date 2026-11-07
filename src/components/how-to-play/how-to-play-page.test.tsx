@@ -8,7 +8,7 @@ describe("HowToPlayPage", () => {
         const html = await renderAt(HowToPlayPage, "/hoe-te-spelen");
 
         expect(html).toContain("<h1");
-        expect(html).toContain("Hoe te spelen");
+        expect(html).toContain("Hoe speel je");
         expect(html.match(/<li class="flex items-baseline/g)).toHaveLength(3);
         expect(html).toContain("Raad een station in Nederland.");
         expect(html).toContain("Vind het in zes gokken.");

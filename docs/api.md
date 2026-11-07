@@ -46,7 +46,7 @@ GET /api/v1/nl/puzzles/today
 - **The puzzle** is the entry of `puzzles.json` with that date. A day without one (before puzzle 1, past the end of the schedule) answers `not_found`.
 - **The answer** is never in it: the service builds the answer field by field, and `todayPuzzleOutputSchema` is strict, so its test fails on any field it does not name, `station` included.
 - **`maxGuesses`** is the game's `maxGuesses` (`rules.ts`), 6.
-- **`todayPuzzleQueryOptions`** keeps the answer fresh until `nextPuzzleAt`.
+- **`todayPuzzleQueryOptions`** keeps the answer fresh until `nextPuzzleAt`. The game page's countdown reads it again then ([game.md](game.md#countdown)).
 - **Kept until the next puzzle** ([Caching](#caching)): the CDN and a client keep the REST answer for the seconds left until `nextPuzzleAt`, so it is never served past Amsterdam midnight.
 
 ### The archive
