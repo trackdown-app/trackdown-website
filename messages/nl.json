@@ -79,6 +79,9 @@
         "changeKnown": "Overstap, station bekend",
         "changeHidden": "Overstap, raad hem om te onthullen"
     },
+    "countdown": {
+        "nextStation": "Volgend station over"
+    },
     "language": {
         "label": "Taal",
         "nl": "Nederlands",

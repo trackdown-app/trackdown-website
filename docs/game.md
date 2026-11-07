@@ -4,7 +4,7 @@ The home page, `/` (`/en` in English), is today's puzzle on the Dutch network, a
 
 ## The route
 
-The loader fills two queries ([data-loading.md](data-loading.md)): `todayPuzzleQueryOptions("nl")` and `stationsQueryOptions("nl", locale)`. The component reads both with `useSuspenseQuery` and hands them to `GamePage`. The route names `GameLegend` as its footer legend ([site-shell.md](site-shell.md#footer)). The network is fixed at `nl` until the network picker lands.
+The loader fills two queries ([data-loading.md](data-loading.md)): `todayPuzzleQueryOptions("nl")` and `stationsQueryOptions("nl", locale)`. The component reads both with `useSuspenseQuery` and hands them to `GamePage`. The route names `PlayingFooterLegend` (`src/components/game/playing-footer-legend.tsx`) as its footer legend ([site-shell.md](site-shell.md#footer)): the line legend and the [countdown](#countdown). The network is fixed at `todayNetwork` (`src/lib/game/today-network.ts`), `nl`, until the network picker lands; the route and the countdown both read it.
 
 ## The page
 
@@ -45,6 +45,16 @@ The page never knows the mystery station while the game is on. Once it is over, 
 
 Beside the dots, in 16px semibold: "Guess 5 of 6, newest first". The page shows the progress only while the game is on; `GameProgress` also words a finished game ("Found in 4 of 6, newest first", "All 6 guesses used, newest first") for a view that shows one. The dots are hidden from screen readers; the words say the same.
 
+## Countdown
+
+`NextPuzzleCountdown` (`src/components/game/next-puzzle-countdown.tsx`) is the footer's "Next station in 13:42:08" / "Volgend station over 13:42:08", from the design's Web · Playing board: muted text, the time in ink and bold. It sits opposite the line legend while playing and after the game is over. The design's Web · Solved board also sets it under "What you'll share" ([share.md](share.md)); it is not there yet.
+
+- **The time left** is from now to today's puzzle's `nextPuzzleAt`, the next midnight in Europe/Amsterdam ([api.md](api.md#todays-puzzle)), read from the `todayPuzzle` query the route's loader filled. `secondsUntil` and `countdownClock` (`src/lib/game/countdown.ts`) turn it into `hh:mm:ss`. Both ends are instants, so the day the clocks change counts its real 23 or 25 hours: just after midnight on the last Sunday of October it shows `24:59:59`. The time is a `<time>` whose `dateTime` is the same as an ISO 8601 duration (`PT13H42M8S`).
+- **Ticking.** `useNow` (`src/lib/use-now.ts`) is a clock for `useSyncExternalStore` that ticks at the start of every second, aimed at the next whole second so a throttled timer does not drift.
+- **Server render and hydration.** The server renders the time left by its own clock. The browser's first render reads its own clock, a second or two later, so the `<time>` is `suppressHydrationWarning`: React keeps the server's text and the next tick puts it right. The figures are tabular and always `hh:mm:ss`, so nothing moves when it does.
+- **At zero** the countdown invalidates the `todayPuzzle` query. The new answer is a new puzzle number, so the page plays a new game ([Storage](#storage)) and the countdown starts again from the new `nextPuzzleAt`. A browser clock ahead of the server's reaches zero first and gets today's puzzle again: it shows `00:00:00` and asks every 10 seconds until the new puzzle is in.
+- **Without the puzzle** (its read failed) the countdown is not shown.
+
 ## Game state
 
 `useGame` (`src/lib/game/use-game.ts`) holds the game at one puzzle:
@@ -67,4 +77,6 @@ A game is kept in `localStorage` under `trackdown:game:v1:{network}:{number}`, o
 
 - `src/lib/game/game-state.test.ts` covers the key, writing and reading back a game, broken entries, the status, and the store with storage and without.
 - `src/components/game/game-page.test.tsx` renders the page in `happy-dom` with `submitGuessFn` mocked: the day line, kept guesses and progress, a guess sent with the earlier ones and kept over a reload, a hidden change on an earlier trip named once it is guessed, a game without storage, a guess that fails, Dutch. With `revealAnswerFn` mocked too: winning (the reveal asked once with the guesses, the answer as the focused heading, the revealed list, the buttons), missing (every change named, focus left alone), no answer before the reveal answers, and a reveal that fails and is asked again; sharing the result ([share.md](share.md#tests)).
-- `src/router.test.tsx` renders `/` through the router with the server functions mocked.
+- `src/lib/game/countdown.test.ts` covers the clock and the duration, midnight in Amsterdam rather than UTC, and the 23- and 25-hour days the clocks change.
+- `src/components/game/next-puzzle-countdown.test.tsx` renders the countdown in `happy-dom` with fake timers and `getTodayPuzzleFn` mocked: the text in both languages, ticking, reading the puzzle again at zero, asking again while the server still answers the old one, and hydrating over a server render two seconds older without an error.
+- `src/router.test.tsx` renders `/` through the router with the server functions mocked, the countdown in its footer.
