@@ -5,10 +5,12 @@ import { errorResponse, restGet, restHandlers, restPost } from "@/lib/api/rest";
 import type { RestHandler } from "@/lib/api/rest";
 import { submitGuess } from "@/lib/game/guess";
 import { getMeta } from "@/lib/game/meta";
+import { getPuzzleArchive } from "@/lib/game/puzzle-archive";
 import { revealAnswer } from "@/lib/game/reveal";
 import {
     guessInputSchema,
     metaInputSchema,
+    puzzleArchiveInputSchema,
     revealInputSchema,
     stationsInputSchema,
     todayPuzzleInputSchema,
@@ -33,6 +35,17 @@ export const metaHandlers = restHandlers({
 export const todayPuzzleHandlers = restHandlers({
     GET: restGet(todayPuzzleInputSchema, (input) =>
         getTodayPuzzle(input, serviceContext),
+    ),
+});
+
+/**
+ * `/api/v1/{network}/puzzles`: the `puzzleArchive` operation for iOS;
+ * `getPuzzleArchiveFn` is the same for the web. It grows by one puzzle each
+ * day, so it is never kept.
+ */
+export const puzzleArchiveHandlers = restHandlers({
+    GET: restGet(puzzleArchiveInputSchema, (input) =>
+        getPuzzleArchive(input, serviceContext),
     ),
 });
 

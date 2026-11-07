@@ -54,6 +54,34 @@ export const todayPuzzleOutputSchema = z.strictObject({
 
 export type TodayPuzzleOutput = z.output<typeof todayPuzzleOutputSchema>;
 
+/** `puzzleArchive`: which network's puzzles. From the path, so no default. */
+export const puzzleArchiveInputSchema = z.object({
+    network: networkIdSchema,
+});
+
+export type PuzzleArchiveInput = z.output<typeof puzzleArchiveInputSchema>;
+
+/**
+ * `puzzleArchive`: one puzzle a player can still play. Never its mystery
+ * station: strict, so a field this schema does not name fails the test of
+ * its service.
+ */
+export const archivedPuzzleSchema = z.strictObject({
+    number: z.number().int().positive(),
+    /** The puzzle's day, `YYYY-MM-DD`, in Europe/Amsterdam. */
+    date: z.iso.date(),
+});
+
+export type ArchivedPuzzle = z.output<typeof archivedPuzzleSchema>;
+
+/** `puzzleArchive`: every puzzle up to today's, oldest first, today's last. */
+export const puzzleArchiveOutputSchema = z.strictObject({
+    network: networkIdSchema,
+    puzzles: z.array(archivedPuzzleSchema),
+});
+
+export type PuzzleArchiveOutput = z.output<typeof puzzleArchiveOutputSchema>;
+
 /**
  * `guess`: one guess at a puzzle, with the guesses before it. The network and
  * the puzzle's number come from the path; the REST route reads the number as
