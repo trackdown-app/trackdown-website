@@ -45,3 +45,4 @@ The site runs on http://localhost:3000.
 - [How to play](docs/how-to-play.md)
 - [Archive](docs/archive.md)
 - [Deploy](docs/deploy.md)
+- [Server logs and traces](docs/logging.md)

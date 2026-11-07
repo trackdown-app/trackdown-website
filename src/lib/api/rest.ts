@@ -4,6 +4,10 @@ import { z } from "zod";
 import { ApiError } from "@/lib/api/api-error";
 import { unknownClientError } from "@/lib/api/client-identification";
 import { crossOriginError, rateLimitRefusal } from "@/lib/api/request-guard";
+import { trace } from "@opentelemetry/api";
+import { errorAttributes, operationAttributes } from "@/lib/logging/attributes";
+import { createLogger } from "@/lib/logging/logger";
+import { annotateRequest } from "@/lib/logging/request-metadata";
 
 /**
  * What a REST route's method handler gets from Start, as far as it reads it:
@@ -56,6 +60,8 @@ export function jsonResponse(
 
 /** `error` in the API's error format, with its status. */
 export function errorResponse(error: ApiError): Response {
+    trace.getActiveSpan()?.setAttributes(errorAttributes(error));
+    annotateRequest(errorAttributes(error));
     return jsonResponse(error.toBody(), error.status);
 }
 
@@ -122,12 +128,18 @@ async function answer<S extends z.ZodType, O>(
             new ApiError("invalid_input", z.prettifyError(parsed.error)),
         );
     }
+    trace.getActiveSpan()?.setAttributes(operationAttributes(parsed.data));
+    annotateRequest(operationAttributes(parsed.data));
     let output: O;
     try {
         output = await run(parsed.data);
     } catch (error) {
         return errorResponse(toApiError(error));
     }
+    // Today's puzzle and default-network operations learn this metadata
+    // from the service. The helper reads no other fields from the output.
+    trace.getActiveSpan()?.setAttributes(operationAttributes(output));
+    annotateRequest(operationAttributes(output));
     return jsonResponse(
         output,
         200,
@@ -229,6 +241,6 @@ export function toApiError(error: unknown): ApiError {
     if (error instanceof ApiError) {
         return error;
     }
-    console.error("An API operation failed", error);
+    createLogger("api").error("API operation failed", errorAttributes(error));
     return new ApiError("internal_error", "Something went wrong on the server");
 }
