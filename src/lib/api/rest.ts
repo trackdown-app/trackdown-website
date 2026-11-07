@@ -3,8 +3,14 @@ import "@tanstack/react-start/server-only";
 import { z } from "zod";
 import { ApiError } from "@/lib/api/api-error";
 
-/** What a REST route's method handler gets from Start, as far as it reads it. */
-export type RestContext = { request: Request };
+/**
+ * What a REST route's method handler gets from Start, as far as it reads it:
+ * the request and the route's path parameters (`$network`).
+ */
+export type RestContext = {
+    request: Request;
+    params: Readonly<Record<string, string>>;
+};
 
 export type RestHandler = (context: RestContext) => Promise<Response>;
 
@@ -22,7 +28,8 @@ export function errorResponse(error: ApiError): Response {
 }
 
 /**
- * A `GET` handler for one operation: reads the input from the query string,
+ * A `GET` handler for one operation: reads the input from the query string
+ * and the path parameters (which win over a query field of the same name),
  * checks it against `input`, answers with what `run` returns as JSON, and
  * turns every error into the API's error format (docs/api.md#errors).
  */
@@ -30,9 +37,9 @@ export function restGet<S extends z.ZodType, O>(
     input: S,
     run: (input: z.output<S>) => Promise<O>,
 ): RestHandler {
-    return async ({ request }) => {
+    return async ({ request, params }) => {
         const query = Object.fromEntries(new URL(request.url).searchParams);
-        const parsed = input.safeParse(query);
+        const parsed = input.safeParse({ ...query, ...params });
         if (!parsed.success) {
             return errorResponse(
                 new ApiError("invalid_input", z.prettifyError(parsed.error)),

@@ -4,8 +4,9 @@ import { ApiError } from "@/lib/api/api-error";
 import { errorResponse, restGet, restHandlers } from "@/lib/api/rest";
 import type { RestHandler } from "@/lib/api/rest";
 import { getMeta } from "@/lib/game/meta";
-import { metaInputSchema } from "@/lib/game/schemas";
+import { metaInputSchema, todayPuzzleInputSchema } from "@/lib/game/schemas";
 import { serviceContext } from "@/lib/game/service-context";
+import { getTodayPuzzle } from "@/lib/game/today-puzzle";
 
 // The handlers of every REST route under `/api/v1` (docs/api.md). Each route
 // file in `src/routes/api/v1/` only hands its handlers to Start, so the tests
@@ -14,6 +15,16 @@ import { serviceContext } from "@/lib/game/service-context";
 /** `/api/v1/meta`: the `meta` operation for iOS; `getMetaFn` is the same for the web. */
 export const metaHandlers = restHandlers({
     GET: restGet(metaInputSchema, (input) => getMeta(input, serviceContext)),
+});
+
+/**
+ * `/api/v1/{network}/puzzles/today`: the `todayPuzzle` operation for iOS;
+ * `getTodayPuzzleFn` is the same for the web.
+ */
+export const todayPuzzleHandlers = restHandlers({
+    GET: restGet(todayPuzzleInputSchema, (input) =>
+        getTodayPuzzle(input, serviceContext),
+    ),
 });
 
 /**

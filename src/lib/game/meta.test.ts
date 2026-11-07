@@ -11,6 +11,7 @@ const fixtureDir = resolve(import.meta.dirname, "../../../fixtures/trackdown-dat
 const context = {
     data: createGameData(readDataDir(fixtureDir)),
     dataRef: "abc123",
+    now: () => new Date("2026-06-18T12:00:00.000Z"),
 };
 
 describe("getMeta", () => {
