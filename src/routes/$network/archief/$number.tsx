@@ -8,15 +8,12 @@ import { puzzleArchiveQueryOptions } from "@/lib/game/puzzle-archive.queries";
 import { puzzleDate } from "@/lib/game/puzzle-day";
 import { maxGuesses } from "@/lib/game/rules";
 import { stationsQueryOptions } from "@/lib/game/stations.queries";
-import { todayNetwork as network } from "@/lib/game/today-network";
 
-export const Route = createFileRoute("/archief/$number")({
-    loader: async ({ context, params }) => {
+export const Route = createFileRoute("/$network/archief/$number")({
+    loader: async ({ context: { queryClient, network }, params }) => {
         const [archive] = await Promise.all([
-            context.queryClient.ensureQueryData(puzzleArchiveQueryOptions(network)),
-            context.queryClient.ensureQueryData(
-                stationsQueryOptions(network, getLocale()),
-            ),
+            queryClient.ensureQueryData(puzzleArchiveQueryOptions(network)),
+            queryClient.ensureQueryData(stationsQueryOptions(network, getLocale())),
         ]);
         // Only the archive's own numbers, written as it writes them: a
         // puzzle after today's is not in it, so its page is not found, as
@@ -27,10 +24,10 @@ export const Route = createFileRoute("/archief/$number")({
         if (puzzle == null) {
             throw notFound();
         }
-        // Today's puzzle is played on the home page, where it counts for
-        // the streak.
+        // Today's puzzle is played on the network's home page, where it
+        // counts for the streak.
         if (puzzle.date === puzzleDate(new Date())) {
-            throw redirect({ to: "/" });
+            throw redirect({ to: "/$network", params: { network } });
         }
         return { puzzle: { network, ...puzzle, maxGuesses } };
     },
@@ -43,6 +40,7 @@ export const Route = createFileRoute("/archief/$number")({
 });
 
 function ArchiveGame() {
+    const { network } = Route.useRouteContext();
     const { puzzle } = Route.useLoaderData();
     const { data: stations } = useSuspenseQuery(
         stationsQueryOptions(network, getLocale()),

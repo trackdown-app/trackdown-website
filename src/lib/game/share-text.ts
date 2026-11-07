@@ -80,11 +80,12 @@ export type ShareTextInput = {
  * ●━           17m
  * ●━           13m
  * Tracked down in 5
- * https://trackdown.nl/en
+ * https://trackdown.nl/en/nl
  * ```
  *
  * A lost game scores `X/6` and says "Not tracked down". The last line is
- * the site in the page's language, so a friend can play too.
+ * the network's game in the page's language, so a friend can play the same
+ * puzzle too.
  */
 export function shareText({
     network,
@@ -103,5 +104,7 @@ export function shareText({
     const footer = won
         ? m["share.won"]({ count: String(guesses.length) })
         : m["share.lost"]();
-    return [header, ...shareGrid(guesses), footer, m["share.url"]()].join("\n");
+    return [header, ...shareGrid(guesses), footer, m["share.url"]({ network })].join(
+        "\n",
+    );
 }

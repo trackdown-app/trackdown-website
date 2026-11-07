@@ -5,6 +5,7 @@ import {
     defaultRenderHandler,
 } from "@tanstack/react-router/ssr/server";
 import { describe, expect, it, vi } from "vitest";
+import { overwriteGetLocale } from "@/paraglide/runtime";
 import { ErrorPage } from "@/components/errors/error-page";
 import { NotFoundPage } from "@/components/errors/not-found-page";
 import { RootDocument } from "@/components/layout/root-document";
@@ -99,8 +100,31 @@ function siteRouterWithFailingPage(): AnyRouter {
 }
 
 describe("the site's router", () => {
-    it("answers the home page with today's game, inside the header and footer", async () => {
-        const { status, html } = await respondAt(getRouter, "/");
+    it.each([
+        ["/", "nl", "/nl"],
+        ["/en", "en", "/en/nl"],
+    ] as const)(
+        "sends %s to the chosen network's game, the default one without a choice",
+        async (pathname, locale, expected) => {
+            // Without `paraglideMiddleware` the test sets the locale the
+            // server would read from the URL.
+            overwriteGetLocale(() => locale);
+            const handler = createRequestHandler({
+                request: new Request(new URL(pathname, "http://localhost")),
+                createRouter: getRouter,
+            });
+            const response = await handler(defaultRenderHandler);
+
+            expect(response.status).toBe(307);
+            expect(
+                new URL(response.headers.get("location") ?? "", "http://localhost")
+                    .pathname,
+            ).toBe(expected);
+        },
+    );
+
+    it("answers a network's page with today's game, inside the header and footer", async () => {
+        const { status, html } = await respondAt(getRouter, "/nl");
 
         expect(status).toBe(200);
         expect(html).toContain("Vrijdag 6 november, puzzel 142");
@@ -128,20 +152,20 @@ describe("the site's router", () => {
     });
 
     it("answers the archive with every puzzle up to today's, newest first", async () => {
-        const { status, html } = await respondAt(getRouter, "/archief");
+        const { status, html } = await respondAt(getRouter, "/nl/archief");
 
         expect(status).toBe(200);
         expect(html).toContain("<title>Archief · Trackdown</title>");
-        const links = [...html.matchAll(/href="(\/archief\/\d+)"/g)].map(
+        const links = [...html.matchAll(/href="(\/nl\/archief\/\d+)"/g)].map(
             (match) => match[1],
         );
-        expect(links).toEqual(["/archief/143", "/archief/142"]);
+        expect(links).toEqual(["/nl/archief/143", "/nl/archief/142"]);
         expect(html).toContain("Puzzel 144");
         expect(html).toContain("<header");
     });
 
     it("plays an earlier puzzle on its own page, with the legend in the footer", async () => {
-        const { status, html } = await respondAt(getRouter, "/archief/142");
+        const { status, html } = await respondAt(getRouter, "/nl/archief/142");
 
         expect(status).toBe(200);
         expect(html).toContain("<title>Puzzel 142 · Trackdown</title>");
@@ -152,9 +176,9 @@ describe("the site's router", () => {
         expect(html).not.toContain("Volgend station over");
     });
 
-    it("sends today's puzzle in the archive to the home page", async () => {
+    it("sends today's puzzle in the archive to the network's game", async () => {
         const handler = createRequestHandler({
-            request: new Request("http://localhost/archief/144"),
+            request: new Request("http://localhost/nl/archief/144"),
             createRouter: getRouter,
         });
         const response = await handler(defaultRenderHandler);
@@ -163,11 +187,11 @@ describe("the site's router", () => {
         expect(
             new URL(response.headers.get("location") ?? "", "http://localhost")
                 .pathname,
-        ).toBe("/");
+        ).toBe("/nl");
     });
 
-    it.each(["/archief/145", "/archief/0", "/archief/0142", "/archief/abc"])(
-        "answers %s, not a puzzle up to today's, with 404",
+    it.each(["/be", "/be/archief", "/be/archief/1", "/NL"])(
+        "answers %s, a network the game has no data for, with 404",
         async (pathname) => {
             const { status, html } = await respondAt(getRouter, pathname);
 
@@ -175,6 +199,18 @@ describe("the site's router", () => {
             expect(html).toContain("Deze pagina bestaat niet");
         },
     );
+
+    it.each([
+        "/nl/archief/145",
+        "/nl/archief/0",
+        "/nl/archief/0142",
+        "/nl/archief/abc",
+    ])("answers %s, not a puzzle up to today's, with 404", async (pathname) => {
+        const { status, html } = await respondAt(getRouter, pathname);
+
+        expect(status).toBe(404);
+        expect(html).toContain("Deze pagina bestaat niet");
+    });
 
     it("answers an unknown path with 404 and the not-found page", async () => {
         const { status, html } = await respondAt(getRouter, "/geen-station");

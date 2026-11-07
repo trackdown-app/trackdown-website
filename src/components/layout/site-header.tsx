@@ -5,19 +5,22 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { LanguageSwitch } from "@/components/language/language-switch";
 import { LogoMark } from "@/components/layout/logo-mark";
-import { NetworkPill } from "@/components/layout/network-pill";
+import { NetworkPicker } from "@/components/layout/network-picker";
 import { shellContainer } from "@/components/layout/shell-container";
+import { useCurrentNetwork } from "@/lib/use-current-network";
 
 const navLinkClasses =
     "inline-flex min-h-11 items-center px-2 text-base font-medium text-foreground no-underline underline-offset-[0.3em] hover:underline aria-[current=page]:font-semibold aria-[current=page]:underline sm:px-3";
 
 /**
  * The header every page shares, after the design's Web · Playing board: the
- * logo linking home and the network pill on the left; Archive, How to play,
- * the statistics button and the language switch on the right. Both halves
- * wrap, so it fits a 320px screen without scrolling sideways.
+ * logo linking to the network's game and the network picker on the left;
+ * the network's archive, How to play, the statistics button and the
+ * language switch on the right. Both halves wrap, so it fits a 320px screen
+ * without scrolling sideways.
  */
 export function SiteHeader() {
+    const network = useCurrentNetwork();
     return (
         <header
             className={cn(
@@ -27,7 +30,8 @@ export function SiteHeader() {
         >
             <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
                 <Link
-                    to="/"
+                    to="/$network"
+                    params={{ network }}
                     activeOptions={{ exact: true }}
                     aria-label={m["header.home"]()}
                     className="flex min-h-11 items-center gap-2.5 text-foreground no-underline"
@@ -37,14 +41,18 @@ export function SiteHeader() {
                         {m["site.name"]()}
                     </span>
                 </Link>
-                <NetworkPill />
+                <NetworkPicker />
             </div>
             <div className="flex flex-wrap items-center gap-x-1 gap-y-2">
                 <nav aria-label={m["header.nav"]()}>
                     <ul className="flex items-center gap-1">
                         <li>
                             {/* Current on every puzzle of the archive too. */}
-                            <Link to="/archief" className={navLinkClasses}>
+                            <Link
+                                to="/$network/archief"
+                                params={{ network }}
+                                className={navLinkClasses}
+                            >
                                 {m["header.archive"]()}
                             </Link>
                         </li>

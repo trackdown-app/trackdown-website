@@ -13,7 +13,7 @@ import type { ArchivedPuzzle } from "@/lib/game/schemas";
 type ArchivePuzzleRowProps = {
     network: NetworkId;
     puzzle: ArchivedPuzzle;
-    /** Today's puzzle: links to the home page, where it counts for the streak. */
+    /** Today's puzzle: links to the network's game, where it counts for the streak. */
     isToday: boolean;
     store: GameStore;
 };
@@ -66,13 +66,13 @@ export function ArchivePuzzleRow({
     return (
         <li className="border-b border-rule">
             {isToday ? (
-                <Link to="/" className={rowClasses}>
+                <Link to="/$network" params={{ network }} className={rowClasses}>
                     {content}
                 </Link>
             ) : (
                 <Link
-                    to="/archief/$number"
-                    params={{ number: String(puzzle.number) }}
+                    to="/$network/archief/$number"
+                    params={{ network, number: String(puzzle.number) }}
                     className={rowClasses}
                 >
                     {content}

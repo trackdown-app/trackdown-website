@@ -3,7 +3,7 @@ import { useEffect, useMemo, useRef } from "react";
 import { m } from "@/paraglide/messages";
 import { localizeHref } from "@/paraglide/runtime";
 import { cn } from "@/lib/utils";
-import { sitePaths } from "@/lib/site-paths";
+import { networkArchivePath } from "@/lib/site-paths";
 import { AnswerPlate } from "@/components/game/answer-plate";
 import { GuessList } from "@/components/game/guess-list";
 import { ShareButton } from "@/components/game/share-button";
@@ -105,7 +105,7 @@ export function GameOver({
                 <div className="flex flex-wrap gap-3">
                     <ShareButton text={share} target={shareTarget} />
                     <a
-                        href={localizeHref(sitePaths.archive)}
+                        href={localizeHref(networkArchivePath(puzzle.network))}
                         className={cn(
                             buttonVariants({ variant: "outline", size: "lg" }),
                             "rounded-lg border-2 px-5.5",

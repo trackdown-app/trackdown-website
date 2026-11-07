@@ -2,6 +2,8 @@ import type { QueryClient } from "@tanstack/react-query";
 import { createRootRouteWithContext } from "@tanstack/react-router";
 import { m } from "@/paraglide/messages";
 import { RootDocument } from "@/components/layout/root-document";
+import { defaultNetwork } from "@/lib/data/networks";
+import { readNetworkChoice } from "@/lib/network-choice";
 import appCss from "../styles.css?url";
 
 /** What every route's loader gets in `context`; built in `src/router.tsx`. */
@@ -11,6 +13,11 @@ export interface RouterContext {
 }
 
 export const Route = createRootRouteWithContext<RouterContext>()({
+    // The network this visitor plays when the page has none of its own,
+    // such as `/` and How to play (docs/network-picker.md).
+    beforeLoad: async () => ({
+        chosenNetwork: (await readNetworkChoice()) ?? defaultNetwork,
+    }),
     head: () => ({
         meta: [
             {

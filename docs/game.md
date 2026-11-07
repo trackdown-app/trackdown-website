@@ -1,10 +1,10 @@
 # The game page
 
-The home page, `/` (`/en` in English), is today's puzzle on the Dutch network, after the design's Web · Playing board. `src/routes/index.tsx` loads it; `GamePage` (`src/components/game/game-page.tsx`) draws it. The archive plays an earlier puzzle with the same `GamePage`, given `archive` ([archive.md](archive.md#playing-an-earlier-puzzle)).
+A network's game, `/{network}` (`/en/{network}` in English, `/nl` for the Dutch network), is today's puzzle on that network, after the design's Web · Playing board. `/` sends a visitor to the game of the network they chose ([network-picker.md](network-picker.md)). `src/routes/$network/index.tsx` loads it; `GamePage` (`src/components/game/game-page.tsx`) draws it. The archive plays an earlier puzzle with the same `GamePage`, given `archive` ([archive.md](archive.md#playing-an-earlier-puzzle)).
 
 ## The route
 
-The loader fills two queries ([data-loading.md](data-loading.md)): `todayPuzzleQueryOptions("nl")` and `stationsQueryOptions("nl", locale)`. The component reads both with `useSuspenseQuery` and hands them to `GamePage`. The route names `PlayingFooterLegend` (`src/components/game/playing-footer-legend.tsx`) as its footer legend ([site-shell.md](site-shell.md#footer)): the line legend and the [countdown](#countdown). The network is fixed at `todayNetwork` (`src/lib/game/today-network.ts`), `nl`, until the network picker lands; the route and the countdown both read it.
+The loader fills two queries ([data-loading.md](data-loading.md)): `todayPuzzleQueryOptions(network)` and `stationsQueryOptions(network, locale)`, `network` from the route's context ([network-picker.md](network-picker.md#routes)). The component reads both with `useSuspenseQuery` and hands them to `GamePage`. The route names `PlayingFooterLegend` (`src/components/game/playing-footer-legend.tsx`) as its footer legend ([site-shell.md](site-shell.md#footer)): the line legend and the [countdown](#countdown). The countdown reads the network from the page (`useCurrentNetwork`).
 
 ## The page
 
@@ -22,7 +22,7 @@ Once the game is over the question, the search and the progress give way to the 
 `GameOver` (`src/components/game/game-over.tsx`) is the finished game, after the design's Web · Solved board, in the same column:
 
 - **The answer plate.** `AnswerPlate` (`src/components/game/answer-plate.tsx`): a 16px-cornered plate in `plate`, the theme turned over ([design-system.md](design-system.md#colour)). The logo mark in its plate colours, its bar filled, beside how it went in `plate-muted` 18px: "You tracked it down in 5 of 6 guesses" / "Je hebt hem gevonden in 5 van 6 gokken", or when missed "No guesses left. The mystery station was" / "Geen gokken meer. Het mysteriestation was". Below it the mystery station as the page's `h1`, Barlow Condensed 800, 52px to 112px with the width. The plate is a section named "Today's answer" / "Het antwoord van vandaag".
-- **The buttons.** "Share result" / "Deel je resultaat", the ink main button with a share icon, and "Play an older puzzle" / "Speel een eerdere puzzel", an outlined link to the archive (`/archief`, [archive.md](archive.md)). Both 52px, 12px corners. The share button shares the result ([share.md](share.md#sharing)), and a status line under the buttons says when it was copied instead.
+- **The buttons.** "Share result" / "Deel je resultaat", the ink main button with a share icon, and "Play an older puzzle" / "Speel een eerdere puzzel", an outlined link to the network's archive (`/{network}/archief`, `networkArchivePath`, [archive.md](archive.md)). Both 52px, 12px corners. The share button shares the result ([share.md](share.md#sharing)), and a status line under the buttons says when it was copied instead.
 - **How you got there.** `GuessList` in its revealed form ([guess-list.md](guess-list.md#revealed)): every guess, newest first, every change named.
 - **What you'll share.** `SharePreview` ([share.md](share.md#the-preview)): the exact text the share button hands on, without station names.
 
@@ -79,4 +79,4 @@ A game is kept in `localStorage` under `trackdown:game:v1:{network}:{number}`, o
 - `src/components/game/game-page.test.tsx` renders the page in `happy-dom` with `submitGuessFn` mocked: the day line, kept guesses and progress, a guess sent with the earlier ones and kept over a reload, a hidden change on an earlier trip named once it is guessed, a game without storage, a guess that fails, Dutch. With `revealAnswerFn` mocked too: winning (the reveal asked once with the guesses, the answer as the focused heading, the revealed list, the buttons), missing (every change named, focus left alone), no answer before the reveal answers, and a reveal that fails and is asked again; sharing the result ([share.md](share.md#tests)).
 - `src/lib/game/countdown.test.ts` covers the clock and the duration, midnight in Amsterdam rather than UTC, and the 23- and 25-hour days the clocks change.
 - `src/components/game/next-puzzle-countdown.test.tsx` renders the countdown in `happy-dom` with fake timers and `getTodayPuzzleFn` mocked: the text in both languages, ticking, reading the puzzle again at zero, asking again while the server still answers the old one, and hydrating over a server render two seconds older without an error.
-- `src/router.test.tsx` renders `/` through the router with the server functions mocked, the countdown in its footer.
+- `src/router.test.tsx` renders `/nl` through the router with the server functions mocked, the countdown in its footer.

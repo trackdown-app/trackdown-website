@@ -13,13 +13,13 @@ Trackdown NL 142, 5/6
 ●━           17m
 ●━           13m
 Tracked down in 5
-https://trackdown.nl/en
+https://trackdown.nl/en/nl
 ```
 
 - **Header.** "Trackdown", the network's id in capitals, the puzzle number and the score: the guesses used out of the puzzle's `maxGuesses`, or `X/6` for a lost game.
 - **Grid.** One line per wrong guess, oldest first (the guess list shows them newest first). Each starts with `●`, the guess; every ride is a run of `━`, one per 15 minutes rounded, at least one; every change is a `○`, whether its station is known or not. The trip's total follows, two spaces past the longest line so the times line up: `2h25`, `17m` (`2u25` in Dutch).
 - **Footer.** "Tracked down in 5" / "Gevonden in 5", or "Not tracked down" / "Niet gevonden".
-- **Link.** The site in the page's language, so a friend can play too: `https://trackdown.nl` in Dutch, `https://trackdown.nl/en` in English (the `share.url` message). It is part of the text, not the Web Share API's `url`, so the share sheet, the clipboard and the preview all carry the same thing.
+- **Link.** The network's game in the page's language, so a friend plays the same network's puzzle, whatever network they chose themselves: `https://trackdown.nl/nl` in Dutch, `https://trackdown.nl/en/nl` in English (the `share.url` message, given the network, [network-picker.md](network-picker.md#routes)). It is part of the text, not the Web Share API's `url`, so the share sheet, the clipboard and the preview all carry the same thing.
 
 The correct guess has no trip, so it has no line; the score and footer count it. Station names and codes never appear: the grid holds only its marks and times.
 

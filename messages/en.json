@@ -66,7 +66,7 @@
         "header": "Trackdown {network} {number}, {score}/{total}",
         "won": "Tracked down in {count}",
         "lost": "Not tracked down",
-        "url": "https://trackdown.nl/en",
+        "url": "https://trackdown.nl/en/{network}",
         "minutes": "{minutes}m",
         "hoursMinutes": "{hours}h{minutes}",
         "copied": "Copied. Paste it wherever you like.",
@@ -122,7 +122,15 @@
         "howToPlay": "How to play",
         "statistics": "Statistics",
         "network": "Network",
-        "networkNl": "Netherlands"
+        "changeNetwork": "Change network"
+    },
+    "networkPicker": {
+        "title": "Networks",
+        "lead": "Each network has its own daily station.",
+        "available": "To play",
+        "chosen": "Chosen",
+        "upcoming": "Coming next",
+        "comingLater": "Coming later"
     },
     "footer": {
         "tagline": "Trackdown, a hobby project by Bram Gussekloo",
