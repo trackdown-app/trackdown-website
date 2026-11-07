@@ -6,8 +6,9 @@ Vercel hosts the site and its API. TanStack Start reaches Vercel through Nitro, 
 
 `nitro()` in `vite.config.ts` sets no `preset`. Nitro picks one from the environment:
 
-- Under `vercel build` (or on Vercel's builders) the `VERCEL` variable is set, so Nitro uses the `vercel` preset and writes `.vercel/output/`.
+- Under `vercel build` on a laptop (or on Vercel's builders) the `VERCEL` variable is set, so Nitro uses the `vercel` preset and writes `.vercel/output/`.
 - Anywhere else, such as a local `bun run build` or CI's Build check, it uses the Node server preset and writes `.output/`, which `bun run start` runs ([getting-started.md](getting-started.md#scripts)).
+- On GitHub Actions Nitro detects GitHub before it looks at `VERCEL`, so even `vercel build` would get the Node server preset, and Vercel then fails looking for a static `dist/`. The deploy workflow sets `NITRO_PRESET=vercel` on its build step for that reason.
 
 `NITRO_PRESET=vercel bun run build` forces the `vercel` preset without the Vercel CLI, to look at the output.
 

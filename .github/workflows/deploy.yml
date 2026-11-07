@@ -75,6 +75,9 @@ jobs:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           TRACKDOWN_DATA_DIR: ${{ github.workspace }}/.trackdown-data/data
           TRACKDOWN_DATA_REF: ${{ steps.data.outputs.ref }}
+          # On GitHub Actions Nitro detects GitHub, not Vercel, and would
+          # build a Node server (docs/deploy.md#the-build).
+          NITRO_PRESET: vercel
         # `VERCEL_PROD_FLAG` is empty or `--prod`, so it stays unquoted.
         run: bunx vercel build $VERCEL_PROD_FLAG --token="$VERCEL_TOKEN"
 
