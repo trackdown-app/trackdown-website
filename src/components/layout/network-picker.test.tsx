@@ -59,9 +59,17 @@ describe("NetworkPicker", () => {
 
         const dialog = await screen.findByRole("dialog", { name: "Networks" });
         const playable = within(dialog).getByRole("list", { name: "To play" });
-        const link = within(playable).getByRole("link");
-        expect(link.getAttribute("href")).toBe("/en/nl");
+        const links = within(playable).getAllByRole("link");
+        expect(links.map((each) => each.getAttribute("href"))).toEqual([
+            "/en/nl",
+            "/en/gb",
+        ]);
+        const [link] = links;
+        if (link == null) {
+            throw new Error("no network link");
+        }
         expect(link.getAttribute("aria-current")).toBe("page");
+        expect(links[1]?.getAttribute("aria-current")).toBeNull();
         expect(link.textContent).toContain("Chosen");
         const upcoming = within(dialog).getByRole("region", { name: "Coming next" });
         expect(
@@ -72,7 +80,6 @@ describe("NetworkPicker", () => {
             "BEBelgiumComing later",
             "DEGermanyComing later",
             "CHSwitzerlandComing later",
-            "GBUnited KingdomComing later",
             "JPJapanComing later",
         ]);
         expect(within(upcoming).queryByRole("link")).toBeNull();

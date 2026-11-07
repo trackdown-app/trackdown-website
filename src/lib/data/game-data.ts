@@ -30,6 +30,11 @@ export class GameDataError extends Error {
     override name = "GameDataError";
 }
 
+/** A data file that is not in the data directory at all. */
+export class MissingDataFileError extends GameDataError {
+    override name = "MissingDataFileError";
+}
+
 export type GameData = {
     stations: (network: NetworkId) => Promise<Station[]>;
     puzzles: (network: NetworkId) => Promise<Puzzle[]>;
@@ -55,7 +60,9 @@ export function createGameData(read: DataReader): GameData {
     ): Promise<z.output<S>> {
         const value = await read(path);
         if (value == null) {
-            throw new GameDataError(`${path} is missing from the data directory`);
+            throw new MissingDataFileError(
+                `${path} is missing from the data directory`,
+            );
         }
         const result = schema.safeParse(value);
         if (!result.success) {
