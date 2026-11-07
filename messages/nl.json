@@ -6,6 +6,13 @@
     "home": {
         "comingSoon": "Binnenkort beschikbaar."
     },
+    "stationSearch": {
+        "label": "Raad een station",
+        "placeholder": "Raad station {number} van {total}",
+        "submit": "Raad",
+        "list": "Passende stations",
+        "noMatch": "Geen station gevonden voor „{query}”"
+    },
     "language": {
         "label": "Taal",
         "nl": "Nederlands",

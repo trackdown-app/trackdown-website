@@ -35,6 +35,7 @@
   - `docs/design-system.md`: the design's colour tokens in light and dark, the Barlow fonts, shape, the contrast test, defaults for what the design does not draw.
   - `docs/i18n.md`: Paraglide, locale routing (`/` Dutch, `/en` English), the language switch, messages and their compile step.
   - `docs/site-shell.md`: the skip link, focus ring, header, footer and its legend slot, the shell's page paths, the not-found and error pages.
+  - `docs/station-search.md`: the station search combobox, its matching, keyboard and screen reader behaviour, the combobox parts in `src/components/ui/`.
   - `docs/deploy.md`: Nitro's preset detection, the `.vercel/output` layout, the function region, the game data's build-time variables, the deploy workflow and its secrets, the Vercel project and its environments, a manual deploy.
 - A new feature area gets its own `docs/<feature>.md`, an entry in the README's documentation list and a line in the list above.
 
