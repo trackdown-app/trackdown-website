@@ -50,3 +50,4 @@ The site runs on http://localhost:3000.
 - [Deploy](docs/deploy.md)
 - [Server logs and traces](docs/logging.md)
 - [Analytics and cookie consent](docs/analytics.md)
+- [Security headers](docs/errors-and-headers.md)

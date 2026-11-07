@@ -47,7 +47,7 @@ Every event receives these properties through `before_send`, including the first
 | `consent_marketing` | Always `false`; Trackdown offers no marketing consent |
 | `consent_version` | Current `CONSENT_TEXT_VERSION` |
 
-These consent property names match SkoonHome's integration. The public PostHog project ingestion token and `https://t.trackdown.nl` live in `posthog-client.ts`; no browser environment variable is needed. The ingestion key is intentionally public, unlike a personal API key. Server telemetry continues reading its own runtime `POSTHOG_PROJECT_TOKEN`; it is not copied into the client by Vite.
+These consent property names match SkoonHome's integration. The public PostHog project ingestion token lives in `posthog-client.ts` and `https://t.trackdown.nl` in `posthog-hosts.ts`, which the Content-Security-Policy also reads ([errors-and-headers.md](errors-and-headers.md#content-security-policy)); a new PostHog host needs adding there. No browser environment variable is needed. The ingestion key is intentionally public, unlike a personal API key. Server telemetry continues reading its own runtime `POSTHOG_PROJECT_TOKEN`; it is not copied into the client by Vite.
 
 ## Game events
 

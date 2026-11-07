@@ -1,7 +1,7 @@
 // Marks this module server-only: importing it from client code fails the
 // build, so the game data never ships to the browser.
 import "@tanstack/react-start/server-only";
-import { z } from "zod";
+import { z } from "@/lib/zod";
 import {
     metaFileSchema,
     puzzlesFileSchema,

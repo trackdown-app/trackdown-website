@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "@/lib/zod";
 
 // The files of one network's data folder (docs/data.md#files). The schemas
 // hold no data, so this module may be imported anywhere; only the loader

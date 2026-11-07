@@ -13,12 +13,23 @@ import { RootDocument } from "@/components/layout/root-document";
 import { getRouter } from "@/router";
 import { themeInitScript } from "@/lib/theme";
 
+// The request context `src/server.ts` hands Start, with this response's
+// Content-Security-Policy nonce. There is no Start server here to set it.
+// Without a nonce, as on the development server, unless a test sets one.
+const testNonce = "dGVzdC1ub25jZQ==";
+const startContext: { nonce?: string } = {};
+vi.mock("@tanstack/react-start", async (importOriginal) => ({
+    ...(await importOriginal<typeof import("@tanstack/react-start")>()),
+    getGlobalStartContext: () => startContext,
+}));
+
 vi.mock("@/lib/analytics/consent.functions", () => ({
     getConsentFn: vi.fn(() => Promise.resolve(null)),
 }));
 
 beforeEach(() => {
     vi.mocked(getConsentFn).mockResolvedValue(null);
+    delete startContext.nonce;
 });
 
 // The home page's loader calls server functions, which need the Start server
@@ -215,6 +226,21 @@ describe("the site's router", () => {
         expect(script).toBeLessThan(html.indexOf('rel="stylesheet"'));
         expect(script).toBeLessThan(html.indexOf("<body"));
         expect(html).toContain('aria-label="Donkere modus"');
+    });
+
+    it("puts the request's CSP nonce on every inline script and in the head", async () => {
+        startContext.nonce = testNonce;
+        const { html } = await respondAt(getRouter, "/nl");
+        const scripts = [...html.matchAll(/<script\b[^>]*>/g)].map(([tag]) => tag);
+        const inline = scripts.filter((tag) => !tag.includes(" src="));
+
+        expect(inline.length).toBeGreaterThan(0);
+        for (const tag of inline) {
+            expect(tag).toContain(`nonce="${testNonce}"`);
+        }
+        expect(html).toContain(
+            `<meta property="csp-nonce" content="${testNonce}"/>`,
+        );
     });
 
     it.each([

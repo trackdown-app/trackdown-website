@@ -1,5 +1,6 @@
 import type { CaptureResult, PostHog, PostHogConfig } from "posthog-js";
 import { CONSENT_TEXT_VERSION } from "@/lib/analytics/consent";
+import { posthogApiHost } from "@/lib/analytics/posthog-hosts";
 import type { ConsentChoice } from "@/lib/analytics/consent";
 import type {
     AnalyticsEventName,
@@ -10,7 +11,6 @@ import type {
 // not a personal API key. Server telemetry keeps its own runtime configuration.
 export const posthogProjectToken =
     "phc_vnP2gJ4ChTNrDsHKCCy4qEMTgPmFUwmFPRarWtK2khfX";
-export const posthogApiHost = "https://t.trackdown.nl";
 
 let loading: Promise<PostHog> | null = null;
 

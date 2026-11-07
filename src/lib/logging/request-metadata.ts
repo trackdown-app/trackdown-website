@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "@/lib/zod";
 import { AsyncLocalStorage } from "node:async_hooks";
 import { networkIdSchema } from "@/lib/data/networks";
 import { operationAttributes, routeSchema } from "@/lib/logging/attributes";
