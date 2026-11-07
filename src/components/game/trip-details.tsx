@@ -90,7 +90,7 @@ export function TripDetails({
                             }
                         >
                             {step.station == null
-                                ? m["tripDetails.hiddenStation"]()
+                                ? m["tripDetails.unknownStation"]()
                                 : (names.get(step.station) ?? step.station)}
                         </span>
                         <span className={timeClasses}>
@@ -103,9 +103,7 @@ export function TripDetails({
             })}
             <li className={rowClasses}>
                 <TripDetailsRail above={last} below={null}>
-                    <span className="relative flex size-[18px] items-center justify-center rounded-full bg-ink text-[11px] leading-none font-extrabold text-background">
-                        ?
-                    </span>
+                    <span className="relative size-[18px] rounded-full bg-ink" />
                 </TripDetailsRail>
                 <span className="self-center font-semibold">
                     {m["tripDetails.mysteryStation"]()}

@@ -5,7 +5,7 @@ The rules page, at `/hoe-te-spelen` (`/en/hoe-te-spelen` in English). `src/route
 The design draws How to play only for the iPhone, as a sheet over the game (the Trackdown design canvas's iOS · How to play board). The web page has the same content in the site's page layout instead: the shell's column, the playing board's condensed title, then:
 
 - **The three rules**, numbered in Barlow Condensed: guess any station, we draw the fastest trip to the mystery station, shorter lines are closer and you have six guesses.
-- **An example trip** (`ExampleTrip`, `src/components/how-to-play/example-trip.tsx`): the board's guess of Maastricht, 2h 25m away, an IC for 2h 02m, a hidden change and a last ride of 17 minutes. It is drawn by the game's own `GuessList` ([guess-list.md](guess-list.md)), so it looks exactly like a row on the game page, mystery bar, time grid and screen reader sentence included. The board's caption explains the hidden change below it. The data is fixed in the component; nothing is loaded.
+- **An example trip** (`ExampleTrip`, `src/components/how-to-play/example-trip.tsx`): the board's guess of Maastricht, 2h 25m away, an IC for 2h 02m, a change at an unknown station and a last ride of 17 minutes. It is drawn by the game's own `GuessList` ([guess-list.md](guess-list.md)), so it looks exactly like a row on the game page, mystery bar, time grid and screen reader sentence included. The board's caption explains the unknown change below it. The data is fixed in the component; nothing is loaded.
 - **The line legend**, the game's `GameLegend` ([guess-list.md](guess-list.md#legend)), under its own heading. The page names no `footerLegend`, so the footer shows its tagline.
 - **Play today's station**, a 52px button linking to today's puzzle.
 

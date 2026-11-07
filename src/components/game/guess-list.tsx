@@ -80,17 +80,9 @@ export function GuessList({
     ) : (
         <div className="flex flex-wrap items-center justify-between gap-4 pb-2.5">
             {progress}
-            <div className="ml-auto flex items-center gap-2.5">
-                <span className="text-[15px] font-semibold">
-                    {m["guessList.mysteryStation"]()}
-                </span>
-                <span
-                    aria-hidden="true"
-                    className="flex size-6 items-center justify-center rounded-full bg-ink text-[15px] font-extrabold text-background"
-                >
-                    ?
-                </span>
-            </div>
+            <span className="ml-auto text-[15px] font-semibold">
+                {m["guessList.mysteryStation"]()}
+            </span>
         </div>
     );
 

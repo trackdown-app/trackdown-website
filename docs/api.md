@@ -87,7 +87,7 @@ POST /api/v1/nl/puzzles/142/guesses
 ```
 
 - **The trip** is the guess's entry in the mystery station's `to/<code>.json` ([data.md](data.md#files)): rides (`train`, `minutes`) and changes (`minutes`) in order. `totalMinutes` adds up every ride and change.
-- **A change's station** is its code only when it is among `earlierGuesses`; otherwise `null`, the design's hidden `?`. A trip never names a station the player has not named first, and never the mystery station.
+- **A change's station** is its code only when it is among `earlierGuesses`; otherwise `null`, the design's `?` for an unknown station. A trip never names a station the player has not named first, and never the mystery station.
 - **The earlier trips** come back too, in `earlierTrips`: each earlier guess, in the input's order, with its trip again and its changes named by every guess so far, this one included. A change hidden when an earlier guess was answered shows once the player guesses that station, so a client replaces the steps it kept for each earlier guess with these. On a first guess the list is empty. They are the same trips the earlier guesses answered, so they hand a scraper nothing a repeated call would not.
 - **A correct guess** answers `correct: true` with no trip (`steps: []`, `totalMinutes: 0`). The whole trip list is [the reveal](#the-reveal), an operation of its own.
 - **The puzzle** is any puzzle up to today's ([Today's puzzle](#todays-puzzle)), so an earlier day can still be played. A puzzle after today's answers `not_found`, the same as one that does not exist, so the schedule's future stays hidden.

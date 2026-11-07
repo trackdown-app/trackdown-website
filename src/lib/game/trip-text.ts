@@ -113,7 +113,7 @@ function changesText(guess: ListedGuess, names: StationNames): string {
         return m["trip.changes"]({ count: String(changes.length) });
     }
     return only.station == null
-        ? m["trip.changeHidden"]()
+        ? m["trip.changeUnknown"]()
         : m["trip.changeAt"]({ station: nameOf(only.station, names) });
 }
 
@@ -148,7 +148,7 @@ export function spokenGuess(
             }
             const duration = spokenMinutes(step.minutes);
             return step.station == null
-                ? m["trip.spokenChangeHidden"]({ duration })
+                ? m["trip.spokenChangeUnknown"]({ duration })
                 : m["trip.spokenChangeAt"]({
                       station: nameOf(step.station, names),
                       duration,

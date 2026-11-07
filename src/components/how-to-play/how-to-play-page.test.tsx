@@ -29,7 +29,7 @@ describe("HowToPlayPage", () => {
         const html = await renderAt(HowToPlayPage, "/hoe-te-spelen");
 
         expect(html).toContain('aria-label="Legenda"');
-        expect(html).toContain("Overstap, raad hem om te onthullen");
+        expect(html).toContain("Overstap, station onbekend");
     });
 
     it("speaks English and links to today's puzzle under /en", async () => {

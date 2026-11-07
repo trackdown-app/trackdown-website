@@ -114,7 +114,7 @@ describe("tripSummary", () => {
 
         expect(tripSummary(direct, names)).toBe("17m, direct");
         expect(tripSummary(hidden, names)).toBe(
-            "2h 25m, change at a hidden station",
+            "2h 25m, change at an unknown station",
         );
         expect(tripSummary(twice, names)).toBe("2h 25m, 2 changes");
     });
