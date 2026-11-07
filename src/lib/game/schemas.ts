@@ -1,6 +1,7 @@
 import { z } from "zod";
-import { metaFileSchema } from "@/lib/data/data-schema";
+import { metaFileSchema, stationCodeSchema } from "@/lib/data/data-schema";
 import { networkIdSchema } from "@/lib/data/networks";
+import { baseLocale, locales } from "@/paraglide/runtime";
 
 // The input and output of every API operation, in one place
 // (docs/api.md#schemas). The server function and the REST route check their
@@ -48,3 +49,39 @@ export const todayPuzzleOutputSchema = z.strictObject({
 });
 
 export type TodayPuzzleOutput = z.output<typeof todayPuzzleOutputSchema>;
+
+/** A site locale: `nl` or `en`. Without one, the base locale, `nl`. */
+export const localeSchema = z.enum(locales).default(baseLocale);
+
+/**
+ * `stations`: which network's stations, from the path, and in which locale
+ * to name their provinces (query string), by default `nl`.
+ */
+export const stationsInputSchema = z.object({
+    network: networkIdSchema,
+    locale: localeSchema,
+});
+
+export type StationsInput = z.output<typeof stationsInputSchema>;
+
+/**
+ * `stations`: one station a player can guess. Strict, so a field this schema
+ * does not name (its coordinates, a trip) fails the test of its service.
+ */
+export const guessableStationSchema = z.strictObject({
+    code: stationCodeSchema,
+    name: z.string().min(1),
+    /** The station's province, named in the input's locale. */
+    province: z.string().min(1),
+});
+
+export type GuessableStation = z.output<typeof guessableStationSchema>;
+
+/** `stations`: every station a player can guess, sorted by name. */
+export const stationsOutputSchema = z.strictObject({
+    network: networkIdSchema,
+    locale: z.enum(locales),
+    stations: z.array(guessableStationSchema),
+});
+
+export type StationsOutput = z.output<typeof stationsOutputSchema>;

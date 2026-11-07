@@ -23,7 +23,7 @@ function TracksIndex() {
 }
 ```
 
-No page reads data yet; the home page is a placeholder. The game's operations (`metaQueryOptions` and `todayPuzzleQueryOptions` so far) live in `src/lib/game/`, each with a service the server function calls ([api.md](api.md#the-pieces)).
+No page reads data yet; the home page is a placeholder. The game's operations (`metaQueryOptions`, `todayPuzzleQueryOptions` and `stationsQueryOptions` so far) live in `src/lib/game/`, each with a service the server function calls ([api.md](api.md#the-pieces)).
 
 ## The query client
 
