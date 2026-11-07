@@ -1,6 +1,6 @@
 # Analytics and cookie consent
 
-The consent banner implements issue #39. Browser analytics belongs to [issue #40](https://github.com/trackdown-app/trackdown-website/issues/40): no browser PostHog SDK or analytics cookie is added here. Existing server logs and traces are independent of browser consent ([logging.md](logging.md)). The English copy matches the supplied Web · Cookie banner canvas and its description of PostHog agrees with the privacy policy canvas for [issue #45](https://github.com/trackdown-app/trackdown-website/issues/45).
+The consent banner implements issue #39 and browser PostHog analytics implements [issue #40](https://github.com/trackdown-app/trackdown-website/issues/40). Pageviews are cookieless before an answer and after a refusal; acceptance enables a host-only PostHog cookie. Existing server logs and traces are independent of browser consent ([logging.md](logging.md)). The English copy matches the supplied Web · Cookie banner canvas and its description of PostHog agrees with the privacy policy canvas for [issue #45](https://github.com/trackdown-app/trackdown-website/issues/45).
 
 ## Banner and settings
 
@@ -16,7 +16,7 @@ The POST accepts `Sec-Fetch-Site: same-origin`, or, without that header, an `Ori
 
 ## Consent cookie
 
-`src/lib/analytics/consent.ts` defines the shared contract for #40. The strictly necessary `trackdown-consent` cookie holds URL-encoded JSON:
+`src/lib/analytics/consent.ts` defines the shared contract. The strictly necessary `trackdown-consent` cookie holds URL-encoded JSON:
 
 | Field | Value |
 | --- | --- |
@@ -26,10 +26,39 @@ The POST accepts `Sec-Fetch-Site: same-origin`, or, without that header, an `Ori
 
 The cookie is host-only, has `Path=/`, `HttpOnly`, `SameSite=Lax` and a one-year `Max-Age` (`31536000` seconds). It is `Secure` outside Vite development. No cookie is set merely by visiting or reopening settings. Missing and invalid records, and records from another text version, mean no consent (`null`). Raise `CONSENT_TEXT_VERSION` whenever the banner's wording or what acceptance allows changes.
 
-The browser receives only `ConsentChoice | null` through the loader; it does not read the HTTP-only cookie. Browser analytics must use `choice.analytics === true` as the only permission for cookie persistence; `null` and `false` mean cookieless operation. Withdrawing uses the same Decline form and replaces the record with `false`. Issue #40 must remove old PostHog persistence when it reads that answer. Marketing consent and advertising trackers are outside this contract.
+The browser receives only `ConsentChoice | null` through the loader; it does not read the HTTP-only cookie. Browser analytics uses `choice.analytics === true` as the only permission for cookie persistence; `null` and `false` mean cookieless operation. Withdrawing uses the same Decline form and replaces the record with `false`. The next document removes old PostHog persistence before starting the SDK. Marketing consent and advertising trackers are outside this contract.
+
+## Browser analytics
+
+`BrowserAnalytics` (`src/components/consent/browser-analytics.tsx`) runs in `RootDocument`, including not-found and error pages. Its effect starts `src/lib/analytics/posthog-client.ts` after hydration. The `posthog-js` SDK is dynamically imported into a separate chunk; server rendering never initializes it. A document-wide promise prevents duplicate initialization, including React StrictMode. A failed import can be retried, and analytics failures never interrupt the game.
+
+The native consent forms always reload the document, so the SDK mode is chosen once, before initialization. Without acceptance it uses `cookieless_mode: "always"` and disables persistence. Before the import, cleanup deletes this project's host-only `ph_<project-token>_posthog` cookie and `ph_<project-token>_*` keys in both local and session storage. This covers withdrawal, an expired consent cookie, and a changed consent text version, even if the SDK cannot load. Other storage, including saved games and the necessary consent cookie, is preserved. Each storage backend is cleaned independently if the other is unavailable.
+
+With acceptance, `persistence: "cookie"` keeps the anonymous identity in a host-only PostHog cookie, secure on HTTPS, with the SDK's one-year expiry. Session bookkeeping may also use session storage after acceptance. No person profiles are created and the site never calls `identify`. The PostHog cookie is distinct from the HTTP-only consent cookie.
+
+The SDK sends the initial `$pageview` and subsequent History API pageviews, including localized navigation. Pageleave, autocapture, dead clicks, exceptions, heatmaps, performance capture, session replay, surveys, product tours, conversations and feature-flag requests are disabled. Game events belong to later issues. URL queries and fragments are removed from event properties, including nested URLs, and `$ip` is set to `null`.
+
+Every event receives these properties through `before_send`, including the first pageview:
+
+| Property | Value |
+| --- | --- |
+| `environment` | Vite mode (`development` locally, `production` for built previews and production) |
+| `consent_analytics` | `null` before an answer, `true` after acceptance, `false` after refusal |
+| `consent_marketing` | Always `false`; Trackdown offers no marketing consent |
+| `consent_version` | Current `CONSENT_TEXT_VERSION` |
+
+These consent property names match SkoonHome's integration. The public PostHog project ingestion token and `https://t.trackdown.nl` live in `posthog-client.ts`; no browser environment variable is needed. The ingestion key is intentionally public, unlike a personal API key. Server telemetry continues reading its own runtime `POSTHOG_PROJECT_TOKEN`; it is not copied into the client by Vite.
+
+## PostHog project and proxy
+
+`t.trackdown.nl` is the managed reverse proxy for the EU cloud. Its CNAME targets the provisioned `*.cf-prod-eu-proxy.europehog.com` host. The SDK uses `api_host: "https://t.trackdown.nl"` for ingestion and assets, and `ui_host: "https://eu.posthog.com"` for PostHog links. Its root may redirect to the website; `/static/array.js` must serve JavaScript and ingestion paths must reach PostHog. No application proxy route is needed. See PostHog's [managed proxy guide](https://posthog.com/docs/advanced/proxy).
+
+In PostHog's project settings, enable **Web analytics → Enable cookieless tracking** before deployment; PostHog otherwise discards cookieless events. Confirm **General → IP data capture** discards client IP data. The browser's `$ip: null` does not replace that project setting. See [PostHog's data collection guide](https://posthog.com/docs/privacy/data-collection). These project settings cannot be verified or changed with the public ingestion token.
 
 ## Verification
 
 `src/lib/analytics/consent.test.ts` checks records and text versions, native POSTs, cookie attributes, origin guards, invalid forms and safe redirects. `cookie-banner.test.tsx` checks server-rendered NL/EN copy, equal button classes and order, localized return paths, statuses and settings forms. `cookie-banner-lifecycle.test.tsx` checks that both confirmations disappear after five seconds while unanswered and reopened settings stay visible. Router tests check first visits, both saved choices, settings reopening, private caching and no initial cookie. Footer tests cover both locales.
 
-Run `bun run typecheck`, `bun run lint`, `bun run test` and `bun run build`. Browser checks are manual: test first visit, both choices, refresh, footer reopening and withdrawal in both themes and languages, then repeat without JavaScript. Check phone widths, short viewports and keyboard focus at the title and status. PostHog event delivery and persistence switching await #40; the privacy route awaits #45.
+`src/lib/analytics/posthog-client.test.ts` exercises the real SDK with intercepted transport: first and client-navigation pageviews without cookies or storage, accepted cookie identity across initialization, cleanup after withdrawal or missing consent, independent storage failures, consent properties, and URL/IP filtering. Tests send no events to PostHog.
+
+Run `bun run typecheck`, `bun run lint`, `bun run test` and `bun run build`. Browser checks are manual: test first visit, both choices, refresh, footer reopening and withdrawal in both themes and languages, then repeat without JavaScript. Check phone widths, short viewports and keyboard focus at the title and status. In browser developer tools, verify no `ph_*` cookie or storage before acceptance, the host-only PostHog cookie after acceptance, and removal after refusal. Navigate between NL and EN pages and confirm pageviews and consent properties in PostHog through `t.trackdown.nl`. With JavaScript disabled, consent still works and browser analytics does not run. The privacy route awaits #45.

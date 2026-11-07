@@ -90,6 +90,8 @@ The project is `trackdown-website` in Bram's personal Vercel scope, `bram-gussek
   | `POSTHOG_PROJECT_TOKEN` | The PostHog project token (`phc_...`) for server logs and traces to the EU cloud. Sensitive, server-only, required at startup on Vercel. Add to both Preview and Production before deploying this telemetry integration; never prefix with `VITE_`. See [logging.md](logging.md). |
 - **Region.** The function region comes from the build (see above), because a prebuilt deploy carries its own function config. `regions` in `vercel.json` sets the project's default to `fra1` as well, so the deploy's own region matches.
 
+Browser analytics uses the public ingestion token in `src/lib/analytics/posthog-client.ts` and the managed EU proxy at `https://t.trackdown.nl`; it needs no Vercel environment variable. Before deploying, enable cookieless tracking and confirm IP discard in the PostHog project. DNS must keep `t.trackdown.nl` pointing to its provisioned EU proxy CNAME. See [analytics.md](analytics.md#posthog-project-and-proxy) for setup and manual verification. The runtime server telemetry variable above remains separate.
+
 ## A manual deploy
 
 With the Vercel CLI (`bunx vercel`), logged in as the owner of the scope (`bunx vercel login`):
