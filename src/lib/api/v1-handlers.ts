@@ -1,10 +1,15 @@
 // Marks this module server-only: its handlers read the game data.
 import "@tanstack/react-start/server-only";
 import { ApiError } from "@/lib/api/api-error";
-import { errorResponse, restGet, restHandlers } from "@/lib/api/rest";
+import { errorResponse, restGet, restHandlers, restPost } from "@/lib/api/rest";
 import type { RestHandler } from "@/lib/api/rest";
+import { submitGuess } from "@/lib/game/guess";
 import { getMeta } from "@/lib/game/meta";
-import { metaInputSchema, todayPuzzleInputSchema } from "@/lib/game/schemas";
+import {
+    guessInputSchema,
+    metaInputSchema,
+    todayPuzzleInputSchema,
+} from "@/lib/game/schemas";
 import { serviceContext } from "@/lib/game/service-context";
 import { getTodayPuzzle } from "@/lib/game/today-puzzle";
 
@@ -25,6 +30,14 @@ export const todayPuzzleHandlers = restHandlers({
     GET: restGet(todayPuzzleInputSchema, (input) =>
         getTodayPuzzle(input, serviceContext),
     ),
+});
+
+/**
+ * `/api/v1/{network}/puzzles/{n}/guesses`: the `guess` operation for iOS;
+ * `submitGuessFn` is the same for the web.
+ */
+export const guessHandlers = restHandlers({
+    POST: restPost(guessInputSchema, (input) => submitGuess(input, serviceContext)),
 });
 
 /**

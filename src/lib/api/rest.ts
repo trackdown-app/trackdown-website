@@ -37,40 +37,81 @@ export function restGet<S extends z.ZodType, O>(
     input: S,
     run: (input: z.output<S>) => Promise<O>,
 ): RestHandler {
-    return async ({ request, params }) => {
+    return ({ request, params }) => {
         const query = Object.fromEntries(new URL(request.url).searchParams);
-        const parsed = input.safeParse({ ...query, ...params });
-        if (!parsed.success) {
-            return errorResponse(
-                new ApiError("invalid_input", z.prettifyError(parsed.error)),
-            );
-        }
-        try {
-            return jsonResponse(await run(parsed.data));
-        } catch (error) {
-            return errorResponse(toApiError(error));
-        }
+        return answer(input, { ...query, ...params }, run);
     };
 }
+
+/**
+ * A `POST` handler for one operation: reads the input from the JSON body and
+ * the path parameters (which win over a body field of the same name), and
+ * answers like `restGet`. A body that is not a JSON object is `invalid_input`.
+ */
+export function restPost<S extends z.ZodType, O>(
+    input: S,
+    run: (input: z.output<S>) => Promise<O>,
+): RestHandler {
+    return async ({ request, params }) => {
+        let body: unknown;
+        try {
+            body = await request.json();
+        } catch {
+            return errorResponse(
+                new ApiError("invalid_input", "the request body is not JSON"),
+            );
+        }
+        if (typeof body !== "object" || body == null || Array.isArray(body)) {
+            return errorResponse(
+                new ApiError(
+                    "invalid_input",
+                    "the request body is not a JSON object",
+                ),
+            );
+        }
+        return answer(input, { ...body, ...params }, run);
+    };
+}
+
+/** `fields` checked against `input`, then `run`'s answer, as `restGet` describes. */
+async function answer<S extends z.ZodType, O>(
+    input: S,
+    fields: Record<string, unknown>,
+    run: (input: z.output<S>) => Promise<O>,
+): Promise<Response> {
+    const parsed = input.safeParse(fields);
+    if (!parsed.success) {
+        return errorResponse(
+            new ApiError("invalid_input", z.prettifyError(parsed.error)),
+        );
+    }
+    try {
+        return jsonResponse(await run(parsed.data));
+    } catch (error) {
+        return errorResponse(toApiError(error));
+    }
+}
+
+type RestMethod = "GET" | "POST";
 
 /**
  * A REST route's `handlers`, with every other method answered 405 in the
  * API's error format instead of falling through to the site's pages.
  */
-export function restHandlers(handlers: { GET: RestHandler }): {
-    GET: RestHandler;
-    ANY: RestHandler;
-} {
+export function restHandlers<M extends RestMethod>(
+    handlers: Record<M, RestHandler>,
+): Record<M, RestHandler> & { ANY: RestHandler } {
+    const allow = Object.keys(handlers).join(", ");
     return {
         ...handlers,
         ANY: ({ request }) => {
             const response = errorResponse(
                 new ApiError(
                     "method_not_allowed",
-                    `${request.method} is not allowed here; use GET`,
+                    `${request.method} is not allowed here; use ${allow}`,
                 ),
             );
-            response.headers.set("Allow", "GET");
+            response.headers.set("Allow", allow);
             return Promise.resolve(response);
         },
     };

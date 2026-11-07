@@ -1,5 +1,9 @@
 import { z } from "zod";
-import { metaFileSchema } from "@/lib/data/data-schema";
+import {
+    metaFileSchema,
+    stationCodeSchema,
+    trainTypeSchema,
+} from "@/lib/data/data-schema";
 import { networkIdSchema } from "@/lib/data/networks";
 
 // The input and output of every API operation, in one place
@@ -48,3 +52,59 @@ export const todayPuzzleOutputSchema = z.strictObject({
 });
 
 export type TodayPuzzleOutput = z.output<typeof todayPuzzleOutputSchema>;
+
+/**
+ * `guess`: one guess at a puzzle, with the guesses before it. The network and
+ * the puzzle's number come from the path; the REST route reads the number as
+ * a string, so it is coerced. Which stations exist, repeats and the number of
+ * guesses are the service's to check: they need the data or the rules.
+ */
+export const guessInputSchema = z.object({
+    network: networkIdSchema,
+    number: z.coerce.number().int().positive(),
+    /** The station guessed now. */
+    guess: stationCodeSchema,
+    /** The player's earlier guesses at this puzzle, oldest first. */
+    earlierGuesses: z.array(stationCodeSchema).default([]),
+});
+
+export type GuessInput = z.output<typeof guessInputSchema>;
+
+/** `guess`: one ride of the trip from the guess to the mystery station. */
+export const guessRideSchema = z.strictObject({
+    kind: z.literal("ride"),
+    train: trainTypeSchema,
+    minutes: z.number().int().nonnegative(),
+});
+
+/**
+ * `guess`: one change of the trip. `station` is the station's code only when
+ * the player guessed it earlier, else `null`: a hidden `?`, so a trip never
+ * names a station the player has not named first.
+ */
+export const guessChangeSchema = z.strictObject({
+    kind: z.literal("change"),
+    station: stationCodeSchema.nullable(),
+    minutes: z.number().int().nonnegative(),
+});
+
+/**
+ * `guess`: how far the guess is from the mystery station. Never the mystery
+ * station itself: strict, so a field this schema does not name fails the
+ * test of its service. A correct guess has no trip (`steps` is empty and
+ * `totalMinutes` 0); the whole trip list is the reveal's.
+ */
+export const guessOutputSchema = z.strictObject({
+    network: networkIdSchema,
+    number: z.number().int().positive(),
+    guess: stationCodeSchema,
+    correct: z.boolean(),
+    /** The trip's rides and changes, from the guess to the mystery station. */
+    steps: z.array(
+        z.discriminatedUnion("kind", [guessRideSchema, guessChangeSchema]),
+    ),
+    /** Every ride and change together, in minutes. */
+    totalMinutes: z.number().int().nonnegative(),
+});
+
+export type GuessOutput = z.output<typeof guessOutputSchema>;

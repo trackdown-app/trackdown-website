@@ -3,11 +3,16 @@ import { describe, expect, it, vi } from "vitest";
 import { apiErrorBodySchema } from "@/lib/api/api-error";
 import type { RestHandler } from "@/lib/api/rest";
 import {
+    guessHandlers,
     metaHandlers,
     todayPuzzleHandlers,
     unknownOperationHandlers,
 } from "@/lib/api/v1-handlers";
-import { metaOutputSchema, todayPuzzleOutputSchema } from "@/lib/game/schemas";
+import {
+    guessOutputSchema,
+    metaOutputSchema,
+    todayPuzzleOutputSchema,
+} from "@/lib/game/schemas";
 import { serviceContext } from "@/lib/game/service-context";
 
 // The REST routes over the fixture, never the real data: the services get
@@ -161,6 +166,87 @@ describe("GET /api/v1/{network}/puzzles/today", () => {
 
         expect(response.status).toBe(405);
         expect(response.headers.get("Allow")).toBe("GET");
+    });
+});
+
+describe("POST /api/v1/{network}/puzzles/{n}/guesses", () => {
+    /** A POST of `body` to puzzle `number`'s guesses. */
+    function post(body: string, number = "2"): Promise<Response> {
+        return guessHandlers.POST({
+            request: new Request(
+                new URL(`/api/v1/nl/puzzles/${number}/guesses`, "http://localhost"),
+                {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body,
+                },
+            ),
+            params: { network: "nl", number },
+        });
+    }
+
+    it("answers 200 with the trip, its unguessed changes hidden", async () => {
+        const response = await post(
+            JSON.stringify({ guess: "dlt", earlierGuesses: ["chr"] }),
+        );
+
+        expect(response.status).toBe(200);
+        const json: unknown = await response.json();
+        expect(guessOutputSchema.parse(json)).toMatchObject({
+            number: 2,
+            guess: "dlt",
+            correct: false,
+            totalMinutes: 69,
+        });
+        // Puzzle 2's mystery station.
+        expect(JSON.stringify(json)).not.toContain("ech");
+    });
+
+    it("takes the puzzle from the path, not the body", async () => {
+        const response = await post(JSON.stringify({ guess: "dlt", number: 3 }));
+
+        expect(response.status).toBe(200);
+    });
+
+    it("answers 404 not_found for a puzzle after today's", async () => {
+        const response = await post(JSON.stringify({ guess: "dlt" }), "3");
+
+        expect(response.status).toBe(404);
+        expect(apiErrorBodySchema.parse(await response.json()).error.code).toBe(
+            "not_found",
+        );
+    });
+
+    it("answers 400 invalid_input for a station that does not exist", async () => {
+        const response = await post(JSON.stringify({ guess: "xyz" }));
+
+        expect(response.status).toBe(400);
+        expect(apiErrorBodySchema.parse(await response.json()).error.code).toBe(
+            "invalid_input",
+        );
+    });
+
+    it("answers 400 invalid_input for a body that is not a JSON object", async () => {
+        for (const body of ["not json", "[]", "null"]) {
+            const response = await post(body);
+
+            expect(response.status).toBe(400);
+            expect(apiErrorBodySchema.parse(await response.json()).error.code).toBe(
+                "invalid_input",
+            );
+        }
+    });
+
+    it("answers 405 method_not_allowed for another method", async () => {
+        const response = await call(
+            guessHandlers.ANY,
+            "/api/v1/nl/puzzles/2/guesses",
+            "GET",
+            { network: "nl", number: "2" },
+        );
+
+        expect(response.status).toBe(405);
+        expect(response.headers.get("Allow")).toBe("POST");
     });
 });
 
