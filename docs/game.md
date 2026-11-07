@@ -15,7 +15,23 @@ Top to bottom, in the shell's 1080px column:
 - **The search.** `StationSearch` ([station-search.md](station-search.md)), told which guess this is and which stations were guessed. When a guess does not go through (a network error, the rate limit), an alert under it says so; nothing is kept and the player can guess again.
 - **The guesses.** `GuessList` ([guess-list.md](guess-list.md)), newest first, with the progress dots in its header row opposite "Mystery station". Before the first guess the list, and so the progress, is not shown.
 
-Once the game is over the search gives way to one line: "You tracked it down in N of 6." or "No guesses left. A new mystery station comes at midnight." The Solved and Missed screen will replace that line.
+Once the game is over the question, the search and the progress give way to the solved or missed screen, below the day.
+
+## Solved and missed
+
+`GameOver` (`src/components/game/game-over.tsx`) is the finished game, after the design's Web · Solved board, in the same column:
+
+- **The answer plate.** `AnswerPlate` (`src/components/game/answer-plate.tsx`): a 16px-cornered plate in `plate`, the theme turned over ([design-system.md](design-system.md#colour)). The logo mark in its plate colours, its bar filled, beside how it went in `plate-muted` 18px: "You tracked it down in 5 of 6 guesses" / "Je hebt hem gevonden in 5 van 6 gokken", or when missed "No guesses left. The mystery station was" / "Geen gokken meer. Het mysteriestation was". Below it the mystery station as the page's `h1`, Barlow Condensed 800, 52px to 112px with the width. The plate is a section named "Today's answer" / "Het antwoord van vandaag".
+- **The buttons.** "Share result" / "Deel je resultaat", the ink main button with a share icon, and "Play an older puzzle" / "Speel een eerdere puzzel", an outlined link to the archive (`/archief`). Both 52px, 12px corners. Sharing and the archive page come with their own features: until then the share button does nothing and the link shows the not-found page.
+- **How you got there.** `GuessList` in its revealed form ([guess-list.md](guess-list.md#revealed)): every guess, newest first, every change named.
+
+The design's record and "What you'll share" below them come with statistics and sharing.
+
+### The answer comes from the reveal
+
+The page never knows the mystery station while the game is on. Once it is over, `GameOver` asks the `reveal` operation for the kept guesses (`revealQueryOptions`, [data-loading.md](data-loading.md#a-read-sent-as-a-post)), and the plate and the list come from its answer. Until it answers, a bar holds the station's place in the plate (read out as "Loading the answer") and the list is not shown. When it fails (a network error, the rate limit), the plate says "The answer didn't load." as an alert with a "Try again" button that asks again. A kept game shown again after a reload asks once more; the answer is cached for the page's life.
+
+**Focus.** When the guess that ends the game is made on the page, the search it came from is gone, so focus moves to the plate's heading once the reveal has answered (or failed). A finished game shown again after a reload leaves focus alone.
 
 ## Progress
 
@@ -26,7 +42,7 @@ Once the game is over the search gives way to one line: "You tracked it down in 
 - The line is `ink` up to the guess now, or up to the last guess once the game is over.
 - After a guess the `ink` line slides on to the next dot (500ms, eased like the trip line's train) and the dots change colour (300ms). Not with `prefers-reduced-motion: reduce`.
 
-Beside the dots, in 16px semibold: "Guess 5 of 6, newest first", "Found in 4 of 6, newest first" or "All 6 guesses used, newest first". The dots are hidden from screen readers; the words say the same.
+Beside the dots, in 16px semibold: "Guess 5 of 6, newest first". The page shows the progress only while the game is on; `GameProgress` also words a finished game ("Found in 4 of 6, newest first", "All 6 guesses used, newest first") for a view that shows one. The dots are hidden from screen readers; the words say the same.
 
 ## Game state
 
@@ -49,5 +65,5 @@ A game is kept in `localStorage` under `trackdown:game:v1:{network}:{number}`, o
 ## Tests
 
 - `src/lib/game/game-state.test.ts` covers the key, writing and reading back a game, broken entries, the status, and the store with storage and without.
-- `src/components/game/game-page.test.tsx` renders the page in `happy-dom` with `submitGuessFn` mocked: the day line, kept guesses and progress, a guess sent with the earlier ones and kept over a reload, a hidden change on an earlier trip named once it is guessed, a game without storage, winning, losing, a guess that fails, Dutch.
+- `src/components/game/game-page.test.tsx` renders the page in `happy-dom` with `submitGuessFn` mocked: the day line, kept guesses and progress, a guess sent with the earlier ones and kept over a reload, a hidden change on an earlier trip named once it is guessed, a game without storage, a guess that fails, Dutch. With `revealAnswerFn` mocked too: winning (the reveal asked once with the guesses, the answer as the focused heading, the revealed list, the buttons), missing (every change named, focus left alone), no answer before the reveal answers, and a reveal that fails and is asked again.
 - `src/router.test.tsx` renders `/` through the router with the server functions mocked.

@@ -47,6 +47,8 @@ const textPairs: [text: string, ground: string][] = [
     ["on-line", "line-3"],
     ["on-action", "action"],
     ["bg", "ink"],
+    ["on-plate", "plate"],
+    ["plate-muted", "plate"],
 ];
 
 describe.each(Object.entries(modes))("%s theme", (_mode, tokens) => {
