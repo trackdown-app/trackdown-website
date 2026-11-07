@@ -4,6 +4,7 @@ import { ApiError, apiErrorCodeSchema } from "@/lib/api/api-error";
 import { networkIdSchema } from "@/lib/data/networks";
 
 export const functionNameSchema = z.enum([
+    "getConsentFn",
     "getMetaFn",
     "getTodayPuzzleFn",
     "getPuzzleArchiveFn",
@@ -14,6 +15,7 @@ export const functionNameSchema = z.enum([
 ]);
 
 export const routeSchema = z.enum([
+    "/consent",
     "/",
     "/hoe-te-spelen",
     "/archief",

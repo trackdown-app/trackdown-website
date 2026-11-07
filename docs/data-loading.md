@@ -1,6 +1,6 @@
 # Data loading
 
-Every read the site makes, from a route's loader or from the browser, and every change it sends goes through a server function and TanStack Query. The browser never calls an API of its own: no `fetch` to a URL. The REST routes under `/api/v1` are for the iOS app; they call the same services as the server functions ([api.md](api.md)).
+Every application read, from a route's loader or from the browser, goes through a server function and TanStack Query. Game mutations do too. The browser never calls an API of its own: no `fetch` to a URL. The REST routes under `/api/v1` are for the iOS app; they call the same services as the server functions ([api.md](api.md)). Cookie choices use a native POST to `/consent`, so they also work without JavaScript ([analytics.md](analytics.md)).
 
 ## The pieces
 
@@ -26,6 +26,8 @@ function TracksIndex() {
 The home page, the game, loads today's puzzle and the stations this way, sends each guess through a mutation and reads the finished game's answer through a query ([game.md](game.md)). The archive loads the puzzle list, and an earlier puzzle's page the list and the stations ([archive.md](archive.md)). The game's operations (`metaQueryOptions`, `todayPuzzleQueryOptions`, `puzzleArchiveQueryOptions`, `stationsQueryOptions` and `revealQueryOptions` so far) live in `src/lib/game/`, each with a service the server function calls ([api.md](api.md#the-pieces)).
 
 ## The query client
+
+The root loader also fills `consentQueryOptions` (`src/lib/analytics/consent.queries.ts`) with the request's HTTP-only cookie answer and returns it as loader data for `RootDocument`. The banner is ready on the server and during hydration, including on error pages. Consent stays fresh for the document's lifetime; native consent forms reload after changing it. Root page responses and the consent server function use `Cache-Control: private, no-store` to keep one visitor's choice out of shared caches.
 
 `getRouter` (`src/router.tsx`) builds a `QueryClient` for every router, so one per request on the server and one per page in the browser: a cache shared between requests would keep every request's reads in the server's memory. It puts the client in the router's context (`RouterContext` in `src/routes/__root.tsx`), where every loader reads it.
 

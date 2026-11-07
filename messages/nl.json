@@ -143,6 +143,15 @@
         "networkNl": "Nederland",
         "darkMode": "Donkere modus"
     },
+    "consent": {
+        "title": "Cookies, alleen als jij het goed vindt",
+        "copy": "Trackdown is een hobbyproject zonder advertenties. Bezoeken worden anoniem geteld, zonder cookies. Met jouw toestemming plaatst PostHog ook een cookie, zodat ik kan zien hoe terugkerende spelers het doen en het spel kan verbeteren. Er wordt niets verkocht. Weiger je, dan werkt het spel precies hetzelfde.",
+        "privacy": "Privacybeleid",
+        "decline": "Weigeren",
+        "accept": "Accepteren",
+        "accepted": "Analytische cookie aan. Bedankt dat je helpt Trackdown te verbeteren.",
+        "declined": "Geen analytische cookie. Bezoeken worden alleen anoniem geteld."
+    },
     "footer": {
         "tagline": "Trackdown, een hobbyproject van Bram Gussekloo",
         "nav": "Over de site",

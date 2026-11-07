@@ -38,15 +38,14 @@ async function renderWithLegend(): Promise<string> {
 }
 
 describe("SiteFooter", () => {
-    it("links About, Privacy, Terms and Cookie settings in Dutch", async () => {
-        const linked = linkedPaths(await renderAt(SiteFooter, "/"));
+    it("links About, Privacy and Terms and offers Cookie settings in Dutch", async () => {
+        const html = await renderAt(SiteFooter, "/");
+        const linked = linkedPaths(html);
 
-        expect(linked).toEqual([
-            "/over",
-            "/privacy",
-            "/voorwaarden",
-            "/privacy#cookies",
-        ]);
+        expect(linked).toEqual(["/over", "/privacy", "/voorwaarden"]);
+        expect(html).toContain('action="/#cookie-title"');
+        expect(html).toContain('name="cookie-settings"');
+        expect(html).toContain("Cookie-instellingen");
     });
 
     it("links the same pages under /en in English", async () => {
@@ -57,12 +56,12 @@ describe("SiteFooter", () => {
             "/en/over",
             "/en/privacy",
             "/en/voorwaarden",
-            "/en/privacy#cookies",
         ]);
+        expect(html).toContain('action="/en#cookie-title"');
         expect(html).toContain("Cookie settings");
     });
 
-    it("marks the current page with aria-current, not the cookie settings link", async () => {
+    it("marks only the current page with aria-current", async () => {
         const html = await renderAt(SiteFooter, "/privacy");
         const current = [...html.matchAll(/<a [^>]*aria-current="page"[^>]*>/g)];
 

@@ -1,6 +1,7 @@
 import { useMatches } from "@tanstack/react-router";
 import { m } from "@/paraglide/messages";
-import { cookieSettingsLink, sitePaths } from "@/lib/site-paths";
+import { sitePaths } from "@/lib/site-paths";
+import { CookieSettingsButton } from "@/components/consent/cookie-settings-button";
 import { cn } from "@/lib/utils";
 import { PageLink } from "@/components/layout/page-link";
 import { shellContainer } from "@/components/layout/shell-container";
@@ -27,7 +28,7 @@ export function SiteFooter() {
     });
 
     return (
-        <footer className={cn(shellContainer, "pb-16")}>
+        <footer className={cn(shellContainer, "pb-44")}>
             <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-4 border-t border-rule pt-5 text-[15px] text-muted-foreground">
                 {Legend == null ? (
                     <p>{m["footer.tagline"]()}</p>
@@ -67,16 +68,7 @@ export function SiteFooter() {
                             </PageLink>
                         </li>
                         <li>
-                            {/* A link to the privacy policy's part on cookies
-                                until the cookie banner exists; its button,
-                                which opens the banner again, replaces it. */}
-                            <PageLink
-                                path={cookieSettingsLink.path}
-                                hash={cookieSettingsLink.hash}
-                                className={footerLinkClasses}
-                            >
-                                {m["footer.cookieSettings"]()}
-                            </PageLink>
+                            <CookieSettingsButton />
                         </li>
                     </ul>
                 </nav>

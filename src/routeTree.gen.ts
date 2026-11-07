@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ConsentRouteImport } from './routes/consent'
 import { Route as HoeTeSpelenRouteImport } from './routes/hoe-te-spelen'
 import { Route as ArchiefIndexRouteImport } from './routes/archief/index'
 import { Route as ArchiefNumberRouteImport } from './routes/archief/$number'
@@ -25,6 +26,11 @@ import { Route as ApiV1NetworkPuzzlesNumberRevealRouteImport } from './routes/ap
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConsentRoute = ConsentRouteImport.update({
+  id: '/consent',
+  path: '/consent',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HoeTeSpelenRoute = HoeTeSpelenRouteImport.update({
@@ -89,6 +95,7 @@ const ApiV1NetworkPuzzlesNumberRevealRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/consent': typeof ConsentRoute
   '/hoe-te-spelen': typeof HoeTeSpelenRoute
   '/archief/$number': typeof ArchiefNumberRoute
   '/archief/': typeof ArchiefIndexRoute
@@ -103,6 +110,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/consent': typeof ConsentRoute
   '/hoe-te-spelen': typeof HoeTeSpelenRoute
   '/archief/$number': typeof ArchiefNumberRoute
   '/archief': typeof ArchiefIndexRoute
@@ -118,6 +126,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/consent': typeof ConsentRoute
   '/hoe-te-spelen': typeof HoeTeSpelenRoute
   '/archief/$number': typeof ArchiefNumberRoute
   '/archief/': typeof ArchiefIndexRoute
@@ -134,6 +143,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/consent'
     | '/hoe-te-spelen'
     | '/archief/$number'
     | '/archief/'
@@ -148,6 +158,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/consent'
     | '/hoe-te-spelen'
     | '/archief/$number'
     | '/archief'
@@ -162,6 +173,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/consent'
     | '/hoe-te-spelen'
     | '/archief/$number'
     | '/archief/'
@@ -177,6 +189,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ConsentRoute: typeof ConsentRoute
   HoeTeSpelenRoute: typeof HoeTeSpelenRoute
   ArchiefNumberRoute: typeof ArchiefNumberRoute
   ArchiefIndexRoute: typeof ArchiefIndexRoute
@@ -197,6 +210,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/consent': {
+      id: '/consent'
+      path: '/consent'
+      fullPath: '/consent'
+      preLoaderRoute: typeof ConsentRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/hoe-te-spelen': {
@@ -281,6 +301,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ConsentRoute: ConsentRoute,
   HoeTeSpelenRoute: HoeTeSpelenRoute,
   ArchiefNumberRoute: ArchiefNumberRoute,
   ArchiefIndexRoute: ArchiefIndexRoute,
