@@ -15,6 +15,8 @@
     "paraglide:compile": "bun run scripts/compile-paraglide.ts",
     "data:check": "bun run scripts/check-data.ts",
     "build:guard": "bun run scripts/check-build-output.ts",
+    "openapi": "bun run paraglide:compile && bun run scripts/openapi.ts",
+    "openapi:check": "bun run paraglide:compile && bun run scripts/openapi.ts --check",
     "postinstall": "bun run paraglide:compile --force"
   },
   "dependencies": {
@@ -45,6 +47,7 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@inlang/paraglide-js": "^2.25.4",
+    "@seriousme/openapi-schema-validator": "^2.11.0",
     "@tanstack/devtools-vite": "^0.8.5",
     "@tanstack/eslint-plugin-query": "^5.104.0",
     "@types/eslint-plugin-jsx-a11y": "^6.10.1",

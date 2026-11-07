@@ -1,6 +1,7 @@
 // Marks this module server-only: its handlers read the game data.
 import "@tanstack/react-start/server-only";
 import { ApiError } from "@/lib/api/api-error";
+import { openApiDocument, openApiInputSchema } from "@/lib/api/openapi";
 import {
     errorResponse,
     rateLimited,
@@ -91,6 +92,19 @@ export const stationsHandlers = restHandlers({
     GET: restGet(
         stationsInputSchema,
         (input) => getStations(input, serviceContext),
+        "deploy",
+    ),
+});
+
+/**
+ * `/api/v1/openapi.json`: the OpenAPI document the iOS app generates its
+ * client from (docs/api.md#the-openapi-document). It only changes with a
+ * deploy, so the CDN keeps it.
+ */
+export const openApiHandlers = restHandlers({
+    GET: restGet(
+        openApiInputSchema,
+        () => Promise.resolve(openApiDocument),
         "deploy",
     ),
 });

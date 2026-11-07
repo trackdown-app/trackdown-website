@@ -18,6 +18,7 @@ See the table in the [README](../README.md#scripts).
 - `typecheck`, `lint` and `test` each run `bun run paraglide:compile` first, which compiles the messages into `src/paraglide/` (skipped when nothing changed). See [i18n.md](i18n.md#compiling).
 - `bun run data:check [dir]` reads every file of a trackdown-data `data/` folder through the loader and lists what does not match ([data.md](data.md#checking-the-data)).
 - `bun run build:guard [dir]` runs after a build and fails when a file, puzzle, station or trip of a trackdown-data `data/` folder shows up in the static output ([data.md](data.md#the-build-guard)).
+- `bun run openapi` writes `openapi/v1.json`, the OpenAPI document of `/api/v1`, from the shared schemas; `bun run openapi:check` only fails when the committed file differs ([api.md](api.md#the-openapi-document)).
 - `bun run format` writes Prettier's formatting; `bun run check` only reports files that differ.
 
 ## Unit tests
@@ -37,11 +38,12 @@ bun run build
 
 ## Continuous integration
 
-`.github/workflows/pr.yml` runs the verify loop on every pull request, as five checks: Install, Typecheck, Lint, Test and Build.
+`.github/workflows/pr.yml` runs the verify loop on every pull request, as six checks: Install, Typecheck, Lint, Test, OpenAPI and Build.
 
 - Install runs `bun install --frozen-lockfile` and caches `node_modules`, keyed on `bun.lock`. The other four jobs restore that cache and fail if it is missing; they install only the Bun binary, at the version in `.bun-version`.
 - Every action is pinned to a commit SHA, with its release in a trailing comment.
 - Build builds with the fixture as the game data (`TRACKDOWN_DATA_DIR=fixtures/trackdown-data`), then runs `bun run build:guard` on it, so a change that would put data in the static output fails the check ([data.md](data.md#the-build-guard)).
+- OpenAPI runs `bun run openapi:check`, so a schema change without a regenerated `openapi/v1.json` fails the check ([api.md](api.md#the-openapi-document)).
 - The jobs read only this repository. The build needs no private data, so CI holds no token or secret for another repository. Deploys, which do bring in the data, are a separate workflow ([deploy.md](deploy.md#the-deploy-workflow)).
 
 `.github/dependabot.yml` proposes weekly updates for the packages (the `bun` ecosystem, which updates `bun.lock`, with a three-day cooldown like `bunfig.toml`) and for the pinned actions.
@@ -49,6 +51,7 @@ bun run build
 ## Generated code
 
 - `src/routeTree.gen.ts` is written by the TanStack Router plugin whenever Vite runs (`dev` or `build`). It is committed, so a fresh clone type-checks before its first build. Add or rename a route, run `bun run build` or `bun run dev`, and commit the regenerated file with the route.
+- `openapi/v1.json` is written by `bun run openapi` from the shared zod schemas. It is committed for the iOS app to generate its client from; CI and a unit test fail when it is stale. Never edit it by hand ([api.md](api.md#the-openapi-document)).
 - `src/paraglide/` is written by Paraglide from `messages/` (the Vite plugin, and `bun run paraglide:compile` on `postinstall` and before `typecheck`, `lint` and `test`). It is not committed. See [i18n.md](i18n.md).
 
 ## shadcn/ui

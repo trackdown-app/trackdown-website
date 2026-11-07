@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiV1SplatRouteImport } from './routes/api/v1/$'
 import { Route as ApiV1MetaRouteImport } from './routes/api/v1/meta'
+import { Route as ApiV1OpenapiDotjsonRouteImport } from './routes/api/v1/openapi[.]json'
 import { Route as ApiV1NetworkStationsRouteImport } from './routes/api/v1/$network/stations'
 import { Route as ApiV1NetworkPuzzlesIndexRouteImport } from './routes/api/v1/$network/puzzles/index'
 import { Route as ApiV1NetworkPuzzlesTodayRouteImport } from './routes/api/v1/$network/puzzles/today'
@@ -31,6 +32,11 @@ const ApiV1SplatRoute = ApiV1SplatRouteImport.update({
 const ApiV1MetaRoute = ApiV1MetaRouteImport.update({
   id: '/api/v1/meta',
   path: '/api/v1/meta',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1OpenapiDotjsonRoute = ApiV1OpenapiDotjsonRouteImport.update({
+  id: '/api/v1/openapi.json',
+  path: '/api/v1/openapi.json',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiV1NetworkStationsRoute = ApiV1NetworkStationsRouteImport.update({
@@ -67,6 +73,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/api/v1/$': typeof ApiV1SplatRoute
   '/api/v1/meta': typeof ApiV1MetaRoute
+  '/api/v1/openapi.json': typeof ApiV1OpenapiDotjsonRoute
   '/api/v1/$network/stations': typeof ApiV1NetworkStationsRoute
   '/api/v1/$network/puzzles/today': typeof ApiV1NetworkPuzzlesTodayRoute
   '/api/v1/$network/puzzles/': typeof ApiV1NetworkPuzzlesIndexRoute
@@ -77,6 +84,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/api/v1/$': typeof ApiV1SplatRoute
   '/api/v1/meta': typeof ApiV1MetaRoute
+  '/api/v1/openapi.json': typeof ApiV1OpenapiDotjsonRoute
   '/api/v1/$network/stations': typeof ApiV1NetworkStationsRoute
   '/api/v1/$network/puzzles/today': typeof ApiV1NetworkPuzzlesTodayRoute
   '/api/v1/$network/puzzles': typeof ApiV1NetworkPuzzlesIndexRoute
@@ -88,6 +96,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/api/v1/$': typeof ApiV1SplatRoute
   '/api/v1/meta': typeof ApiV1MetaRoute
+  '/api/v1/openapi.json': typeof ApiV1OpenapiDotjsonRoute
   '/api/v1/$network/stations': typeof ApiV1NetworkStationsRoute
   '/api/v1/$network/puzzles/today': typeof ApiV1NetworkPuzzlesTodayRoute
   '/api/v1/$network/puzzles/': typeof ApiV1NetworkPuzzlesIndexRoute
@@ -100,6 +109,7 @@ export interface FileRouteTypes {
     | '/'
     | '/api/v1/$'
     | '/api/v1/meta'
+    | '/api/v1/openapi.json'
     | '/api/v1/$network/stations'
     | '/api/v1/$network/puzzles/today'
     | '/api/v1/$network/puzzles/'
@@ -110,6 +120,7 @@ export interface FileRouteTypes {
     | '/'
     | '/api/v1/$'
     | '/api/v1/meta'
+    | '/api/v1/openapi.json'
     | '/api/v1/$network/stations'
     | '/api/v1/$network/puzzles/today'
     | '/api/v1/$network/puzzles'
@@ -120,6 +131,7 @@ export interface FileRouteTypes {
     | '/'
     | '/api/v1/$'
     | '/api/v1/meta'
+    | '/api/v1/openapi.json'
     | '/api/v1/$network/stations'
     | '/api/v1/$network/puzzles/today'
     | '/api/v1/$network/puzzles/'
@@ -131,6 +143,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ApiV1SplatRoute: typeof ApiV1SplatRoute
   ApiV1MetaRoute: typeof ApiV1MetaRoute
+  ApiV1OpenapiDotjsonRoute: typeof ApiV1OpenapiDotjsonRoute
   ApiV1NetworkStationsRoute: typeof ApiV1NetworkStationsRoute
   ApiV1NetworkPuzzlesTodayRoute: typeof ApiV1NetworkPuzzlesTodayRoute
   ApiV1NetworkPuzzlesIndexRoute: typeof ApiV1NetworkPuzzlesIndexRoute
@@ -159,6 +172,13 @@ declare module '@tanstack/react-router' {
       path: '/api/v1/meta'
       fullPath: '/api/v1/meta'
       preLoaderRoute: typeof ApiV1MetaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/openapi.json': {
+      id: '/api/v1/openapi.json'
+      path: '/api/v1/openapi.json'
+      fullPath: '/api/v1/openapi.json'
+      preLoaderRoute: typeof ApiV1OpenapiDotjsonRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/v1/$network/stations': {
@@ -203,6 +223,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ApiV1SplatRoute: ApiV1SplatRoute,
   ApiV1MetaRoute: ApiV1MetaRoute,
+  ApiV1OpenapiDotjsonRoute: ApiV1OpenapiDotjsonRoute,
   ApiV1NetworkStationsRoute: ApiV1NetworkStationsRoute,
   ApiV1NetworkPuzzlesTodayRoute: ApiV1NetworkPuzzlesTodayRoute,
   ApiV1NetworkPuzzlesIndexRoute: ApiV1NetworkPuzzlesIndexRoute,
