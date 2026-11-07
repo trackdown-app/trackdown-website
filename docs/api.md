@@ -15,6 +15,7 @@ iOS:  GET /api/v1/meta ── metaHandlers.GET ──────────┘
 | `meta` | `getMeta` (`src/lib/game/meta.ts`) | `getMetaFn`, `metaQueryOptions(network)` | `GET /api/v1/meta` | `metaInputSchema`: `network` (query string), default `nl` | `metaOutputSchema`: the network's `meta.json`, with `network` and `dataRef` |
 | `todayPuzzle` | `getTodayPuzzle` (`src/lib/game/today-puzzle.ts`) | `getTodayPuzzleFn`, `todayPuzzleQueryOptions(network)` | `GET /api/v1/{network}/puzzles/today` | `todayPuzzleInputSchema`: `network` (path), required | `todayPuzzleOutputSchema`: `network`, `number`, `date`, `maxGuesses`, `nextPuzzleAt`; never the station |
 | `guess` | `submitGuess` (`src/lib/game/guess.ts`) | `submitGuessFn` (`POST`, through a `useMutation`) | `POST /api/v1/{network}/puzzles/{n}/guesses` | `guessInputSchema`: `network`, `number` (path), `guess`, `earlierGuesses` (JSON body; default `[]`) | `guessOutputSchema`: `network`, `number`, `guess`, `correct`, `steps`, `totalMinutes`; never the station |
+| `stations` | `getStations` (`src/lib/game/stations.ts`) | `getStationsFn`, `stationsQueryOptions(network, locale)` | `GET /api/v1/{network}/stations` | `stationsInputSchema`: `network` (path), required; `locale` (query string), `nl` or `en`, default `nl` | `stationsOutputSchema`: `network`, `locale`, `stations` (`code`, `name`, `province`); no coordinates, no trips |
 
 `dataRef` is the trackdown-data commit the build was made from, or `local` ([deploy.md](deploy.md#the-game-data)).
 
@@ -65,14 +66,31 @@ POST /api/v1/nl/puzzles/142/guesses
 - **A correct guess** answers `correct: true` with no trip (`steps: []`, `totalMinutes: 0`). The whole trip list is the reveal, an operation of its own.
 - **The puzzle** is any puzzle up to today's ([Today's puzzle](#todays-puzzle)), so an earlier day can still be played. A puzzle after today's answers `not_found`, the same as one that does not exist, so the schedule's future stays hidden.
 - **Rejected** with `invalid_input`: a guess or an earlier guess that is not a station of the network, a guess that is among the earlier guesses, earlier guesses that repeat a station, a guess beyond `maxGuesses` (a seventh), and a guess after an earlier one already solved the puzzle. The puzzle is checked first, so a future puzzle answers `not_found` whatever the guesses.
-- **The REST route** reads `network` and `number` from the path and the rest from the JSON body (`restPost`, below); a body that is not a JSON object is `invalid_input`.
+- **The REST route** reads `network` and `number` from the path and the rest from the JSON body (`restPost`, below); a body that is not a JSON object is `invalid_input`. A guess's answer is never kept (`Cache-Control: no-store`).
+
+### Stations
+
+Every station a player can guess, for the guess search: 395 for `nl`.
+
+```text
+GET /api/v1/nl/stations?locale=en
+
+200 {"network":"nl","locale":"en","stations":[
+     {"code":"ht","name":"'s-Hertogenbosch","province":"North Brabant"},
+     {"code":"hto","name":"'s-Hertogenbosch Oost","province":"North Brabant"},…]}
+```
+
+- **The stations** are the network's `stations.json`, in its order (by name), and nothing else. A station that only appears as a change in a trip (Aachen, Antwerpen) is not guessable and not in it.
+- **No trip data, no coordinates**: the service builds each station field by field, and `stationsOutputSchema` and its stations are strict, so its test fails on any field they do not name.
+- **The province** is named in `locale`. `stations.json` names it in Dutch; `provinceName` (`src/lib/game/province-names.ts`) gives the English name where it differs (Noord-Holland is North Holland, Fryslân is Friesland). A province without an entry keeps its data name, so a new one shows in Dutch until it is added there.
+- **Cached for long** ([Caching](#caching)): the answer only changes with a deploy. `stationsQueryOptions` keeps it fresh for as long as the page is open.
 
 ## The pieces
 
 - **Schemas** (`src/lib/game/schemas.ts`): the input and output schema of every operation, in one place. They hold no data and no server code, so the browser may import them, and they are the contract the iOS app follows.
 - **Services** (`src/lib/game/<operation>.ts`, server-only): one function per operation, `(input, context) => Promise<output>`. The input is already checked. Everything else it reads comes from the `ServiceContext` it is given (`src/lib/game/service-context.ts`): the game data, the data's commit and the current time (`now()`). The server function and the REST route pass `serviceContext`, which reads the real data; a test passes the fixture. A service throws an `ApiError` for an answer that is the caller's fault (a puzzle that does not exist yet); any other error is a server error.
 - **Server functions** (`src/lib/game/<operation>.functions.ts`) and **query options** (`<operation>.queries.ts`): the web's side, as in [data-loading.md](data-loading.md#the-pieces). The validator is the operation's input schema, the handler calls the service with `serviceContext`.
-- **REST handlers** (`src/lib/api/v1-handlers.ts`, server-only): the iOS side. `restGet(inputSchema, run)` (`src/lib/api/rest.ts`) reads the input from the query string and the route's path parameters (a path parameter wins over a query field of the same name), checks it, calls the service and answers JSON with `Cache-Control: no-store`. `restPost(inputSchema, run)` does the same with the JSON body in place of the query string. `restHandlers` adds an `ANY` handler that answers every other method 405, with `Allow` naming the route's own methods.
+- **REST handlers** (`src/lib/api/v1-handlers.ts`, server-only): the iOS side. `restGet(inputSchema, run)` (`src/lib/api/rest.ts`) reads the input from the query string and the route's path parameters (a path parameter wins over a query field of the same name), checks it, calls the service and answers JSON. `restGet(inputSchema, run, "deploy")` lets the CDN keep a successful answer ([Caching](#caching)); without it every answer is `Cache-Control: no-store`. `restPost(inputSchema, run)` does the same with the JSON body in place of the query string, and is never kept. `restHandlers` adds an `ANY` handler that answers every other method 405, with `Allow` naming the route's own methods.
 - **REST routes** (`src/routes/api/v1/<operation>.ts`, or a nested path such as `$network/puzzles/today.ts` for `/api/v1/{network}/puzzles/today` and `$network/puzzles/$number/guesses.ts` for `/api/v1/{network}/puzzles/{n}/guesses`): a file route with only `server.handlers`, the operation's handlers from `v1-handlers.ts`. `src/routes/api/v1/$.ts` answers every other path under `/api/v1` 404 in the error format, not with the site's not-found page.
 
 ## Errors
@@ -94,6 +112,17 @@ The message is for a developer, not for a player: the app shows its own text per
 
 A server function's error reaches the web's query as a thrown error, which the route's error page shows ([site-shell.md](site-shell.md)).
 
+## Caching
+
+A REST answer says how long it may be kept (`RestCache`, `src/lib/api/rest.ts`):
+
+| Cache | Headers | For |
+| --- | --- | --- |
+| `none` (default) | `Cache-Control: no-store` | Every error, and every answer that changes between deploys (`meta`, `todayPuzzle`). |
+| `deploy` | `Cache-Control: public, max-age=86400`, `Vercel-CDN-Cache-Control: public, max-age=31536000` | An answer that only changes with a deploy (`stations`). |
+
+`Vercel-CDN-Cache-Control` is read by Vercel's CDN only and not passed on: the CDN keeps the answer for a year, per URL (so per `locale`), and its cache belongs to one deployment, so a new deploy answers afresh. A client (the iOS app, a browser) keeps it for a day. An error is never kept, whatever the operation's cache.
+
 ## Versioning
 
 Every REST route lives under `/api/v1`. A change the iOS app already in the App Store would break on (a field removed or renamed, a meaning changed) goes under `/api/v2` beside v1, until v1's last app version is gone. A new field or a new operation is not a break and stays in v1. Server functions are not versioned: the web and its server ship together.
@@ -110,4 +139,4 @@ The router's locale rewrite also matches `/en/api/v1/…` ([i18n.md](i18n.md#loc
 
 ## Tests
 
-`src/lib/game/meta.test.ts` runs the service and its schemas on the fixture. `src/lib/game/today-puzzle.test.ts` runs `getTodayPuzzle` at fixed instants on the fixture with its schedule carried on for 400 days: puzzle 142 on 6 November 2026, the switch at Amsterdam midnight in winter and summer, both clock changes, no station in the answer and a day without a puzzle. `src/lib/game/guess.test.ts` runs `submitGuess` on the fixture's puzzle 2, with five stations added so a seventh guess can be made: the redaction of change stations by the earlier guesses, a correct guess without a trip, no mystery station in a wrong guess's answer, an earlier puzzle, and every rejection. `src/lib/api/v1-handlers.test.ts` calls the REST handlers with a `Request` and path parameters, as Start does, with `serviceContext` mocked to read the fixture at a fixed time: the answer, a bad input, a body that is not a JSON object, a server error that keeps its message to itself, a day without a puzzle, a guess at a future puzzle (404), another method and an unknown path.
+`src/lib/game/meta.test.ts` runs the service and its schemas on the fixture. `src/lib/game/today-puzzle.test.ts` runs `getTodayPuzzle` at fixed instants on the fixture with its schedule carried on for 400 days: puzzle 142 on 6 November 2026, the switch at Amsterdam midnight in winter and summer, both clock changes, no station in the answer and a day without a puzzle. `src/lib/game/stations.test.ts` runs `getStations` on the fixture: every station with its code, name and province, nothing its strict schema does not name, no station that is only a change in a trip, the English province names and the input's defaults. `src/lib/game/guess.test.ts` runs `submitGuess` on the fixture's puzzle 2, with five stations added so a seventh guess can be made: the redaction of change stations by the earlier guesses, a correct guess without a trip, no mystery station in a wrong guess's answer, an earlier puzzle, and every rejection. `src/lib/api/v1-handlers.test.ts` calls the REST handlers with a `Request` and path parameters, as Start does, with `serviceContext` mocked to read the fixture at a fixed time: the answer, a bad input, a body that is not a JSON object, a server error that keeps its message to itself, a day without a puzzle, a guess at a future puzzle (404), the cache headers of a kept answer and of its errors, another method and an unknown path.

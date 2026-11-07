@@ -8,9 +8,11 @@ import { getMeta } from "@/lib/game/meta";
 import {
     guessInputSchema,
     metaInputSchema,
+    stationsInputSchema,
     todayPuzzleInputSchema,
 } from "@/lib/game/schemas";
 import { serviceContext } from "@/lib/game/service-context";
+import { getStations } from "@/lib/game/stations";
 import { getTodayPuzzle } from "@/lib/game/today-puzzle";
 
 // The handlers of every REST route under `/api/v1` (docs/api.md). Each route
@@ -38,6 +40,19 @@ export const todayPuzzleHandlers = restHandlers({
  */
 export const guessHandlers = restHandlers({
     POST: restPost(guessInputSchema, (input) => submitGuess(input, serviceContext)),
+});
+
+/**
+ * `/api/v1/{network}/stations`: the `stations` operation for iOS;
+ * `getStationsFn` is the same for the web. It only changes with a deploy, so
+ * the CDN keeps it (docs/api.md#caching).
+ */
+export const stationsHandlers = restHandlers({
+    GET: restGet(
+        stationsInputSchema,
+        (input) => getStations(input, serviceContext),
+        "deploy",
+    ),
 });
 
 /**
