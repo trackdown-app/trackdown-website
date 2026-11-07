@@ -82,6 +82,17 @@
     "countdown": {
         "nextStation": "Next station in"
     },
+    "howToPlay": {
+        "pageTitle": "How to play · Trackdown",
+        "title": "How to play",
+        "rule1": "Guess any station in the Netherlands.",
+        "rule2": "We draw the fastest train trip from your guess to the mystery station.",
+        "rule3": "Shorter lines are closer. Find it in six guesses.",
+        "exampleTitle": "An example trip",
+        "exampleCaption": "You change trains once, 17 minutes before the mystery station. Guess the station where you change and its name appears.",
+        "legendTitle": "Reading the line",
+        "play": "Play today's station"
+    },
     "language": {
         "label": "Language",
         "nl": "Dutch",

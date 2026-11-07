@@ -93,6 +93,17 @@ describe("the site's router", () => {
         expect(html).toContain('href="#content"');
     });
 
+    it("answers how to play with its page, inside the header and footer", async () => {
+        const { status, html } = await respondAt(getRouter, "/hoe-te-spelen");
+
+        expect(status).toBe(200);
+        expect(html).toContain("<title>Hoe speel je · Trackdown</title>");
+        expect(html).toContain("Raad een station in Nederland.");
+        expect(html).toContain("<header");
+        // No legend in the footer here: the page carries it.
+        expect(html).toContain("Trackdown, een hobbyproject van Bram Gussekloo");
+    });
+
     it("answers an unknown path with 404 and the not-found page", async () => {
         const { status, html } = await respondAt(getRouter, "/geen-station");
 

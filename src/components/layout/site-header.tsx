@@ -53,12 +53,9 @@ export function SiteHeader() {
                             </PageLink>
                         </li>
                         <li>
-                            <PageLink
-                                path={sitePaths.howToPlay}
-                                className={navLinkClasses}
-                            >
+                            <Link to="/hoe-te-spelen" className={navLinkClasses}>
                                 {m["header.howToPlay"]()}
-                            </PageLink>
+                            </Link>
                         </li>
                     </ul>
                 </nav>

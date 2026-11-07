@@ -82,6 +82,17 @@
     "countdown": {
         "nextStation": "Volgend station over"
     },
+    "howToPlay": {
+        "pageTitle": "Hoe speel je · Trackdown",
+        "title": "Hoe speel je",
+        "rule1": "Raad een station in Nederland.",
+        "rule2": "Wij tekenen de snelste treinreis van je gok naar het mysteriestation.",
+        "rule3": "Hoe korter de lijn, hoe dichterbij. Vind het in zes gokken.",
+        "exampleTitle": "Een voorbeeldreis",
+        "exampleCaption": "Je stapt één keer over, 17 minuten voor het mysteriestation. Raad het station waar je overstapt en de naam verschijnt.",
+        "legendTitle": "Zo lees je de lijn",
+        "play": "Speel het station van vandaag"
+    },
     "language": {
         "label": "Taal",
         "nl": "Nederlands",
