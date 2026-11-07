@@ -2,8 +2,15 @@ import { describe, expect, it } from "vitest";
 import { robotsTxt, sitemapPaths, sitemapXml } from "@/lib/sitemap";
 
 describe("sitemapPaths", () => {
-    it("lists every network's game and archive, and How to play", () => {
-        expect(sitemapPaths()).toEqual(["/nl", "/nl/archief", "/hoe-te-spelen"]);
+    it("lists every network's game and archive, How to play, About, Privacy and Terms", () => {
+        expect(sitemapPaths()).toEqual([
+            "/nl",
+            "/nl/archief",
+            "/hoe-te-spelen",
+            "/over",
+            "/privacy",
+            "/voorwaarden",
+        ]);
     });
 });
 
@@ -21,7 +28,7 @@ describe("sitemapXml", () => {
         ]) {
             expect(xml).toContain(`<loc>${url}</loc>`);
         }
-        expect(xml.match(/<url>/g)).toHaveLength(6);
+        expect(xml.match(/<url>/g)).toHaveLength(12);
     });
 
     it("names each page's language versions, as its head does", () => {

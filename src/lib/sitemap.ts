@@ -6,8 +6,9 @@ import { networkArchivePath, sitePaths } from "@/lib/site-paths";
 
 /**
  * The pages the sitemap lists, without a locale: every network's game and
- * archive, and How to play. Not `/`, which redirects to a network's game,
- * nor an archive's puzzles, which the archive links to (docs/seo.md#sitemap).
+ * archive, How to play, About, Privacy and Terms. Not `/`, which redirects
+ * to a network's game, nor an archive's puzzles, which the archive links to
+ * (docs/seo.md#sitemap).
  */
 export function sitemapPaths(): string[] {
     return [
@@ -16,6 +17,9 @@ export function sitemapPaths(): string[] {
             networkArchivePath(network),
         ]),
         sitePaths.howToPlay,
+        sitePaths.about,
+        sitePaths.privacy,
+        sitePaths.terms,
     ];
 }
 

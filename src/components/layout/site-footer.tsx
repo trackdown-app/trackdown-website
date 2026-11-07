@@ -1,9 +1,7 @@
-import { useMatches } from "@tanstack/react-router";
+import { Link, useMatches } from "@tanstack/react-router";
 import { m } from "@/paraglide/messages";
-import { sitePaths } from "@/lib/site-paths";
 import { CookieSettingsButton } from "@/components/consent/cookie-settings-button";
 import { cn } from "@/lib/utils";
-import { PageLink } from "@/components/layout/page-link";
 import { shellContainer } from "@/components/layout/shell-container";
 
 const footerLinkClasses =
@@ -44,28 +42,19 @@ export function SiteFooter() {
                 >
                     <ul className="flex flex-wrap gap-x-5 gap-y-1">
                         <li>
-                            <PageLink
-                                path={sitePaths.about}
-                                className={footerLinkClasses}
-                            >
+                            <Link to="/over" className={footerLinkClasses}>
                                 {m["footer.about"]()}
-                            </PageLink>
+                            </Link>
                         </li>
                         <li>
-                            <PageLink
-                                path={sitePaths.privacy}
-                                className={footerLinkClasses}
-                            >
+                            <Link to="/privacy" className={footerLinkClasses}>
                                 {m["footer.privacy"]()}
-                            </PageLink>
+                            </Link>
                         </li>
                         <li>
-                            <PageLink
-                                path={sitePaths.terms}
-                                className={footerLinkClasses}
-                            >
+                            <Link to="/voorwaarden" className={footerLinkClasses}>
                                 {m["footer.terms"]()}
-                            </PageLink>
+                            </Link>
                         </li>
                         <li>
                             <CookieSettingsButton />

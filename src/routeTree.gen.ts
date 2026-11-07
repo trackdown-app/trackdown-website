@@ -13,8 +13,11 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as NetworkRouteRouteImport } from './routes/$network/route'
 import { Route as ConsentRouteImport } from './routes/consent'
 import { Route as HoeTeSpelenRouteImport } from './routes/hoe-te-spelen'
+import { Route as OverRouteImport } from './routes/over'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as VoorwaardenRouteImport } from './routes/voorwaarden'
 import { Route as NetworkIndexRouteImport } from './routes/$network/index'
 import { Route as NetworkArchiefIndexRouteImport } from './routes/$network/archief/index'
 import { Route as NetworkArchiefNumberRouteImport } from './routes/$network/archief/$number'
@@ -47,6 +50,16 @@ const HoeTeSpelenRoute = HoeTeSpelenRouteImport.update({
   path: '/hoe-te-spelen',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OverRoute = OverRouteImport.update({
+  id: '/over',
+  path: '/over',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
   id: '/robots.txt',
   path: '/robots.txt',
@@ -55,6 +68,11 @@ const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VoorwaardenRoute = VoorwaardenRouteImport.update({
+  id: '/voorwaarden',
+  path: '/voorwaarden',
   getParentRoute: () => rootRouteImport,
 } as any)
 const NetworkIndexRoute = NetworkIndexRouteImport.update({
@@ -122,8 +140,11 @@ export interface FileRoutesByFullPath {
   '/$network': typeof NetworkRouteRouteWithChildren
   '/consent': typeof ConsentRoute
   '/hoe-te-spelen': typeof HoeTeSpelenRoute
+  '/over': typeof OverRoute
+  '/privacy': typeof PrivacyRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/voorwaarden': typeof VoorwaardenRoute
   '/$network/': typeof NetworkIndexRoute
   '/$network/archief/$number': typeof NetworkArchiefNumberRoute
   '/api/v1/$': typeof ApiV1SplatRoute
@@ -140,8 +161,11 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/consent': typeof ConsentRoute
   '/hoe-te-spelen': typeof HoeTeSpelenRoute
+  '/over': typeof OverRoute
+  '/privacy': typeof PrivacyRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/voorwaarden': typeof VoorwaardenRoute
   '/$network': typeof NetworkIndexRoute
   '/$network/archief/$number': typeof NetworkArchiefNumberRoute
   '/api/v1/$': typeof ApiV1SplatRoute
@@ -160,8 +184,11 @@ export interface FileRoutesById {
   '/$network': typeof NetworkRouteRouteWithChildren
   '/consent': typeof ConsentRoute
   '/hoe-te-spelen': typeof HoeTeSpelenRoute
+  '/over': typeof OverRoute
+  '/privacy': typeof PrivacyRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/voorwaarden': typeof VoorwaardenRoute
   '/$network/': typeof NetworkIndexRoute
   '/$network/archief/$number': typeof NetworkArchiefNumberRoute
   '/api/v1/$': typeof ApiV1SplatRoute
@@ -181,8 +208,11 @@ export interface FileRouteTypes {
     | '/$network'
     | '/consent'
     | '/hoe-te-spelen'
+    | '/over'
+    | '/privacy'
     | '/robots.txt'
     | '/sitemap.xml'
+    | '/voorwaarden'
     | '/$network/'
     | '/$network/archief/$number'
     | '/api/v1/$'
@@ -199,8 +229,11 @@ export interface FileRouteTypes {
     | '/'
     | '/consent'
     | '/hoe-te-spelen'
+    | '/over'
+    | '/privacy'
     | '/robots.txt'
     | '/sitemap.xml'
+    | '/voorwaarden'
     | '/$network'
     | '/$network/archief/$number'
     | '/api/v1/$'
@@ -218,8 +251,11 @@ export interface FileRouteTypes {
     | '/$network'
     | '/consent'
     | '/hoe-te-spelen'
+    | '/over'
+    | '/privacy'
     | '/robots.txt'
     | '/sitemap.xml'
+    | '/voorwaarden'
     | '/$network/'
     | '/$network/archief/$number'
     | '/api/v1/$'
@@ -238,8 +274,11 @@ export interface RootRouteChildren {
   NetworkRouteRoute: typeof NetworkRouteRouteWithChildren
   ConsentRoute: typeof ConsentRoute
   HoeTeSpelenRoute: typeof HoeTeSpelenRoute
+  OverRoute: typeof OverRoute
+  PrivacyRoute: typeof PrivacyRoute
   RobotsDottxtRoute: typeof RobotsDottxtRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  VoorwaardenRoute: typeof VoorwaardenRoute
   ApiV1SplatRoute: typeof ApiV1SplatRoute
   ApiV1MetaRoute: typeof ApiV1MetaRoute
   ApiV1OpenapiDotjsonRoute: typeof ApiV1OpenapiDotjsonRoute
@@ -280,6 +319,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HoeTeSpelenRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/over': {
+      id: '/over'
+      path: '/over'
+      fullPath: '/over'
+      preLoaderRoute: typeof OverRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/robots.txt': {
       id: '/robots.txt'
       path: '/robots.txt'
@@ -292,6 +345,13 @@ declare module '@tanstack/react-router' {
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/voorwaarden': {
+      id: '/voorwaarden'
+      path: '/voorwaarden'
+      fullPath: '/voorwaarden'
+      preLoaderRoute: typeof VoorwaardenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/$network/': {
@@ -395,8 +455,11 @@ const rootRouteChildren: RootRouteChildren = {
   NetworkRouteRoute: NetworkRouteRouteWithChildren,
   ConsentRoute: ConsentRoute,
   HoeTeSpelenRoute: HoeTeSpelenRoute,
+  OverRoute: OverRoute,
+  PrivacyRoute: PrivacyRoute,
   RobotsDottxtRoute: RobotsDottxtRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  VoorwaardenRoute: VoorwaardenRoute,
   ApiV1SplatRoute: ApiV1SplatRoute,
   ApiV1MetaRoute: ApiV1MetaRoute,
   ApiV1OpenapiDotjsonRoute: ApiV1OpenapiDotjsonRoute,
