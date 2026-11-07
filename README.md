@@ -22,6 +22,8 @@ The site runs on http://localhost:3000.
 | `bun run typecheck` | Compiles messages, then type-checks with the TypeScript 7 compiler |
 | `bun run lint` | Compiles messages, then runs ESLint (with Prettier) |
 | `bun run test` | Compiles messages, then runs Vitest |
+| `bun run test:browser` | Playwright: axe and keyboard checks against the production build |
+| `bun run lighthouse` | Lighthouse CI: the game page's performance budgets against the production build |
 | `bun run paraglide:compile` | Compiles `messages/` into `src/paraglide/` (also on `postinstall`) |
 | `bun run data:check [dir]` | Checks a trackdown-data `data/` folder (default `TRACKDOWN_DATA_DIR`) against the loader's schemas |
 | `bun run build:guard [dir]` | After a build, fails when anything from a trackdown-data `data/` folder (default `TRACKDOWN_DATA_DIR`) is in the static output |
@@ -51,3 +53,4 @@ The site runs on http://localhost:3000.
 - [Server logs and traces](docs/logging.md)
 - [Analytics and cookie consent](docs/analytics.md)
 - [Security headers](docs/errors-and-headers.md)
+- [Accessibility and performance](docs/accessibility.md)

@@ -49,6 +49,7 @@
   - `docs/logging.md`: server logs and traces, PostHog EU, startup validation, Vercel flushing, privacy filtering, and the telemetry tests.
   - `docs/analytics.md`: the consent banner and status, native consent forms and cookie settings, the versioned consent cookie, the browser analytics integration contract, and the typed game events.
   - `docs/errors-and-headers.md`: the security headers, the Content-Security-Policy and its nonce, the static files' headers on Vercel, the Preview toolbar hosts, and the jitless `@/lib/zod`.
+  - `docs/accessibility.md`: the axe and Lighthouse budgets, the checked pages, keyboard play, names that match what is shown, font preloads and fallbacks, compression, the browser checks (`e2e/`, `playwright.config.ts`, `lighthouserc.yml`), the shifted clock and the CI job.
 - A new feature area gets its own `docs/<feature>.md`, an entry in the README's documentation list and a line in the list above.
 
 ## Strict Boolean Expressions

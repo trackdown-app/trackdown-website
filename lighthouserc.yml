@@ -1,0 +1,54 @@
+# Lighthouse CI (`bun run lighthouse`): the game page's budgets on a phone,
+# against the production build made from the fixture, so run
+# `TRACKDOWN_DATA_DIR=fixtures/trackdown-data bun run build` first. See
+# docs/accessibility.md#lighthouse.
+ci:
+  collect:
+    # The built server, its clock moved onto the fixture's puzzles, as in
+    # playwright.config.ts (e2e/clock.ts).
+    startServerCommand: PORT=3200 POSTHOG_PROJECT_TOKEN= node --import ./e2e/shift-server-clock.ts .output/server/index.mjs
+    startServerReadyPattern: Listening on
+    url:
+      - http://localhost:3200/nl
+      - http://localhost:3200/en/nl
+    # The median of three runs, so one slow run does not fail the check.
+    numberOfRuns: 3
+    settings:
+      # Lighthouse's default device: a mid-range phone on a slow 4G
+      # connection with a 4x slower CPU.
+      formFactor: mobile
+      # Throttled for real rather than simulated: on localhost every script
+      # has arrived before the first paint, and the simulation then counts
+      # them all into the largest paint, which a phone on 4G does not wait
+      # for (docs/accessibility.md#lighthouse).
+      throttlingMethod: devtools
+      # A build that is not production asks search engines not to index it
+      # (docs/seo.md), and this one runs on localhost.
+      skipAudits:
+        - is-crawlable
+      # A check never counts as a visit in PostHog.
+      blockedUrlPatterns:
+        - "*t.trackdown.nl*"
+      chromeFlags: --no-sandbox --headless=new
+  assert:
+    assertions:
+      categories:performance: [error, { minScore: 0.9, aggregationMethod: median-run }]
+      categories:accessibility: [error, { minScore: 1, aggregationMethod: median-run }]
+      categories:best-practices: [error, { minScore: 1, aggregationMethod: median-run }]
+      categories:seo: [error, { minScore: 1, aggregationMethod: median-run }]
+      first-contentful-paint: [error, { maxNumericValue: 2000, aggregationMethod: median-run }]
+      largest-contentful-paint: [error, { maxNumericValue: 2500, aggregationMethod: median-run }]
+      cumulative-layout-shift: [error, { maxNumericValue: 0.1, aggregationMethod: median-run }]
+      total-blocking-time: [error, { maxNumericValue: 200, aggregationMethod: median-run }]
+      # What the page downloads, compressed, in bytes: about a tenth above
+      # what it takes today, so a new dependency or font has to be
+      # deliberate. The scripts include PostHog's, which loads after the page.
+      resource-summary:script:size: [error, { maxNumericValue: 360000 }]
+      resource-summary:font:size: [error, { maxNumericValue: 175000 }]
+      resource-summary:stylesheet:size: [error, { maxNumericValue: 12000 }]
+      resource-summary:document:size: [error, { maxNumericValue: 32000 }]
+      resource-summary:total:size: [error, { maxNumericValue: 600000 }]
+  upload:
+    # The reports stay with the run (an artifact in CI), never on a public server.
+    target: filesystem
+    outputDir: .lighthouseci/reports

@@ -64,16 +64,21 @@ describe("SiteHeader", () => {
         const html = await renderAt(SiteHeader, "/nl");
         const pill = /<button [^>]*aria-haspopup[^>]*>/.exec(html)?.[0];
 
-        expect(pill).toContain('aria-label="Netwerk: Nederland. Kies een netwerk"');
+        expect(pill).not.toContain("aria-label");
         expect(pill).toContain('aria-expanded="false"');
-        expect(html).toContain("Nederland");
+        // Named by its text, which starts with the name it shows (WCAG 2.5.3).
+        expect(html).toContain(
+            'Nederland<span class="sr-only">. Kies een netwerk</span>',
+        );
     });
 
     it("names the network in English on an English page", async () => {
         overwriteGetLocale(() => "en");
         const html = await renderAt(SiteHeader, "/nl");
 
-        expect(html).toContain('aria-label="Network: Netherlands. Change network"');
+        expect(html).toContain(
+            'Netherlands<span class="sr-only">. Change network</span>',
+        );
     });
 
     it("renders the statistics button as an enabled dialog trigger", async () => {

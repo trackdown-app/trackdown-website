@@ -5,6 +5,7 @@ import { RootDocument } from "@/components/layout/root-document";
 import { consentQueryOptions } from "@/lib/analytics/consent.queries";
 import type { ConsentChoice } from "@/lib/analytics/consent";
 import { defaultNetwork } from "@/lib/data/networks";
+import { fontPreloadLinks } from "@/lib/font-preloads";
 import { readNetworkChoice } from "@/lib/network-choice";
 import appCss from "../styles.css?url";
 
@@ -63,6 +64,7 @@ export const Route = createRootRouteWithContext<RouterContext>()({
                 rel: "stylesheet",
                 href: appCss,
             },
+            ...fontPreloadLinks,
             // The icons in `public/` (docs/seo.md#icons).
             { rel: "icon", href: "/favicon.ico", sizes: "32x32" },
             { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },

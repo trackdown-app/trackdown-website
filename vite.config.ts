@@ -39,6 +39,18 @@ const config = defineConfig(({ mode }) => {
             // (docs/deploy.md). Must directly follow `tanstackStart()`.
             nitro({
                 plugins: ["src/config/telemetry.ts"],
+                // A gzip and a brotli copy of every script, stylesheet and
+                // SVG, which the Node server sends to a browser that accepts
+                // them, as Vercel's CDN compresses them for the live site.
+                // For `bun run start` and the browser checks, which measure
+                // the Node server (docs/accessibility.md#lighthouse); left
+                // out of a Vercel build (`vercel build` sets `VERCEL`, the
+                // deploy workflow `NITRO_PRESET`), whose CDN needs no copies.
+                compressPublicAssets:
+                    process.env["VERCEL"] == null &&
+                    process.env["NITRO_PRESET"] !== "vercel"
+                        ? { gzip: true, brotli: true }
+                        : false,
                 vercel: {
                     // Only read by the `vercel` preset: runs the server
                     // function in Frankfurt, the region closest to the

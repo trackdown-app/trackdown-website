@@ -53,7 +53,7 @@ const trips = await gameData.tripsTo("nl", puzzle.station);
 
 `fixtures/trackdown-data/nl/` is a made-up network of five stations (Alfastad Centraal, Bravodorp, Charlieveen, Deltahaven, Echoburg) in the real files' format, with a trips file for every station. It holds no real data, so it is committed. The unit tests (`src/lib/data/*.test.ts`) run on it only, never on the real data, so CI needs no access to trackdown-data. A test that needs a broken file builds it in the test, over a `DataReader` of its own.
 
-Pointing `TRACKDOWN_DATA_DIR` at `fixtures/trackdown-data` builds or runs the site with the fixture.
+Pointing `TRACKDOWN_DATA_DIR` at `fixtures/trackdown-data` builds or runs the site with the fixture. The browser checks play it, with their clocks moved onto 20 June 2026, its middle puzzle (`e2e/clock.ts`); keep a puzzle on the day before and after it ([accessibility.md](accessibility.md#the-clock)).
 
 ## Checking the data
 
