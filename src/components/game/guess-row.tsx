@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 import { m } from "@/paraglide/messages";
+import { cn } from "@/lib/utils";
 import { TripLine } from "@/components/game/trip-line";
 import type { ListedGuess } from "@/lib/game/trip-line";
 import { spokenGuess, tripSummary } from "@/lib/game/trip-text";
@@ -19,6 +20,8 @@ type GuessRowProps = {
     /** Which guess it was, from 1. */
     number: number;
     names: StationNames;
+    /** A guess just made on this page: the row plays its arrival (docs/guess-list.md#a-new-guess). */
+    entering?: boolean;
 };
 
 /**
@@ -26,14 +29,19 @@ type GuessRowProps = {
  * station and a summary of the trip, then the trip line on the time grid. A
  * screen reader reads the row as one sentence instead.
  */
-export function GuessRow({ guess, number, names }: GuessRowProps) {
+export function GuessRow({ guess, number, names, entering = false }: GuessRowProps) {
     const name = names.get(guess.guess) ?? guess.guess;
     const summary = guess.correct
         ? m["guessList.found"]()
         : tripSummary(guess, names);
 
     return (
-        <li className="flex min-h-[104px] flex-wrap gap-x-4 border-b border-rule">
+        <li
+            className={cn(
+                "flex min-h-[104px] flex-wrap gap-x-4 border-b border-rule",
+                entering && "guess-enter",
+            )}
+        >
             <span className="sr-only">{spokenGuess(guess, number, names)}</span>
             <div
                 aria-hidden="true"

@@ -145,6 +145,23 @@ describe("GuessList", () => {
         );
     });
 
+    it("plays the arrival on the entering guess's row only, with its timings", () => {
+        overwriteGetLocale(() => "en");
+        render(
+            <GuessList guesses={guesses} stations={stations} enteringGuess="mt" />,
+        );
+
+        const [maastricht, ...older] = rows();
+        expect(maastricht?.classList.contains("guess-enter")).toBe(true);
+        for (const row of older) {
+            expect(row.classList.contains("guess-enter")).toBe(false);
+        }
+        const track = maastricht?.querySelector<HTMLElement>("[style*='--trip-ms']");
+        expect(track?.style.getPropertyValue("--trip-ms")).toBe("977ms");
+        const ring = maastricht?.querySelector<HTMLElement>(".trip-ring");
+        expect(ring?.style.getPropertyValue("--ring-delay")).toMatch(/^\d+ms$/);
+    });
+
     it("renders nothing before the first guess", () => {
         const { container } = render(<GuessList guesses={[]} stations={stations} />);
 

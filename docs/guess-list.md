@@ -11,6 +11,7 @@ The game page mounts it with the game's state, with the progress dots in its hea
 | `guesses` | The guesses so far, oldest first: each `guess` operation's answer ([api.md](api.md#a-guess)), or the `reveal` operation's guesses. Only `guess`, `correct`, `steps` and `totalMinutes` are read (`ListedGuess` in `src/lib/game/trip-line.ts`) |
 | `stations` | The network's stations (`code` and `name`), to name each guess and each known change. A code it does not know shows as the code |
 | `progress` | Optional. What the header row shows at the left, opposite "Mystery station": the game page's progress dots |
+| `enteringGuess` | Optional. The station code of a guess just made on the page, whose row plays its arrival ([A new guess](#a-new-guess)) |
 
 Before the first guess the list renders nothing.
 
@@ -29,6 +30,18 @@ The summary is the total time and how the trip changes trains: "2h 25m, change a
 - **Change rings.** A 30px `surface` ring with a 4px ink border, centred where the next ride starts, over the unbroken line: empty when the change's station is known, `?` when the `guess` operation hid it (`station: null`, because the player has not guessed that station yet).
 - **Ride labels.** Inside each ride, in `on-line` bold 13px, centred in the part the dot, rings and bar leave visible: the train and its time ("IC 2h 02m") when it fits, else the time alone ("30m"), else nothing. Whether a label fits is worked out at about 7.2px a character plus 10px padding, on the track's measured width (`useElementWidth`, `src/lib/use-element-width.ts`, a `ResizeObserver`). The server render, before the browser has measured it, assumes the narrowest track, 340px at phone width, so a wide track can gain train names once the page loads.
 - **Guess dot.** A 22px ink dot with a 3px `bg` halo, centred on the start of the first ride.
+
+## A new guess
+
+A guess just made on the page arrives as a train ride. The row gets `guess-enter` (`GuessRow`'s `entering`); the keyframes live in `src/styles.css`, and `TripLine` sets the timings on the elements as CSS variables.
+
+1. **The row opens** at the top of the list (260ms, `max-height` and opacity), pushing the older guesses down rather than jumping them.
+2. **The guess dot lands** on the guessed station from 180ms, scaling up with a small overshoot (220ms).
+3. **The train runs** from 320ms: the rides are uncovered from the dot to the mystery bar (`clip-path`), easing in and out like a train pulling away and braking (an ease-in-out sine). The run takes longer the longer the line, `tripRunMs` in `src/lib/game/trip-line.ts`: 300ms plus 7ms per percent of track, so about 0.4s for the shortest trip and 1s across the whole track. How long it takes says how far the guess is.
+4. **Each change ring drops in** as the train reaches it, with the dot's overshoot. `trainReachesMs` works out when: the inverse of the run's easing at the ring's place.
+5. **The labels fade in** as the train arrives (180ms).
+
+A correct guess has no line; its row only opens. Kept guesses, the ones a reload shows, never move: only the answer to the last guess made on the page enters (`useGame`'s `lastAnswer`). With `prefers-reduced-motion: reduce` nothing moves; the row is drawn as it ends.
 
 ## Time grid and mystery bar
 
@@ -50,4 +63,4 @@ Times in the sentence spell out their units, one and many ("1 hour 1 minute", "1
 
 - `src/lib/game/trip-line.test.ts` covers the width and its limits, where each ride and change sits, the same minutes drawn the same width with a change or without, the labels that fit on a narrow and a wide track, hidden changes and the line colours.
 - `src/lib/game/trip-text.test.ts` covers the short and the spoken times, the summary and the sentence, in both languages.
-- `src/components/game/guess-list.test.tsx` renders the design's four guesses in `happy-dom`: the order, each row's sentence, the drawing hidden, the labels and `?`, the grid labels, Dutch, a correct guess and the empty list.
+- `src/components/game/guess-list.test.tsx` renders the design's four guesses in `happy-dom`: the order, each row's sentence, the drawing hidden, the labels and `?`, the grid labels, Dutch, a correct guess, the entering row's class and timings, and the empty list.

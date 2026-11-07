@@ -12,6 +12,12 @@ type GuessListProps = {
     stations: readonly Pick<GuessableStation, "code" | "name">[];
     /** What the header row shows at the left, opposite "Mystery station": the game's progress. */
     progress?: ReactNode;
+    /**
+     * The station code of a guess just made on this page, whose row plays
+     * its arrival (docs/guess-list.md#a-new-guess). Kept guesses a reload
+     * shows do not move.
+     */
+    enteringGuess?: string | undefined;
 };
 
 /**
@@ -20,7 +26,12 @@ type GuessListProps = {
  * the mystery bar at the right, over a 30-minute time grid. Renders nothing
  * before the first guess.
  */
-export function GuessList({ guesses, stations, progress }: GuessListProps) {
+export function GuessList({
+    guesses,
+    stations,
+    progress,
+    enteringGuess,
+}: GuessListProps) {
     const names = useMemo(
         () => new Map(stations.map((station) => [station.code, station.name])),
         [stations],
@@ -68,6 +79,7 @@ export function GuessList({ guesses, stations, progress }: GuessListProps) {
                             guess={guess}
                             number={number}
                             names={names}
+                            entering={guess.guess === enteringGuess}
                         />
                     ))}
                 </ol>

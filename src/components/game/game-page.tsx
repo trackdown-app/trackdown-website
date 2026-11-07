@@ -97,6 +97,7 @@ export function GamePage({ puzzle, stations, store }: GamePageProps) {
                 <GuessList
                     guesses={game.guesses}
                     stations={stations}
+                    enteringGuess={game.lastAnswer?.guess}
                     progress={
                         <GameProgress
                             guessCount={game.guesses.length}

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { tripLineLayout } from "@/lib/game/trip-line";
+import { trainReachesMs, tripLineLayout, tripRunMs } from "@/lib/game/trip-line";
 import type { ListedGuess } from "@/lib/game/trip-line";
 
 function format(minutes: number): string {
@@ -137,5 +137,21 @@ describe("tripLineLayout", () => {
         expect(
             parts.flatMap((part) => (part.kind === "ride" ? [part.line] : [])),
         ).toEqual([1, 2, 3, 1]);
+    });
+});
+
+describe("a new guess's run", () => {
+    it("takes longer the longer the line", () => {
+        expect(tripRunMs(14)).toBe(398);
+        expect(tripRunMs(100)).toBe(1000);
+    });
+
+    it("reaches a point when the eased run has covered it", () => {
+        // The start at once, halfway at half the time, the bar at the end.
+        expect(trainReachesMs(60, 60)).toBe(0);
+        expect(trainReachesMs(60, 30)).toBe(tripRunMs(60) / 2);
+        expect(trainReachesMs(60, 0)).toBe(tripRunMs(60));
+        // A quarter of the way takes a third of the time: it pulls away slowly.
+        expect(trainReachesMs(60, 45)).toBe(Math.round(tripRunMs(60) / 3));
     });
 });

@@ -24,6 +24,7 @@ Once the game is over the search gives way to one line: "You tracked it down in 
 - A guess made is a filled `ink` dot.
 - The guess now is a ring with a 3px `ink` border; the ones still to come have an `empty` border.
 - The line is `ink` up to the guess now, or up to the last guess once the game is over.
+- After a guess the `ink` line slides on to the next dot (500ms, eased like the trip line's train) and the dots change colour (300ms). Not with `prefers-reduced-motion: reduce`.
 
 Beside the dots, in 16px semibold: "Guess 5 of 6, newest first", "Found in 4 of 6, newest first" or "All 6 guesses used, newest first". The dots are hidden from screen readers; the words say the same.
 
@@ -35,6 +36,7 @@ Beside the dots, in 16px semibold: "Guess 5 of 6, newest first", "Found in 4 of 
 - **Status.** `gameStatus` (`src/lib/game/game-state.ts`): `won` once a guess is correct, `lost` once the puzzle's `maxGuesses` (6) guesses are made, else `playing`.
 - **A guess.** Goes through a `useMutation` that calls `submitGuessFn` with the earlier guesses, so the server can check the game and name the changes the player already guessed ([api.md](api.md#a-guess)). On success the answer is added to the kept game. A guess is ignored while one is on its way or once the game is over.
 - **Screen readers.** A polite live region reads out the answer to each guess made on the page, as the guess list's sentence for that row. Kept guesses a reload shows are not read out.
+- **Arrival.** The same answer's row plays the train ride of [guess-list.md](guess-list.md#a-new-guess); kept guesses do not move.
 
 The server render has no storage, so it renders a game with no guesses. `useSyncExternalStore` reads the kept game as the page hydrates, and again after every write, here or in another tab.
 

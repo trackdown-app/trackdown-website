@@ -83,6 +83,35 @@ function labelPx(text: string): number {
     return text.length * labelCharPx + labelPaddingPx;
 }
 
+/** The run of a new guess's train: a short trip's, then this much more per percent of track. */
+const runBaseMs = 300;
+const runPerPercentMs = 7;
+
+/**
+ * How long a new guess's train takes from the guess dot to the mystery bar
+ * (docs/guess-list.md#a-new-guess): longer the longer the line, from about
+ * 0.4 s for the shortest to 1 s across the whole track.
+ */
+export function tripRunMs(widthPercent: number): number {
+    return Math.round(runBaseMs + runPerPercentMs * widthPercent);
+}
+
+/**
+ * When, into its run, the train reaches the point `atPercent` from the right
+ * on a line `widthPercent` wide. The run eases in and out like an
+ * ease-in-out sine (CSS `cubic-bezier(0.37, 0, 0.63, 1)`), so this is that
+ * curve's inverse: the share of the way covered gives the share of the time.
+ */
+export function trainReachesMs(widthPercent: number, atPercent: number): number {
+    const covered =
+        widthPercent > 0
+            ? Math.min(1, Math.max(0, (widthPercent - atPercent) / widthPercent))
+            : 1;
+    return Math.round(
+        (tripRunMs(widthPercent) * Math.acos(1 - 2 * covered)) / Math.PI,
+    );
+}
+
 /**
  * How `guess`'s trip is drawn on a track `trackPx` wide. Every minute takes
  * the same width, 150 minutes the whole track, so a ride is as wide as it is

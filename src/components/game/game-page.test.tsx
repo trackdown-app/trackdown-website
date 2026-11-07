@@ -123,6 +123,12 @@ describe("GamePage", () => {
         await waitFor(() => {
             expect(guessedNames()).toEqual(["Utrecht Centraal", "Hilversum"]);
         });
+        // The new guess arrives; the kept one stays still.
+        expect(
+            screen
+                .getAllByRole("listitem")
+                .map((row) => row.classList.contains("guess-enter")),
+        ).toEqual([true, false]);
         expect(submitGuessFn).toHaveBeenCalledWith({
             data: {
                 network: "nl",
@@ -136,6 +142,8 @@ describe("GamePage", () => {
         cleanup();
         renderGame(createGameStore(() => window.localStorage));
         expect(guessedNames()).toEqual(["Utrecht Centraal", "Hilversum"]);
+        // Kept guesses do not play their arrival again.
+        expect(document.querySelector(".guess-enter")).toBeNull();
     });
 
     it("plays without storage, keeping nothing", async () => {

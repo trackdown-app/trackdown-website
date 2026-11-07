@@ -47,14 +47,15 @@ export function GameProgress({ guessCount, maxGuesses, status }: GameProgressPro
             <div aria-hidden="true" className="relative flex items-center gap-4">
                 <span className="absolute inset-x-1.5 top-1/2 -mt-[1.5px] h-[3px] bg-empty" />
                 <span
-                    className="absolute left-1.5 top-1/2 -mt-[1.5px] h-[3px] bg-ink"
+                    // Slides on to the next dot after a guess.
+                    className="absolute left-1.5 top-1/2 -mt-[1.5px] h-[3px] bg-ink transition-[width] duration-500 ease-[cubic-bezier(0.37,0,0.63,1)] motion-reduce:transition-none"
                     style={{ width: Math.max(0, reached) * dotPitchPx }}
                 />
                 {dots.map((className, index) => (
                     <span
                         // The dots never reorder.
                         key={index}
-                        className={`relative box-border size-3 rounded-full ${className}`}
+                        className={`relative box-border size-3 rounded-full transition-colors duration-300 motion-reduce:transition-none ${className}`}
                     />
                 ))}
             </div>
