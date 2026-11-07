@@ -86,8 +86,8 @@ const labelPaddingPx = 10;
 
 /**
  * One ride of the line. Its place is in percent of the track, counted from
- * the right, where the mystery bar is: it runs from `startPercent` (further
- * from the bar) to `endPercent`.
+ * the right, where the mystery bar is: its minutes run from `startPercent`
+ * (further from the bar) to `endPercent`.
  */
 export type TripLineRide = {
     kind: "ride";
@@ -97,9 +97,16 @@ export type TripLineRide = {
     line: 1 | 2 | 3;
     startPercent: number;
     endPercent: number;
-    /** How far the dot or ring at its start covers it, in px. */
+    /**
+     * Where its bar is drawn: on to the centre of a change beside it, so the
+     * change's pill covers the join whatever the curve of its ends. Its
+     * minutes elsewhere.
+     */
+    drawStartPercent: number;
+    drawEndPercent: number;
+    /** How far the dot or pill at its start covers the bar, in px. */
     insetStartPx: number;
-    /** How far the ring or mystery bar at its end covers it, in px. */
+    /** How far the pill or mystery bar at its end covers the bar, in px. */
     insetEndPx: number;
     /** What fits inside: train and time, the time alone, or nothing. */
     label: string | null;
@@ -119,9 +126,12 @@ export type TripLineChange = {
     spanPercent: number;
 };
 
-/** How far a change's pill covers each ride beside it, for a wait `waitPx` long. */
-function changeInsetPx(waitPx: number): number {
-    return Math.max(changeOverlapPx, (changeMinPx - waitPx) / 2);
+/**
+ * Half a change's pill, for a wait `waitPx` long: how far it covers the bar
+ * of each ride beside it, which runs on to its centre.
+ */
+function changeHalfPx(waitPx: number): number {
+    return Math.max(changeMinPx / 2, waitPx / 2 + changeOverlapPx);
 }
 
 export type TripLineLayout = {
@@ -207,19 +217,22 @@ export function tripLineLayout(
 
         if (step.kind === "change") {
             const spanPercent = startPercent - endPercent;
-            // The pill reaches over the end of the ride before it.
+            const atPercent = (startPercent + endPercent) / 2;
+            // The ride before runs on under the pill to its centre.
             if (previous?.kind === "ride") {
-                previous.insetEndPx = changeInsetPx((spanPercent / 100) * trackPx);
+                previous.drawEndPercent = atPercent;
+                previous.insetEndPx = changeHalfPx((spanPercent / 100) * trackPx);
             }
             parts.push({
                 kind: "change",
                 known: step.station != null,
-                atPercent: (startPercent + endPercent) / 2,
+                atPercent,
                 spanPercent,
             });
             continue;
         }
 
+        const after = previous?.kind === "change" ? previous : null;
         parts.push({
             kind: "ride",
             train: step.train,
@@ -227,10 +240,13 @@ export function tripLineLayout(
             line: lines[rideIndex % lines.length] ?? 1,
             startPercent,
             endPercent,
+            // It starts under the pill of the change before it, at its centre.
+            drawStartPercent: after?.atPercent ?? startPercent,
+            drawEndPercent: endPercent,
             insetStartPx:
-                previous?.kind === "change"
-                    ? changeInsetPx((previous.spanPercent / 100) * trackPx)
-                    : dotHalfPx,
+                after == null
+                    ? dotHalfPx
+                    : changeHalfPx((after.spanPercent / 100) * trackPx),
             insetEndPx: barHalfPx,
             label: null,
         });
@@ -240,7 +256,7 @@ export function tripLineLayout(
     for (const part of parts) {
         if (part.kind === "ride") {
             const roomPx =
-                ((part.startPercent - part.endPercent) / 100) * trackPx -
+                ((part.drawStartPercent - part.drawEndPercent) / 100) * trackPx -
                 part.insetStartPx -
                 part.insetEndPx;
             const time = formatMinutes(part.minutes);

@@ -67,8 +67,8 @@ export function TripLine({
                             key={index}
                             className={`absolute top-1/2 flex h-[22px] -translate-y-1/2 items-center justify-center overflow-hidden text-on-line ${rescale} ${lineColours[part.line]}`}
                             style={{
-                                right: `${part.endPercent}%`,
-                                width: `${part.startPercent - part.endPercent}%`,
+                                right: `${part.drawEndPercent}%`,
+                                width: `${part.drawStartPercent - part.drawEndPercent}%`,
                                 paddingLeft: part.insetStartPx,
                                 paddingRight: part.insetEndPx,
                             }}

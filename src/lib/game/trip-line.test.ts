@@ -90,8 +90,9 @@ describe("tripLineLayout", () => {
             format,
         );
 
-        // The 9-minute wait is 6%, 20.4px on 340px: the 30px ring reaches
-        // 4.8px over each ride.
+        // The 9-minute wait is 6%, 20.4px on 340px, so the change is the
+        // 30px ring. Each ride's bar runs on under it to its centre, 27%,
+        // where the ring's half, 15px, covers it.
         expect(layout.parts).toEqual([
             {
                 kind: "ride",
@@ -100,8 +101,10 @@ describe("tripLineLayout", () => {
                 line: 1,
                 startPercent: 78,
                 endPercent: expect.closeTo(30),
+                drawStartPercent: 78,
+                drawEndPercent: expect.closeTo(27),
                 insetStartPx: 11,
-                insetEndPx: expect.closeTo(4.8),
+                insetEndPx: 15,
                 label: "IC 1h 12m",
             },
             {
@@ -117,7 +120,9 @@ describe("tripLineLayout", () => {
                 line: 2,
                 startPercent: expect.closeTo(24),
                 endPercent: 0,
-                insetStartPx: expect.closeTo(4.8),
+                drawStartPercent: expect.closeTo(27),
+                drawEndPercent: 0,
+                insetStartPx: 15,
                 insetEndPx: 13,
                 label: "IC 36m",
             },
@@ -153,6 +158,17 @@ describe("tripLineLayout", () => {
             kind: "change",
             spanPercent: expect.closeTo((17 / 210) * 100),
         });
+        // Its bar runs on under both pills to their centres, and what shows
+        // of it is its own 37 minutes less the 3px each pill reaches over.
+        const middle = long.parts[2];
+        expect(middle?.kind).toBe("ride");
+        if (middle?.kind === "ride") {
+            const shownPx =
+                ((middle.drawStartPercent - middle.drawEndPercent) / 100) * 1000 -
+                middle.insetStartPx -
+                middle.insetEndPx;
+            expect(shownPx).toBeCloseTo((37 / 210) * 1000 - 6);
+        }
     });
 
     it("draws the same minutes the same width, with a change before them or not", () => {
