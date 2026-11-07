@@ -1,7 +1,7 @@
 import { resolve } from "node:path";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { apiErrorBodySchema } from "@/lib/api/api-error";
-import type { RestHandler } from "@/lib/api/rest";
+import type { RestContext, RestHandler } from "@/lib/api/rest";
 import {
     guessHandlers,
     metaHandlers,
@@ -37,7 +37,17 @@ vi.mock("@/lib/game/service-context", async () => {
     };
 });
 
-/** Calls `handler` the way Start does, with a request for `path`. */
+/** The headers of the iOS app, with a key the server accepts in these tests. */
+const ios = {
+    "Trackdown-Client-Key": "test-key",
+    "Trackdown-App-Version": "1.4.2",
+};
+
+beforeEach(() => {
+    vi.stubEnv("TRACKDOWN_CLIENT_KEYS", "old-key, test-key");
+});
+
+/** Calls `handler` the way Start does, with the app's request for `path`. */
 function call(
     handler: RestHandler,
     path: string,
@@ -45,7 +55,10 @@ function call(
     params: Record<string, string> = {},
 ): Promise<Response> {
     return handler({
-        request: new Request(new URL(path, "http://localhost"), { method }),
+        request: new Request(new URL(path, "http://localhost"), {
+            method,
+            headers: ios,
+        }),
         params,
     });
 }
@@ -243,7 +256,7 @@ describe("POST /api/v1/{network}/puzzles/{n}/guesses", () => {
                 new URL(`/api/v1/nl/puzzles/${number}/guesses`, "http://localhost"),
                 {
                     method: "POST",
-                    headers: { "Content-Type": "application/json" },
+                    headers: { ...ios, "Content-Type": "application/json" },
                     body,
                 },
             ),
@@ -324,7 +337,7 @@ describe("POST /api/v1/{network}/puzzles/{n}/reveal", () => {
                 new URL(`/api/v1/nl/puzzles/${number}/reveal`, "http://localhost"),
                 {
                     method: "POST",
-                    headers: { "Content-Type": "application/json" },
+                    headers: { ...ios, "Content-Type": "application/json" },
                     body,
                 },
             ),
@@ -466,7 +479,11 @@ describe("the rate limit on a guess and the reveal", () => {
         return guessHandlers.POST({
             request: new Request("http://localhost/api/v1/nl/puzzles/2/guesses", {
                 method: "POST",
-                headers: { "Content-Type": "application/json", "x-real-ip": ip },
+                headers: {
+                    ...ios,
+                    "Content-Type": "application/json",
+                    "x-real-ip": ip,
+                },
                 body: JSON.stringify({ guess: "dlt" }),
             }),
             params: { network: "nl", number: "2" },
@@ -511,7 +528,7 @@ describe("the rate limit on a guess and the reveal", () => {
         const response = await revealHandlers.POST({
             request: new Request("http://localhost/api/v1/nl/puzzles/2/reveal", {
                 method: "POST",
-                headers: { "x-real-ip": "203.0.113.4" },
+                headers: { ...ios, "x-real-ip": "203.0.113.4" },
                 body: JSON.stringify({ guesses: ["ech"] }),
             }),
             params: { network: "nl", number: "2" },
@@ -525,7 +542,9 @@ describe("a cross-origin browser call", () => {
     /** A GET of the stations with `headers`. */
     function stations(headers: Record<string, string>): Promise<Response> {
         return stationsHandlers.GET({
-            request: new Request("http://localhost/api/v1/nl/stations", { headers }),
+            request: new Request("http://localhost/api/v1/nl/stations", {
+                headers: { ...ios, ...headers },
+            }),
             params: { network: "nl" },
         });
     }
@@ -570,6 +589,110 @@ describe("a cross-origin browser call", () => {
     it("answers the site's own origin and a call without Origin, such as iOS", async () => {
         expect((await stations({ Origin: "http://localhost" })).status).toBe(200);
         expect((await stations({})).status).toBe(200);
+    });
+});
+
+describe("the client's key and version", () => {
+    /** A GET of the stations with only `headers`, none of the app's. */
+    function stations(headers: Record<string, string>): Promise<Response> {
+        return stationsHandlers.GET({
+            request: new Request("http://localhost/api/v1/nl/stations", { headers }),
+            params: { network: "nl" },
+        });
+    }
+
+    async function expectUnknownClient(response: Response): Promise<void> {
+        expect(response.status).toBe(401);
+        expect(apiErrorBodySchema.parse(await response.json()).error.code).toBe(
+            "unknown_client",
+        );
+        expect(response.headers.get("Cache-Control")).toBe("no-store");
+    }
+
+    it("answers 401 unknown_client without the headers, and logs it", async () => {
+        const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+        await expectUnknownClient(await stations({}));
+        expect(warn).toHaveBeenCalledWith(
+            "API abuse: a call from an unknown client was refused",
+            expect.objectContaining({ path: "/api/v1/nl/stations" }),
+        );
+    });
+
+    it("refuses a key the server does not accept", async () => {
+        vi.spyOn(console, "warn").mockImplementation(() => {});
+
+        await expectUnknownClient(
+            await stations({ ...ios, "Trackdown-Client-Key": "cut-off-key" }),
+        );
+    });
+
+    it("refuses a missing or malformed app version", async () => {
+        vi.spyOn(console, "warn").mockImplementation(() => {});
+
+        await expectUnknownClient(
+            await stations({ "Trackdown-Client-Key": "test-key" }),
+        );
+        await expectUnknownClient(
+            await stations({ ...ios, "Trackdown-App-Version": "latest" }),
+        );
+    });
+
+    it("accepts every key of TRACKDOWN_CLIENT_KEYS, so a rotation keeps the old one", async () => {
+        expect((await stations(ios)).status).toBe(200);
+        expect(
+            (await stations({ ...ios, "Trackdown-Client-Key": "old-key" })).status,
+        ).toBe(200);
+        expect(
+            (await stations({ ...ios, "Trackdown-App-Version": "2.0" })).status,
+        ).toBe(200);
+    });
+
+    it("refuses every call while TRACKDOWN_CLIENT_KEYS is unset", async () => {
+        vi.stubEnv("TRACKDOWN_CLIENT_KEYS", undefined);
+        vi.spyOn(console, "warn").mockImplementation(() => {});
+        vi.spyOn(console, "error").mockImplementation(() => {});
+
+        await expectUnknownClient(await stations(ios));
+    });
+
+    it("refuses before the rate limit counts, so it never spends an IP's calls", async () => {
+        vi.spyOn(console, "warn").mockImplementation(() => {});
+        function request(headers: Record<string, string>): Promise<Response> {
+            return guessHandlers.POST({
+                request: new Request(
+                    "http://localhost/api/v1/nl/puzzles/2/guesses",
+                    {
+                        method: "POST",
+                        headers: { ...headers, "x-real-ip": "203.0.113.9" },
+                        body: JSON.stringify({ guess: "dlt" }),
+                    },
+                ),
+                params: { network: "nl", number: "2" },
+            });
+        }
+        for (let hit = 0; hit < 60; hit += 1) {
+            await expectUnknownClient(await request({}));
+        }
+
+        expect((await request(ios)).status).toBe(200);
+    });
+
+    it("guards another method and an unknown path too", async () => {
+        vi.spyOn(console, "warn").mockImplementation(() => {});
+        function bare(path: string, method: string): RestContext {
+            return {
+                request: new Request(new URL(path, "http://localhost"), { method }),
+                params: {},
+            };
+        }
+
+        await expectUnknownClient(
+            await metaHandlers.ANY(bare("/api/v1/meta", "DELETE")),
+        );
+        await expectUnknownClient(
+            await unknownOperationHandlers.ANY(bare("/api/v1/secrets", "GET")),
+        );
     });
 });
 

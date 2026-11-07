@@ -2,6 +2,7 @@
 import "@tanstack/react-start/server-only";
 import { z } from "zod";
 import { ApiError } from "@/lib/api/api-error";
+import { unknownClientError } from "@/lib/api/client-identification";
 import { crossOriginError, rateLimitRefusal } from "@/lib/api/request-guard";
 
 /**
@@ -71,10 +72,10 @@ export function restGet<S extends z.ZodType, O>(
     run: (input: z.output<S>) => Promise<O>,
     cache: RestCache | ((output: O) => RestCache) = "none",
 ): RestHandler {
-    return sameOriginOnly(({ request, params }) => {
+    return ({ request, params }) => {
         const query = Object.fromEntries(new URL(request.url).searchParams);
         return answer(input, { ...query, ...params }, run, cache);
-    });
+    };
 }
 
 /**
@@ -87,7 +88,7 @@ export function restPost<S extends z.ZodType, O>(
     input: S,
     run: (input: z.output<S>) => Promise<O>,
 ): RestHandler {
-    return sameOriginOnly(async ({ request, params }) => {
+    return async ({ request, params }) => {
         let body: unknown;
         try {
             body = await request.json();
@@ -105,7 +106,7 @@ export function restPost<S extends z.ZodType, O>(
             );
         }
         return answer(input, { ...body, ...params }, run);
-    });
+    };
 }
 
 /** `fields` checked against `input`, then `run`'s answer, as `restGet` describes. */
@@ -151,43 +152,71 @@ export function rateLimited(handler: RestHandler): RestHandler {
 }
 
 /**
- * `handler` refusing a browser call from another origin with `cross_origin`
- * (403) before it runs (docs/api.md#cross-origin-calls). The answer carries
- * no CORS headers, so the browser keeps even the error from the page.
+ * Who may call a route (docs/api.md#client-identification):
+ * - `client`: only a call that names an accepted client key and its app
+ *   version, such as the iOS app's.
+ * - `anyone`: any call, such as the OpenAPI document's.
  */
-function sameOriginOnly(handler: RestHandler): RestHandler {
+export type RestAccess = "client" | "anyone";
+
+/**
+ * `handler` behind the guards every REST call passes first, in order: a
+ * browser call from another origin is `cross_origin` (403,
+ * docs/api.md#cross-origin-calls), with no CORS headers so the browser keeps
+ * even the error from the page; with `client` access, a call without an
+ * accepted client key and app version is `unknown_client` (401).
+ */
+export function guarded(
+    handler: RestHandler,
+    access: RestAccess = "client",
+): RestHandler {
     return (context) => {
-        const error = crossOriginError(context.request);
+        const error =
+            crossOriginError(context.request) ??
+            (access === "client" ? unknownClientError(context.request) : null);
         return error == null
             ? handler(context)
             : Promise.resolve(errorResponse(error));
     };
 }
 
-type RestMethod = "GET" | "POST";
+/** The 405 answer of a route whose methods are `allow`. */
+function methodNotAllowed(allow: string): RestHandler {
+    return ({ request }) => {
+        const response = errorResponse(
+            new ApiError(
+                "method_not_allowed",
+                `${request.method} is not allowed here; use ${allow}`,
+            ),
+        );
+        response.headers.set("Allow", allow);
+        return Promise.resolve(response);
+    };
+}
 
 /**
- * A REST route's `handlers`, with every other method answered 405 in the
- * API's error format instead of falling through to the site's pages. The 405
- * refuses a cross-origin browser call first, as `restGet` and `restPost` do,
- * so a preflight from another origin is `cross_origin`.
+ * A REST route's `handlers`, each behind `guarded` with `access` (the
+ * client's by default), and every other method answered 405 in the API's
+ * error format instead of falling through to the site's pages. The 405 is
+ * guarded too, so a preflight from another origin is `cross_origin`.
  */
-export function restHandlers<M extends RestMethod>(
-    handlers: Record<M, RestHandler>,
-): Record<M, RestHandler> & { ANY: RestHandler } {
+export function restHandlers(
+    handlers: { GET: RestHandler },
+    access?: RestAccess,
+): { GET: RestHandler; ANY: RestHandler };
+export function restHandlers(
+    handlers: { POST: RestHandler },
+    access?: RestAccess,
+): { POST: RestHandler; ANY: RestHandler };
+export function restHandlers(
+    handlers: { GET?: RestHandler; POST?: RestHandler },
+    access: RestAccess = "client",
+): { GET?: RestHandler; POST?: RestHandler; ANY: RestHandler } {
     const allow = Object.keys(handlers).join(", ");
     return {
-        ...handlers,
-        ANY: sameOriginOnly(({ request }) => {
-            const response = errorResponse(
-                new ApiError(
-                    "method_not_allowed",
-                    `${request.method} is not allowed here; use ${allow}`,
-                ),
-            );
-            response.headers.set("Allow", allow);
-            return Promise.resolve(response);
-        }),
+        ...(handlers.GET == null ? {} : { GET: guarded(handlers.GET, access) }),
+        ...(handlers.POST == null ? {} : { POST: guarded(handlers.POST, access) }),
+        ANY: guarded(methodNotAllowed(allow), access),
     };
 }
 
