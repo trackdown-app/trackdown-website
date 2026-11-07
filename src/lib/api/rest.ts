@@ -2,6 +2,7 @@
 import "@tanstack/react-start/server-only";
 import { z } from "zod";
 import { ApiError } from "@/lib/api/api-error";
+import { crossOriginError, rateLimitRefusal } from "@/lib/api/request-guard";
 
 /**
  * What a REST route's method handler gets from Start, as far as it reads it:
@@ -20,16 +21,28 @@ export type RestHandler = (context: RestContext) => Promise<Response>;
  * - `deploy`: an answer that only changes with a deploy. Vercel's CDN keeps
  *   it for a year, scoped to the deployment, so a new deploy answers afresh;
  *   a client keeps it for a day.
+ * - `{ maxAge }`: an answer that holds for `maxAge` more seconds, such as
+ *   today's puzzle until the next one starts. The CDN and a client both keep
+ *   it that long; `0` or less is never kept.
  */
-export type RestCache = "none" | "deploy";
+export type RestCache = "none" | "deploy" | { maxAge: number };
 
-const cacheHeaders: Record<RestCache, Readonly<Record<string, string>>> = {
-    none: { "Cache-Control": "no-store" },
-    deploy: {
-        "Cache-Control": "public, max-age=86400",
-        "Vercel-CDN-Cache-Control": "public, max-age=31536000",
-    },
-};
+function cacheHeaders(cache: RestCache): Record<string, string> {
+    if (cache === "deploy") {
+        return {
+            "Cache-Control": "public, max-age=86400",
+            "Vercel-CDN-Cache-Control": "public, max-age=31536000",
+        };
+    }
+    if (cache === "none" || cache.maxAge <= 0) {
+        return { "Cache-Control": "no-store" };
+    }
+    const maxAge = Math.floor(cache.maxAge);
+    return {
+        "Cache-Control": `public, max-age=${maxAge}`,
+        "Vercel-CDN-Cache-Control": `public, max-age=${maxAge}`,
+    };
+}
 
 /** `body` as JSON, with `status` and the headers of `cache`. */
 export function jsonResponse(
@@ -37,7 +50,7 @@ export function jsonResponse(
     status = 200,
     cache: RestCache = "none",
 ): Response {
-    return Response.json(body, { status, headers: cacheHeaders[cache] });
+    return Response.json(body, { status, headers: cacheHeaders(cache) });
 }
 
 /** `error` in the API's error format, with its status. */
@@ -50,17 +63,18 @@ export function errorResponse(error: ApiError): Response {
  * and the path parameters (which win over a query field of the same name),
  * checks it against `input`, answers with what `run` returns as JSON, and
  * turns every error into the API's error format (docs/api.md#errors). A
- * successful answer carries the headers of `cache`; an error is never kept.
+ * successful answer carries the headers of `cache`, which may be worked out
+ * from the answer itself; an error is never kept.
  */
 export function restGet<S extends z.ZodType, O>(
     input: S,
     run: (input: z.output<S>) => Promise<O>,
-    cache: RestCache = "none",
+    cache: RestCache | ((output: O) => RestCache) = "none",
 ): RestHandler {
-    return ({ request, params }) => {
+    return sameOriginOnly(({ request, params }) => {
         const query = Object.fromEntries(new URL(request.url).searchParams);
         return answer(input, { ...query, ...params }, run, cache);
-    };
+    });
 }
 
 /**
@@ -73,7 +87,7 @@ export function restPost<S extends z.ZodType, O>(
     input: S,
     run: (input: z.output<S>) => Promise<O>,
 ): RestHandler {
-    return async ({ request, params }) => {
+    return sameOriginOnly(async ({ request, params }) => {
         let body: unknown;
         try {
             body = await request.json();
@@ -91,7 +105,7 @@ export function restPost<S extends z.ZodType, O>(
             );
         }
         return answer(input, { ...body, ...params }, run);
-    };
+    });
 }
 
 /** `fields` checked against `input`, then `run`'s answer, as `restGet` describes. */
@@ -99,7 +113,7 @@ async function answer<S extends z.ZodType, O>(
     input: S,
     fields: Record<string, unknown>,
     run: (input: z.output<S>) => Promise<O>,
-    cache: RestCache = "none",
+    cache: RestCache | ((output: O) => RestCache) = "none",
 ): Promise<Response> {
     const parsed = input.safeParse(fields);
     if (!parsed.success) {
@@ -107,18 +121,56 @@ async function answer<S extends z.ZodType, O>(
             new ApiError("invalid_input", z.prettifyError(parsed.error)),
         );
     }
+    let output: O;
     try {
-        return jsonResponse(await run(parsed.data), 200, cache);
+        output = await run(parsed.data);
     } catch (error) {
         return errorResponse(toApiError(error));
     }
+    return jsonResponse(
+        output,
+        200,
+        typeof cache === "function" ? cache(output) : cache,
+    );
+}
+
+/**
+ * `handler` behind the game's rate limit per IP (docs/api.md#rate-limit):
+ * past it, `rate_limited` (429) with `Retry-After`, and `handler` never runs.
+ */
+export function rateLimited(handler: RestHandler): RestHandler {
+    return (context) => {
+        const refusal = rateLimitRefusal(context.request);
+        if (refusal == null) {
+            return handler(context);
+        }
+        const response = errorResponse(refusal.error);
+        response.headers.set("Retry-After", String(refusal.retryAfterSeconds));
+        return Promise.resolve(response);
+    };
+}
+
+/**
+ * `handler` refusing a browser call from another origin with `cross_origin`
+ * (403) before it runs (docs/api.md#cross-origin-calls). The answer carries
+ * no CORS headers, so the browser keeps even the error from the page.
+ */
+function sameOriginOnly(handler: RestHandler): RestHandler {
+    return (context) => {
+        const error = crossOriginError(context.request);
+        return error == null
+            ? handler(context)
+            : Promise.resolve(errorResponse(error));
+    };
 }
 
 type RestMethod = "GET" | "POST";
 
 /**
  * A REST route's `handlers`, with every other method answered 405 in the
- * API's error format instead of falling through to the site's pages.
+ * API's error format instead of falling through to the site's pages. The 405
+ * refuses a cross-origin browser call first, as `restGet` and `restPost` do,
+ * so a preflight from another origin is `cross_origin`.
  */
 export function restHandlers<M extends RestMethod>(
     handlers: Record<M, RestHandler>,
@@ -126,7 +178,7 @@ export function restHandlers<M extends RestMethod>(
     const allow = Object.keys(handlers).join(", ");
     return {
         ...handlers,
-        ANY: ({ request }) => {
+        ANY: sameOriginOnly(({ request }) => {
             const response = errorResponse(
                 new ApiError(
                     "method_not_allowed",
@@ -135,7 +187,7 @@ export function restHandlers<M extends RestMethod>(
             );
             response.headers.set("Allow", allow);
             return Promise.resolve(response);
-        },
+        }),
     };
 }
 

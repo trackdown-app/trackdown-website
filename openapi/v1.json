@@ -36,10 +36,13 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/InvalidInput"
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError"
+            "$ref": "#/components/responses/InternalServerError"
           }
         }
       }
@@ -60,7 +63,7 @@
         ],
         "responses": {
           "200": {
-            "description": "The answer. Never kept (`Cache-Control: no-store`).",
+            "description": "The answer. Kept by clients and the CDN until `nextPuzzleAt` (`Cache-Control: public, max-age=<seconds left>`).",
             "content": {
               "application/json": {
                 "schema": {
@@ -70,13 +73,16 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/InvalidInput"
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError"
+            "$ref": "#/components/responses/InternalServerError"
           }
         }
       }
@@ -107,10 +113,13 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/InvalidInput"
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError"
+            "$ref": "#/components/responses/InternalServerError"
           }
         }
       }
@@ -160,13 +169,19 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/InvalidInput"
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
           },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
           "500": {
-            "$ref": "#/components/responses/InternalError"
+            "$ref": "#/components/responses/InternalServerError"
           }
         }
       }
@@ -216,16 +231,19 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/InvalidInput"
+            "$ref": "#/components/responses/BadRequest"
           },
           "403": {
-            "$ref": "#/components/responses/GameNotOver"
+            "$ref": "#/components/responses/Forbidden"
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
           },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
           "500": {
-            "$ref": "#/components/responses/InternalError"
+            "$ref": "#/components/responses/InternalServerError"
           }
         }
       }
@@ -269,10 +287,13 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/InvalidInput"
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError"
+            "$ref": "#/components/responses/InternalServerError"
           }
         }
       }
@@ -283,7 +304,7 @@
         "summary": "This document",
         "responses": {
           "200": {
-            "description": "The OpenAPI document of `/api/v1`.",
+            "description": "The OpenAPI document of `/api/v1`. Kept by clients for a day and by the CDN until the next deploy.",
             "content": {
               "application/json": {
                 "schema": {
@@ -291,6 +312,12 @@
                 }
               }
             }
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
           }
         }
       }
@@ -326,8 +353,10 @@
         "enum": [
           "invalid_input",
           "game_not_over",
+          "cross_origin",
           "not_found",
           "method_not_allowed",
+          "rate_limited",
           "internal_error"
         ]
       },
@@ -763,8 +792,8 @@
       }
     },
     "responses": {
-      "InvalidInput": {
-        "description": "`invalid_input`: The input does not match the operation's schema.",
+      "BadRequest": {
+        "description": "`invalid_input`: the input does not match the operation's schema.",
         "content": {
           "application/json": {
             "schema": {
@@ -773,8 +802,8 @@
           }
         }
       },
-      "GameNotOver": {
-        "description": "`game_not_over`: A reveal before the game is over.",
+      "Forbidden": {
+        "description": "`game_not_over`: a reveal before the game is over. `cross_origin`: a browser call from another origin.",
         "content": {
           "application/json": {
             "schema": {
@@ -784,7 +813,7 @@
         }
       },
       "NotFound": {
-        "description": "`not_found`: A puzzle that does not exist, or one after today's.",
+        "description": "`not_found`: a puzzle that does not exist, or one after today's.",
         "content": {
           "application/json": {
             "schema": {
@@ -794,7 +823,7 @@
         }
       },
       "MethodNotAllowed": {
-        "description": "`method_not_allowed`: A method other than the operation's.",
+        "description": "`method_not_allowed`: a method other than the operation's.",
         "content": {
           "application/json": {
             "schema": {
@@ -803,8 +832,28 @@
           }
         }
       },
-      "InternalError": {
-        "description": "`internal_error`: Something went wrong on the server.",
+      "TooManyRequests": {
+        "description": "`rate_limited`: past the rate limit of a guess and the reveal; `Retry-After` says in how many seconds to call again.",
+        "headers": {
+          "Retry-After": {
+            "description": "Seconds until the IP may call again.",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ApiError"
+            }
+          }
+        }
+      },
+      "InternalServerError": {
+        "description": "`internal_error`: something went wrong on the server.",
         "content": {
           "application/json": {
             "schema": {

@@ -2,6 +2,7 @@ import { readdirSync, readFileSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
 import { Validator } from "@seriousme/openapi-schema-validator";
 import { describe, expect, it } from "vitest";
+import { apiErrorCodeSchema } from "@/lib/api/api-error";
 import {
     buildOpenApiDocument,
     openApiDocument,
@@ -101,6 +102,22 @@ describe("the OpenAPI document", () => {
         ]);
         expect(methods("/api/v1/{network}/stations")).toEqual(["get"]);
         expect(methods(openApiPath)).toEqual(["get"]);
+    });
+
+    it("gives every error code a response with the ApiError body", () => {
+        const text = JSON.stringify(openApiDocument["components"]);
+
+        for (const code of apiErrorCodeSchema.options) {
+            expect(text, code).toContain(`\`${code}\``);
+        }
+        expect(pathItem("/api/v1/{network}/puzzles/{number}/reveal")).toHaveProperty(
+            ["post", "responses", "429", "$ref"],
+            "#/components/responses/TooManyRequests",
+        );
+        expect(pathItem("/api/v1/meta")).toHaveProperty(
+            ["get", "responses", "403", "$ref"],
+            "#/components/responses/Forbidden",
+        );
     });
 
     it("lets a client take a new field: no schema forbids extra properties", () => {

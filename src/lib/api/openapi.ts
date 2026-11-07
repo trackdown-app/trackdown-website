@@ -233,10 +233,28 @@ type Operation = {
     /** A `GET`'s other fields are query parameters, a `POST`'s its JSON body. */
     body?: { id: string };
     output: z.ZodType;
-    /** Kept by the CDN until the next deploy (docs/api.md#caching). */
-    cached?: true;
+    /** How long a successful answer is kept (docs/api.md#caching). */
+    cache: keyof typeof cacheDescription;
+    /**
+     * The errors of the operation itself; every operation can also answer
+     * `cross_origin` and `internal_error` (`commonErrors`).
+     */
     errors: ReadonlyArray<ApiErrorCode>;
 };
+
+/** The 200 answer's description, per cache. */
+const cacheDescription = {
+    none: "The answer. Never kept (`Cache-Control: no-store`).",
+    nextPuzzle:
+        "The answer. Kept by clients and the CDN until `nextPuzzleAt` (`Cache-Control: public, max-age=<seconds left>`).",
+    deploy: "The answer. Kept by clients for a day and by the CDN until the next deploy.",
+} as const;
+
+/** What every REST route can answer besides its own errors. */
+const commonErrors: ReadonlyArray<ApiErrorCode> = ["cross_origin", "internal_error"];
+
+/** The input of `GET /api/v1/openapi.json`: none. */
+export const openApiInputSchema = z.object({});
 
 const operations: ReadonlyArray<Operation> = [
     {
@@ -246,7 +264,8 @@ const operations: ReadonlyArray<Operation> = [
         summary: "The network's data: its source, service dates and counts",
         input: metaInputSchema,
         output: metaOutputSchema,
-        errors: ["invalid_input", "internal_error"],
+        cache: "none",
+        errors: ["invalid_input"],
     },
     {
         method: "get",
@@ -255,7 +274,8 @@ const operations: ReadonlyArray<Operation> = [
         summary: "Today's puzzle, without its answer",
         input: todayPuzzleInputSchema,
         output: todayPuzzleOutputSchema,
-        errors: ["invalid_input", "not_found", "internal_error"],
+        cache: "nextPuzzle",
+        errors: ["invalid_input", "not_found"],
     },
     {
         method: "get",
@@ -264,7 +284,8 @@ const operations: ReadonlyArray<Operation> = [
         summary: "Every puzzle up to today's, oldest first, without answers",
         input: puzzleArchiveInputSchema,
         output: puzzleArchiveOutputSchema,
-        errors: ["invalid_input", "internal_error"],
+        cache: "none",
+        errors: ["invalid_input"],
     },
     {
         method: "post",
@@ -275,7 +296,8 @@ const operations: ReadonlyArray<Operation> = [
         input: guessInputSchema,
         body: { id: "GuessRequest" },
         output: guessOutputSchema,
-        errors: ["invalid_input", "not_found", "internal_error"],
+        cache: "none",
+        errors: ["invalid_input", "not_found", "rate_limited"],
     },
     {
         method: "post",
@@ -286,7 +308,8 @@ const operations: ReadonlyArray<Operation> = [
         input: revealInputSchema,
         body: { id: "RevealRequest" },
         output: revealOutputSchema,
-        errors: ["invalid_input", "game_not_over", "not_found", "internal_error"],
+        cache: "none",
+        errors: ["invalid_input", "game_not_over", "not_found", "rate_limited"],
     },
     {
         method: "get",
@@ -295,27 +318,84 @@ const operations: ReadonlyArray<Operation> = [
         summary: "Every station a player can guess, sorted by name",
         input: stationsInputSchema,
         output: stationsOutputSchema,
-        cached: true,
-        errors: ["invalid_input", "internal_error"],
+        cache: "deploy",
+        errors: ["invalid_input"],
     },
 ];
 
-/** The response component of each error code. */
-const errorResponseName: Record<ApiErrorCode, string> = {
-    invalid_input: "InvalidInput",
-    game_not_over: "GameNotOver",
-    not_found: "NotFound",
-    method_not_allowed: "MethodNotAllowed",
-    internal_error: "InternalError",
+const errorDescription: Record<ApiErrorCode, string> = {
+    invalid_input: "the input does not match the operation's schema",
+    game_not_over: "a reveal before the game is over",
+    cross_origin: "a browser call from another origin",
+    not_found: "a puzzle that does not exist, or one after today's",
+    method_not_allowed: "a method other than the operation's",
+    rate_limited:
+        "past the rate limit of a guess and the reveal; `Retry-After` says in how many seconds to call again",
+    internal_error: "something went wrong on the server",
 };
 
-const errorDescription: Record<ApiErrorCode, string> = {
-    invalid_input: "The input does not match the operation's schema.",
-    game_not_over: "A reveal before the game is over.",
-    not_found: "A puzzle that does not exist, or one after today's.",
-    method_not_allowed: "A method other than the operation's.",
-    internal_error: "Something went wrong on the server.",
+/** The response component of each error status: several codes may share one. */
+const errorResponseName: Readonly<Record<number, string>> = {
+    400: "BadRequest",
+    403: "Forbidden",
+    404: "NotFound",
+    405: "MethodNotAllowed",
+    429: "TooManyRequests",
+    500: "InternalServerError",
 };
+
+/** The response component of `code`'s status. */
+function errorResponseOf(code: ApiErrorCode): string {
+    const name = errorResponseName[apiErrorStatus[code]];
+    if (name == null) {
+        throw new Error(`No response component for the status of ${code}`);
+    }
+    return name;
+}
+
+/** Every error response component, each naming the codes of its status. */
+function errorResponses(): JsonObject {
+    const codes = apiErrorCodeSchema.options;
+    return Object.fromEntries(
+        [...new Set(codes.map(errorResponseOf))].map((name) => {
+            const own = codes.filter((code) => errorResponseOf(code) === name);
+            const retryAfter = own.includes("rate_limited")
+                ? {
+                      headers: {
+                          "Retry-After": {
+                              description: "Seconds until the IP may call again.",
+                              required: true,
+                              schema: { type: "integer", minimum: 0 },
+                          },
+                      },
+                  }
+                : {};
+            return [
+                name,
+                {
+                    description: own
+                        .map((code) => `\`${code}\`: ${errorDescription[code]}.`)
+                        .join(" "),
+                    ...retryAfter,
+                    content: jsonContent({ $ref: componentRef("ApiError") }),
+                },
+            ];
+        }),
+    );
+}
+
+/** The error responses of an operation answering `errors`, by status. */
+function errorResponsesFor(errors: ReadonlyArray<ApiErrorCode>): JsonObject {
+    return Object.fromEntries(
+        [...errors, ...commonErrors]
+            .map((code) => [apiErrorStatus[code], errorResponseOf(code)] as const)
+            .sort(([a], [b]) => a - b)
+            .map(([status, name]) => [
+                String(status),
+                { $ref: `#/components/responses/${name}` },
+            ]),
+    );
+}
 
 function jsonContent(schema: JsonObject): JsonObject {
     return { "application/json": { schema } };
@@ -410,17 +490,11 @@ function operationObject(operation: Operation): {
 
     const responses: JsonObject = {
         "200": {
-            description: operation.cached
-                ? "The answer. Kept by clients for a day and by the CDN until the next deploy."
-                : "The answer. Never kept (`Cache-Control: no-store`).",
+            description: cacheDescription[operation.cache],
             content: jsonContent({ $ref: componentRef(outputId(operation.output)) }),
         },
+        ...errorResponsesFor(operation.errors),
     };
-    for (const code of operation.errors) {
-        responses[String(apiErrorStatus[code])] = {
-            $ref: `#/components/responses/${errorResponseName[code]}`,
-        };
-    }
 
     const object: JsonObject = {
         operationId: operation.operationId,
@@ -470,22 +544,13 @@ export function buildOpenApiDocument(): JsonObject {
             summary: "This document",
             responses: {
                 "200": {
-                    description: "The OpenAPI document of `/api/v1`.",
+                    description: `The OpenAPI document of \`/api/v1\`. ${cacheDescription.deploy.replace("The answer. ", "")}`,
                     content: jsonContent({ type: "object" }),
                 },
+                ...errorResponsesFor([]),
             },
         },
     };
-
-    const responses = Object.fromEntries(
-        apiErrorCodeSchema.options.map((code) => [
-            errorResponseName[code],
-            {
-                description: `\`${code}\`: ${errorDescription[code]}`,
-                content: jsonContent({ $ref: componentRef("ApiError") }),
-            },
-        ]),
-    );
 
     return {
         openapi: "3.1.0",
@@ -500,7 +565,7 @@ export function buildOpenApiDocument(): JsonObject {
             schemas: Object.fromEntries(
                 Object.entries(components).sort(([a], [b]) => a.localeCompare(b)),
             ),
-            responses,
+            responses: errorResponses(),
         },
     };
 }
