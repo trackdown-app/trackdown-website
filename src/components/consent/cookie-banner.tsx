@@ -1,4 +1,5 @@
 import { useLocation } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { CookieSettingsButton } from "@/components/consent/cookie-settings-button";
 import { consentSettingsParameter } from "@/lib/analytics/consent";
@@ -13,9 +14,19 @@ export function CookieBanner({ consent }: { consent: ConsentChoice | null }) {
     const location = useLocation();
     const search = new URLSearchParams(location.searchStr);
     const open = consent == null || search.has(consentSettingsParameter);
+    const [statusDismissed, setStatusDismissed] = useState(false);
+
+    useEffect(() => {
+        if (open) return;
+        const timeout = window.setTimeout(() => setStatusDismissed(true), 5_000);
+        return () => window.clearTimeout(timeout);
+    }, [open]);
+
     search.delete(consentSettingsParameter);
     const query = search.toString();
     const returnTo = `${localizeHref(location.pathname)}${query.length > 0 ? `?${query}` : ""}`;
+
+    if (!open && statusDismissed) return null;
 
     return (
         <aside
