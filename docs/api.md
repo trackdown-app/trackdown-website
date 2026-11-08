@@ -237,11 +237,22 @@ Trackdown-App-Version: 1.4.2
 - **Only the REST routes.** The web's server functions do not go through `guarded` and never need the headers; they keep their cross-origin check and the rate limit.
 - **Not a secret.** The key ships inside the app, so anyone can pull it out of the binary. It names a client; it does not prove one. It makes casual scraping a deliberate act and gives one switch to turn a leaked key off. Proof that a call comes from a genuine app on a genuine device is [App Attest](#app-attest-planned), later.
 
+#### Keys in use
+
+Each client has its own key, so one can be cut off without the others. A key itself is never written in this repository, which is public: it lives in `TRACKDOWN_CLIENT_KEYS` on Vercel and in the client's own build configuration, handed over out of band. This table tells the keys apart by a fingerprint, the first eight hex characters of the key's SHA-256 (`printf %s "$KEY" | shasum -a 256 | cut -c1-8`), which says nothing of the key.
+
+| Client            | Fingerprint                      | Accepted in         | Kept in                                                        |
+| ----------------- | -------------------------------- | ------------------- | -------------------------------------------------------------- |
+| iOS app           | `15e29f12`                       | Production, Preview | The iOS project's build configuration, outside its repository |
+| Local development | `local-dev-key` (the key itself) | `.env.local` only   | `.env.example`                                                 |
+
+A new client, or a rotated key, gets its row here in the same change that adds its key to Vercel; a dropped key loses its row.
+
 #### Rotating a key
 
 A key is rotated on a schedule (with each major app release) and at once when it is abused.
 
-1. **Make a new key**: `openssl rand -hex 32`. Keys are opaque: no commas, no spaces.
+1. **Make a new key**: `openssl rand -hex 32`. Keys are opaque: no commas, no spaces. Give it its row in [Keys in use](#keys-in-use), by fingerprint.
 2. **Accept both**: set `TRACKDOWN_CLIENT_KEYS` to `<old>,<new>` in the Vercel project, for Production and Preview (`vercel env rm TRACKDOWN_CLIENT_KEYS production`, then `vercel env add TRACKDOWN_CLIENT_KEYS production`, the same for `preview`). A changed variable reaches only new deploys, so redeploy (run the deploy workflow).
 3. **Ship the app** with the new key in its build configuration.
 4. **Drop the old key** once the app versions that carry it are no longer in use (the version header in the logs shows when): set `TRACKDOWN_CLIENT_KEYS` to `<new>` and redeploy. An app still on the old key then answers `unknown_client`, and shows its own "update the app" text.
