@@ -19,28 +19,29 @@ https://trackdown.nl/en/nl
 - **Header.** "Trackdown", the network's id in capitals, the puzzle number and the score: the guesses used out of the puzzle's `maxGuesses`, or `X/6` for a lost game.
 - **Grid.** One line per wrong guess, oldest first (the guess list shows them newest first). Each starts with `●`, the guess; every ride is a run of `━`, one per 15 minutes rounded, at least one; every change is a `○`, whether its station is known or not. The trip's total follows, two spaces past the longest line so the times line up: `2h25`, `17m` (`2u25` in Dutch).
 - **Footer.** "Tracked down in 5" / "Gevonden in 5", or "Not tracked down" / "Niet gevonden".
-- **Link.** The network's game in the page's language, so a friend plays the same network's puzzle, whatever network they chose themselves: `https://trackdown.nl/nl` in Dutch, `https://trackdown.nl/en/nl` in English (the `share.url` message, given the network, [network-picker.md](network-picker.md#routes)). It is part of the text, not the Web Share API's `url`, so the share sheet, the clipboard and the preview all carry the same thing.
+- **Link.** The network's game in the page's language, so a friend plays the same network's puzzle, whatever network they chose themselves: `https://trackdown.nl/nl` in Dutch, `https://trackdown.nl/en/nl` in English (the `share.url` message, given the network, [network-picker.md](network-picker.md#routes)). It is part of the text, so the clipboard and the preview carry the same thing.
 
 The correct guess has no trip, so it has no line; the score and footer count it. Station names and codes never appear: the grid holds only its marks and times.
 
 ## Sharing
 
-A successful share or clipboard copy emits `result_shared` with puzzle metadata and the method, never the shared text. Cancelled and failed shares emit no game event ([analytics.md](analytics.md#game-events)).
+The Share result button copies the text and nothing else. It never opens the device's share sheet (the Web Share API): the sheet got in the way of pasting the result where the player wanted it.
+
+A successful copy emits `result_shared` with puzzle metadata and the method `copied`, never the shared text. A failed copy emits no game event ([analytics.md](analytics.md#game-events)).
 
 `ShareButton` (`src/components/game/share-button.tsx`) hands the text to `shareResult` (`src/lib/game/share-result.ts`):
 
-- **Web Share API.** Where `navigator.share` exists and `navigator.canShare({ text })` allows it, the device's share sheet opens with the text. A player closing the sheet (`AbortError`) is left alone. Any other refusal falls through to the clipboard.
-- **Clipboard.** Otherwise `navigator.clipboard.writeText` copies it, and a status line on its own row under the buttons says "Copied. Paste it wherever you like." / "Gekopieerd. Plak het waar je maar wilt."
-- **Neither.** Without a clipboard (an insecure context) or when copying is refused, the status line asks the player to select the text in the preview and copy it themselves.
+- **Clipboard.** `navigator.clipboard.writeText` copies it, and a status line on its own row under the buttons says "Copied. Paste it wherever you like." / "Gekopieerd. Plak het waar je maar wilt."
+- **No clipboard.** Without a clipboard (an insecure context) or when copying is refused, the status line asks the player to select the text in the preview and copy it themselves.
 
-The status line is a `role="status"` region, so screen readers announce it. The button is disabled while a share is under way.
+The status line is a `role="status"` region, so screen readers announce it. The button is disabled while a copy is under way.
 
 ## The preview
 
-`SharePreview` (`src/components/game/share-preview.tsx`) is the design's "What you'll share": an `h2`, the text in a `pre` on the `surface` colour with a `rule` border, in Barlow at 17px, and a muted line on why it holds no station names. It shows the same string the button shares. Wide grids scroll inside the box at phone width.
+`SharePreview` (`src/components/game/share-preview.tsx`) is the design's "What you'll share": an `h2`, the text in a `pre` on the `surface` colour with a `rule` border, in Barlow at 17px, and a muted line on why it holds no station names. It shows the same string the button copies. Wide grids scroll inside the box at phone width.
 
 ## Tests
 
 - `src/lib/game/share-text.test.ts`: times, lines, the grid's alignment, the design's text for a won game, a lost game, Dutch, and that no station name or code ends up in the text.
-- `src/lib/game/share-result.test.ts`: the share sheet, a closed sheet, a refused sheet, `canShare` saying no, no Web Share API, no clipboard and a refused copy.
-- `src/components/game/game-page.test.tsx`: no share while playing, the preview on a won game, sharing through the sheet, copying without the Web Share API, and a copy that fails.
+- `src/lib/game/share-result.test.ts`: a copy, a share sheet left closed, no clipboard and a refused copy.
+- `src/components/game/game-page.test.tsx`: no share while playing, the preview on a won game, copying a lost and a won game with the share sheet left closed, and a copy that fails.
