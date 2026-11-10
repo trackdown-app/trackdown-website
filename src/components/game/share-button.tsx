@@ -12,7 +12,7 @@ type ShareButtonProps = {
     text: string;
     /** Safe puzzle metadata, separate from the text being shared. */
     puzzle: PuzzleEventProperties;
-    /** Where it goes; the browser's `navigator` unless a test hands its own. */
+    /** Whose clipboard it goes to; the browser's `navigator` unless a test hands its own. */
     target?: ShareNavigator | undefined;
 };
 
@@ -27,8 +27,8 @@ function outcomeMessage(outcome: ShareOutcome | null): string {
 }
 
 /**
- * The design's Share result button (docs/share.md#sharing): opens the
- * device's share sheet, or copies the text where there is none. Made for a
+ * The design's Share result button (docs/share.md#sharing): copies the text
+ * to the clipboard, and never opens the device's share sheet. Made for a
  * wrapping row of buttons: its status line takes a row of its own under
  * them, and is only there once it has something to say.
  */
@@ -42,7 +42,7 @@ export function ShareButton({ text, puzzle, target }: ShareButtonProps) {
         const result = await shareResult(text, target ?? navigator);
         setOutcome(result);
         setIsSharing(false);
-        if (result === "shared" || result === "copied") {
+        if (result === "copied") {
             trackEvent("result_shared", { ...puzzle, method: result });
         }
     }

@@ -16,9 +16,12 @@ export type AnalyticsEventProperties = {
     /** A successful guess ends the game with a win or a loss. */
     puzzle_solved: PuzzleEventProperties & { guesses_used: number };
     puzzle_missed: PuzzleEventProperties & { guesses_used: number };
-    /** The share sheet or clipboard successfully receives the result. */
+    /**
+     * The clipboard successfully receives the result. `method` is always
+     * `copied`; `shared` came from the share sheet the button once opened.
+     */
     result_shared: PuzzleEventProperties & {
-        method: "shared" | "copied";
+        method: "copied";
     };
     /** The first successful archive guess, including a resumed daily game. */
     archive_puzzle_played: PuzzleEventProperties;

@@ -39,7 +39,7 @@
   - `docs/guess-list.md`: the guess list, its rows and summaries, the trip line's width, segments, change rings and labels, the time grid, the game legend, the screen reader text.
   - `docs/game.md`: the game page at `/`, its route and loader, the progress dots, the game state and the guess mutation, how a game is kept in `localStorage`.
   - `docs/statistics.md`: the player's record (played, won, streaks, guesses needed), how it is worked out from kept games, the streak rules, the record on the solved screen, the statistics dialog and its dialog parts in `src/components/ui/`.
-  - `docs/share.md`: the share text and its grid, the Web Share API and clipboard fallback, the Share result button, the "What you'll share" preview.
+  - `docs/share.md`: the share text and its grid, the Share result button and its clipboard copy, the "What you'll share" preview.
   - `docs/how-to-play.md`: the How to play page at `/hoe-te-spelen`, its rules, example trip and legend.
   - `docs/about-privacy-terms.md`: the About page at `/over` and its data attribution, the privacy policy at `/privacy`, the terms of use at `/voorwaarden`, and what must change in the policy when the site's data handling does.
   - `docs/archive.md`: the archive at `/archief` and its list, playing an earlier puzzle at `/archief/{number}`, the 404 for a future puzzle, the archive mark that keeps a game out of the streak.

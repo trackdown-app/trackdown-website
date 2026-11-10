@@ -644,7 +644,7 @@ describe("GamePage", () => {
         }
     });
 
-    it("hands the result to the share sheet", async () => {
+    it("copies a lost game's result, leaving the share sheet closed", async () => {
         window.localStorage.setItem(
             key,
             serializeGame(
@@ -652,27 +652,33 @@ describe("GamePage", () => {
             ),
         );
         const share = vi.fn(() => Promise.resolve());
+        const writeText = vi.fn(() => Promise.resolve());
+        // A real `navigator` carries `share` beside its clipboard.
+        const target = { share, clipboard: { writeText } };
         renderGame(
             createGameStore(() => window.localStorage),
-            { share },
+            target,
         );
         const user = userEvent.setup();
 
         await user.click(screen.getByRole("button", { name: "Share result" }));
 
-        expect(share).toHaveBeenCalledWith({
-            text: document.querySelector("pre")?.textContent,
-        });
-        expect(screen.getByRole("status").textContent).toBe("");
+        expect(share).not.toHaveBeenCalled();
+        expect(writeText).toHaveBeenCalledWith(
+            document.querySelector("pre")?.textContent,
+        );
+        expect((await screen.findByRole("status")).textContent).toBe(
+            "Copied. Paste it wherever you like.",
+        );
         expect(trackEvent).toHaveBeenCalledExactlyOnceWith("result_shared", {
             network: "nl",
             puzzle_number: 142,
             archive: false,
-            method: "shared",
+            method: "copied",
         });
     });
 
-    it("copies the result without the Web Share API, and says so", async () => {
+    it("copies the result, and says so", async () => {
         window.localStorage.setItem(
             key,
             serializeGame([
@@ -864,24 +870,6 @@ describe("GamePage", () => {
         await guess(user, "Utrecht Centraal");
 
         await waitFor(() => expect(guessedNames()).toEqual(["Utrecht Centraal"]));
-        expect(trackEvent).not.toHaveBeenCalled();
-    });
-
-    it("does not track a cancelled share", async () => {
-        window.localStorage.setItem(
-            key,
-            serializeGame([
-                { guess: "zl", correct: true, steps: [], totalMinutes: 0 },
-            ]),
-        );
-        const user = renderGame(
-            createGameStore(() => window.localStorage),
-            {
-                share: () =>
-                    Promise.reject(new DOMException("Closed", "AbortError")),
-            },
-        );
-        await user.click(screen.getByRole("button", { name: "Share result" }));
         expect(trackEvent).not.toHaveBeenCalled();
     });
 
