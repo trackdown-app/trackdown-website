@@ -3,6 +3,7 @@ import "@tanstack/react-start/server-only";
 import { z } from "@/lib/zod";
 import { ApiError } from "@/lib/api/api-error";
 import { unknownClientError } from "@/lib/api/client-identification";
+import { appAttestEnabled, appAttestError } from "@/lib/api/app-attest";
 import { crossOriginError, rateLimitRefusal } from "@/lib/api/request-guard";
 import { trace } from "@opentelemetry/api";
 import { errorAttributes, operationAttributes } from "@/lib/logging/attributes";
@@ -187,13 +188,18 @@ export function guarded(
     handler: RestHandler,
     access: RestAccess = "client",
 ): RestHandler {
-    return (context) => {
+    return async (context) => {
         const error =
             crossOriginError(context.request) ??
-            (access === "client" ? unknownClientError(context.request) : null);
-        return error == null
-            ? handler(context)
-            : Promise.resolve(errorResponse(error));
+            (access === "client" ? unknownClientError(context.request) : null) ??
+            (access === "client" ? await appAttestError(context.request) : null);
+        const response =
+            error == null ? await handler(context) : errorResponse(error);
+        if (access === "client" && appAttestEnabled()) {
+            response.headers.set("Cache-Control", "no-store");
+            response.headers.set("Vercel-CDN-Cache-Control", "no-store");
+        }
+        return response;
     };
 }
 

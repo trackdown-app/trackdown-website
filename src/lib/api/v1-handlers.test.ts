@@ -3,6 +3,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { apiErrorBodySchema } from "@/lib/api/api-error";
 import type { RestContext, RestHandler } from "@/lib/api/rest";
 import {
+    attestChallengeHandlers,
+    attestHandlers,
     guessHandlers,
     metaHandlers,
     puzzleArchiveHandlers,
@@ -62,6 +64,71 @@ function call(
         params,
     });
 }
+
+describe("Preview without App Attest configuration", () => {
+    beforeEach(() => {
+        vi.stubEnv("VERCEL_ENV", "preview");
+        for (const name of [
+            "TRACKDOWN_ATTEST_MODE",
+            "UPSTASH_REDIS_REST_URL",
+            "UPSTASH_REDIS_REST_TOKEN",
+            "TRACKDOWN_ATTEST_TEAM_ID",
+            "TRACKDOWN_ATTEST_BUNDLE_ID",
+            "TRACKDOWN_ATTEST_REQUIRED_CLIENT_KEYS",
+            "TRACKDOWN_ATTEST_ALLOW_DEVELOPMENT",
+        ]) {
+            vi.stubEnv(name, undefined);
+        }
+    });
+
+    it("serves game reads and writes using existing client headers", async () => {
+        const meta = await call(metaHandlers.GET, "/api/v1/meta");
+        expect(meta.status).toBe(200);
+        expect(metaOutputSchema.parse(await meta.json()).network).toBe("nl");
+        const stations = await call(
+            stationsHandlers.GET,
+            "/api/v1/nl/stations",
+            "GET",
+            { network: "nl" },
+        );
+        expect(stations.status).toBe(200);
+        expect(stations.headers.get("Cache-Control")).toBe("public, max-age=86400");
+        const guess = await guessHandlers.POST({
+            request: new Request("http://localhost/api/v1/nl/puzzles/2/guesses", {
+                method: "POST",
+                headers: { ...ios, "x-real-ip": "203.0.113.22" },
+                body: JSON.stringify({ guess: "dlt" }),
+            }),
+            params: { network: "nl", number: "2" },
+        });
+        expect(guess.status).toBe(200);
+        expect(guessOutputSchema.parse(await guess.json()).guess).toBe("dlt");
+    });
+
+    it("returns ordinary API 404s for disabled enrollment endpoints", async () => {
+        for (const [path, handler] of [
+            ["/api/v1/attest/challenge", attestChallengeHandlers.POST],
+            ["/api/v1/attest", attestHandlers.POST],
+        ] satisfies Array<[string, RestHandler]>) {
+            const response = await handler({
+                request: new Request(`http://localhost${path}`, {
+                    method: "POST",
+                    headers: { ...ios, "x-real-ip": "203.0.113.22" },
+                    body: JSON.stringify({
+                        keyId: Buffer.alloc(32, 1).toString("base64"),
+                        challenge: "a".repeat(64),
+                        attestation: "YWJj",
+                    }),
+                }),
+                params: {},
+            });
+            expect(response.status).toBe(404);
+            expect(apiErrorBodySchema.parse(await response.json()).error.code).toBe(
+                "not_found",
+            );
+        }
+    });
+});
 
 describe("GET /api/v1/meta", () => {
     it("answers 200 with the service's answer as JSON", async () => {

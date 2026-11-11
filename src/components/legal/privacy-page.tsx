@@ -61,6 +61,7 @@ export function PrivacyPage() {
             </LegalSection>
             <LegalSection id="privacy-server" title={m["privacy.serverTitle"]()}>
                 <p>{m["privacy.serverBody"]()}</p>
+                <p>{m["privacy.attestBody"]()}</p>
             </LegalSection>
             <LegalSection id="privacy-others" title={m["privacy.othersTitle"]()}>
                 <p>{m["privacy.othersBody"]()}</p>

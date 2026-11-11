@@ -1,5 +1,11 @@
 import { z } from "@/lib/zod";
 import {
+    challengeInputSchema,
+    challengeOutputSchema,
+    attestInputSchema,
+    attestOutputSchema,
+} from "@/lib/api/app-attest-schemas";
+import {
     apiErrorBodySchema,
     apiErrorCodeSchema,
     apiErrorStatus,
@@ -46,6 +52,8 @@ function componentRef(id: string): string {
  * generated client has one type for it.
  */
 const outputs = z.registry<{ id: string }>();
+outputs.add(challengeOutputSchema, { id: "AttestChallenge" });
+outputs.add(attestOutputSchema, { id: "AttestRegistration" });
 outputs.add(networkIdSchema, { id: "NetworkId" });
 outputs.add(trainTypeSchema, { id: "TrainType" });
 outputs.add(metaOutputSchema, { id: "Meta" });
@@ -260,6 +268,28 @@ const commonErrors: ReadonlyArray<ApiErrorCode> = ["cross_origin", "internal_err
 export const openApiInputSchema = z.object({});
 
 const operations: ReadonlyArray<Operation> = [
+    {
+        method: "post",
+        path: "/api/v1/attest/challenge",
+        operationId: "createAttestChallenge",
+        summary: "A single-use App Attest challenge, valid for five minutes",
+        input: challengeInputSchema,
+        body: { id: "AttestChallengeRequest" },
+        output: challengeOutputSchema,
+        cache: "none",
+        errors: ["invalid_input", "not_found", "rate_limited"],
+    },
+    {
+        method: "post",
+        path: "/api/v1/attest",
+        operationId: "registerAttestation",
+        summary: "Register an Apple App Attest public key",
+        input: attestInputSchema,
+        body: { id: "AttestRegistrationRequest" },
+        output: attestOutputSchema,
+        cache: "none",
+        errors: ["invalid_input", "not_found", "rate_limited"],
+    },
     {
         method: "get",
         path: "/api/v1/meta",
