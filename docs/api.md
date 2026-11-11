@@ -321,8 +321,10 @@ Rollout and runtime configuration:
 In observe/enforce mode all client-protected responses disable browser and CDN
 caching so verification runs on every call; the public OpenAPI document keeps its
 cache policy. Before rollout, deploy to a fresh deployment and purge any existing
-CDN entries from earlier cacheable routes. Redis keys are scoped by Team ID and
-bundle ID; use separate Redis databases for preview and production. Registration
+CDN entries from earlier cacheable routes. Redis keys are scoped by Vercel
+environment (locally `development`), Team ID and bundle ID, so a development
+registration cannot be used in Production. Use separate Redis databases for
+preview and production as well. Registration
 records have no expiry because the installation's key must remain valid.
 
 ### Logs

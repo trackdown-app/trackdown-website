@@ -107,6 +107,11 @@ describe("App Attest", () => {
         expect(mocks.verifyAttestation).toHaveBeenCalledWith(
             expect.objectContaining({ allowDevelopmentEnvironment: false }),
         );
+        expect(mocks.set).toHaveBeenCalledWith(
+            expect.stringContaining("attest:production:"),
+            expect.any(String),
+            { nx: true },
+        );
     });
     it("binds exact method, target and body without consuming original request", async () => {
         const req = request('{"guess":"ASD"}');

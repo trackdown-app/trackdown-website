@@ -41,7 +41,8 @@ function store() {
 
 function keyName(keyId: string): string {
     const { teamIdentifier, bundleIdentifier } = configuration();
-    return `attest:${teamIdentifier}.${bundleIdentifier}:${keyId}`;
+    const environment = process.env["VERCEL_ENV"] ?? "development";
+    return `attest:${environment}:${teamIdentifier}.${bundleIdentifier}:${keyId}`;
 }
 
 function invalid(): ApiError {
