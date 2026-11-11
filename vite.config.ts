@@ -39,6 +39,13 @@ const config = defineConfig(({ mode }) => {
             // (docs/deploy.md). Must directly follow `tanstackStart()`.
             nitro({
                 plugins: ["src/config/telemetry.ts"],
+                // AASA has no extension, so static serving needs an explicit
+                // JSON type on both Node and Vercel (docs/seo.md).
+                routeRules: {
+                    "/.well-known/apple-app-site-association": {
+                        headers: { "Content-Type": "application/json" },
+                    },
+                },
                 // A gzip and a brotli copy of every script, stylesheet and
                 // SVG, which the Node server sends to a browser that accepts
                 // them, as Vercel's CDN compresses them for the live site.

@@ -66,6 +66,34 @@ The PNGs and the ICO are renders of `favicon.svg` (and of the share image's SVG)
 
 ## Sitemap and robots.txt
 
+### iOS universal links
+
+`public/.well-known/apple-app-site-association` associates `trackdown.nl` with
+`CN495B7KTS.nl.trackdown.Trackdown` (the iOS app's Team ID and bundle identifier).
+It allows `/nl`, `/gb`, `/en/*`, and both networks' archive indexes and puzzle
+paths. Other Dutch pages remain web links. The English wildcard includes English
+archive paths.
+
+Nitro's exact route rule in `vite.config.ts` sets `Content-Type: application/json`
+for this extensionless static file on Node and Vercel. Static serving bypasses
+locale routing, so the HTTPS URL `/.well-known/apple-app-site-association` returns
+the file directly without a redirect. Keep the identifiers in sync with the iOS
+app's signing configuration and its `applinks:trackdown.nl` entitlement.
+
+After deploying to production, check the origin and Apple's CDN:
+
+```sh
+curl -i https://trackdown.nl/.well-known/apple-app-site-association
+curl -i https://app-site-association.cdn-apple.com/a/v1/trackdown.nl
+```
+
+Both must return HTTP 200 and the association JSON with the app identifier and
+paths above; the origin must return `application/json` without a `Location`
+header. A CDN error or stale response means verification is still pending.
+Apple may take up to 24 hours to fetch the file. See Apple's
+[associated domains guide](https://developer.apple.com/documentation/xcode/supporting-associated-domains)
+and [universal link debugging guide](https://developer.apple.com/documentation/technotes/tn3155-debugging-universal-links).
+
 ### Sitemap
 
 `/sitemap.xml` (`src/routes/sitemap[.]xml.ts`, `src/lib/sitemap.ts`) lists every network's game and archive, How to play, About, Privacy and Terms, in Dutch and in English: one `<url>` per page and language. Each lists the page's language versions as `xhtml:link` alternates, the same `nl`, `en` and `x-default` its head lists, from the same `languageAlternates()`. An archive's puzzles are not listed; the archive links to each. A new network is listed as soon as it joins `networkIds` ([network-picker.md](network-picker.md)).
