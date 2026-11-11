@@ -303,6 +303,9 @@ Rollout and runtime configuration:
 1. Configure `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`,
    `TRACKDOWN_ATTEST_TEAM_ID` and `TRACKDOWN_ATTEST_BUNDLE_ID` in the deployment.
    Keep the Redis database durable; losing it requires clients to enroll new keys.
+   Production-only configuration is supported: leave all App Attest and Redis
+   variables unset in Preview to keep its existing client-key API working. No
+   Redis connection or Apple identity is needed while the mode is unset/off.
 2. Set `TRACKDOWN_ATTEST_MODE=observe`. Missing/invalid proofs and Redis outages
    log a warning without blocking existing calls. Enrollment still requires a
    working verifier and Redis. Logs contain no keys, assertions or body content.

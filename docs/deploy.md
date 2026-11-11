@@ -94,6 +94,21 @@ The project is `trackdown-website` in Bram's personal Vercel scope, `bram-gussek
 
 Browser analytics uses the public ingestion token in `src/lib/analytics/posthog-client.ts` and the managed EU proxy at `https://t.trackdown.nl`; it needs no Vercel environment variable. Before deploying, enable cookieless tracking and confirm IP discard in the PostHog project. DNS must keep `t.trackdown.nl` pointing to its provisioned EU proxy CNAME. See [analytics.md](analytics.md#posthog-project-and-proxy) for setup and manual verification. The runtime server telemetry variable above remains separate.
 
+### Production-only App Attest
+
+App Attest and Redis configuration is optional and can be scoped to **Production
+only**. Leave all `TRACKDOWN_ATTEST_*` and `UPSTASH_REDIS_REST_*` variables absent
+in Preview. An unset `TRACKDOWN_ATTEST_MODE` disables verification and enrollment
+without creating a Redis client or reading Apple app identity. Existing game API
+calls and caching continue normally; enrollment endpoints answer `404 not_found`.
+Preview still needs the existing client-key and telemetry configuration above.
+
+In Production, set `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`,
+`TRACKDOWN_ATTEST_TEAM_ID`, `TRACKDOWN_ATTEST_BUNDLE_ID` and
+`TRACKDOWN_ATTEST_MODE=observe` to begin rollout. See [api.md](api.md#app-attest)
+for enforcement. Explicitly enabled enforcement never silently turns off when
+credentials are missing: required clients continue to fail closed.
+
 ## A manual deploy
 
 With the Vercel CLI (`bunx vercel`), logged in as the owner of the scope (`bunx vercel login`):

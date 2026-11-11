@@ -18,8 +18,9 @@ const mocks = vi.hoisted(() => ({
     eval: vi.fn(),
     verifyAttestation: vi.fn(),
     verifyAssertion: vi.fn(),
+    fromEnv: vi.fn(),
 }));
-vi.mock("@upstash/redis", () => ({ Redis: { fromEnv: () => mocks } }));
+vi.mock("@upstash/redis", () => ({ Redis: { fromEnv: mocks.fromEnv } }));
 vi.mock("node-app-attest", () => ({
     verifyAttestation: mocks.verifyAttestation,
     verifyAssertion: mocks.verifyAssertion,
@@ -49,6 +50,7 @@ function request(body = "") {
 
 beforeEach(() => {
     vi.clearAllMocks();
+    mocks.fromEnv.mockReturnValue(mocks);
     vi.stubEnv("TRACKDOWN_ATTEST_MODE", "observe");
     vi.stubEnv("TRACKDOWN_ATTEST_TEAM_ID", "TEAMID");
     vi.stubEnv("TRACKDOWN_ATTEST_BUNDLE_ID", "nl.trackdown.Trackdown");
@@ -63,6 +65,43 @@ beforeEach(() => {
 });
 
 describe("App Attest", () => {
+    it.each([undefined, "", "off"])(
+        "requires no Redis or app identity when mode is %s",
+        async (mode) => {
+            vi.stubEnv("VERCEL_ENV", "preview");
+            vi.stubEnv("TRACKDOWN_ATTEST_MODE", mode);
+            for (const name of [
+                "UPSTASH_REDIS_REST_URL",
+                "UPSTASH_REDIS_REST_TOKEN",
+                "TRACKDOWN_ATTEST_TEAM_ID",
+                "TRACKDOWN_ATTEST_BUNDLE_ID",
+                "TRACKDOWN_ATTEST_REQUIRED_CLIENT_KEYS",
+                "TRACKDOWN_ATTEST_ALLOW_DEVELOPMENT",
+            ]) {
+                vi.stubEnv(name, undefined);
+            }
+
+            expect(await appAttestError(request())).toBeNull();
+            const handler = guarded(() =>
+                Promise.resolve(jsonResponse({}, 200, "deploy")),
+            );
+            const response = await handler({ request: request(), params: {} });
+            expect(response.status).toBe(200);
+            expect(response.headers.get("Cache-Control")).toBe(
+                "public, max-age=86400",
+            );
+            await expect(issueAttestChallenge({ keyId })).rejects.toMatchObject({
+                code: "not_found",
+            });
+            await expect(
+                registerAttestation({ keyId, challenge: "unused", attestation }),
+            ).rejects.toMatchObject({ code: "not_found" });
+            expect(mocks.fromEnv).not.toHaveBeenCalled();
+            expect(mocks.verifyAttestation).not.toHaveBeenCalled();
+            expect(mocks.verifyAssertion).not.toHaveBeenCalled();
+            expect(console.warn).not.toHaveBeenCalled();
+        },
+    );
     it("issues random expiring challenges bound to a key", async () => {
         const first = await issueAttestChallenge({ keyId });
         const second = await issueAttestChallenge({ keyId });
