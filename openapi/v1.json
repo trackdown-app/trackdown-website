@@ -12,6 +12,98 @@
     }
   ],
   "paths": {
+    "/api/v1/attest/challenge": {
+      "post": {
+        "operationId": "createAttestChallenge",
+        "summary": "A single-use App Attest challenge, valid for five minutes",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AttestChallengeRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The answer. Never kept (`Cache-Control: no-store`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttestChallenge"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/api/v1/attest": {
+      "post": {
+        "operationId": "registerAttestation",
+        "summary": "Register an Apple App Attest public key",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AttestRegistrationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The answer. Never kept (`Cache-Control: no-store`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttestRegistration"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
     "/api/v1/meta": {
       "get": {
         "operationId": "getMeta",
@@ -402,6 +494,64 @@
         "required": [
           "number",
           "date"
+        ]
+      },
+      "AttestChallenge": {
+        "type": "object",
+        "properties": {
+          "challenge": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "challenge"
+        ]
+      },
+      "AttestChallengeRequest": {
+        "type": "object",
+        "properties": {
+          "keyId": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9+/]{43}=$"
+          }
+        },
+        "required": [
+          "keyId"
+        ]
+      },
+      "AttestRegistration": {
+        "type": "object",
+        "properties": {
+          "registered": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "registered"
+        ]
+      },
+      "AttestRegistrationRequest": {
+        "type": "object",
+        "properties": {
+          "keyId": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9+/]{43}=$"
+          },
+          "challenge": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "attestation": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 24000,
+            "pattern": "^[A-Za-z0-9+/]+={0,2}$"
+          }
+        },
+        "required": [
+          "keyId",
+          "challenge",
+          "attestation"
         ]
       },
       "Change": {

@@ -235,7 +235,7 @@ Trackdown-App-Version: 1.4.2
 - **Refused** with `unknown_client` (401) when the key is missing or not accepted, or the version is missing or not of that form, and logged ([Logs](#logs)). The check (`unknownClientError`, `src/lib/api/client-identification.ts`) runs after the cross-origin check and before the rate limit, so a refused call never counts against an IP's limit. The header names live in `src/lib/api/client-headers.ts`, shared with the OpenAPI document.
 - **Unset** `TRACKDOWN_CLIENT_KEYS` accepts no key: every REST call but the document is refused, and the server logs one `console.error` per instance saying so. Locally, `.env.example` sets it to `local-dev-key` for `bun run start`, which reads `.env.local`; for `bun run dev`, export it in the shell that starts the server.
 - **Only the REST routes.** The web's server functions do not go through `guarded` and never need the headers; they keep their cross-origin check and the rate limit.
-- **Not a secret.** The key ships inside the app, so anyone can pull it out of the binary. It names a client; it does not prove one. It makes casual scraping a deliberate act and gives one switch to turn a leaked key off. Proof that a call comes from a genuine app on a genuine device is [App Attest](#app-attest-planned), later.
+- **Not a secret.** The key ships inside the app, so anyone can pull it out of the binary. It names a client; it does not prove one. It makes casual scraping a deliberate act and gives one switch to turn a leaked key off. Proof that a call comes from a genuine app on a genuine device is [App Attest](#app-attest).
 
 #### Keys in use
 
@@ -259,15 +259,71 @@ A key is rotated on a schedule (with each major app release) and at once when it
 
 **Cutting off abuse** is step 4 straight away: remove the abused key, redeploy, and ship an app with a new one. Honest players on an old build lose the API until they update, so cut a key off only for abuse the [rate limit](#rate-limit) does not hold.
 
-#### App Attest (planned)
+#### App Attest
 
-The client key names the app; Apple's App Attest can prove it. The plan, for when the key is not enough:
+The client key still identifies every call. App Attest additionally proves a real
+app installation. `node-app-attest` verifies Apple's certificate chain, App ID,
+key ID, environment and signatures. Upstash Redis stores expiring challenges and
+public keys with monotonically increasing counters, shared by all instances.
 
-1. **Attest once**: the app makes a key pair in the Secure Enclave (`DCAppAttestService.generateKey`), asks the server for a challenge, and sends Apple's attestation of the key with it to a new `POST /api/v1/attest`. The server checks the attestation against Apple's root certificate, the app's Team ID and bundle ID and the challenge, and keeps the key's public key and counter (a store such as Upstash Redis: the server keeps no state today).
-2. **Assert per call**: each call carries an assertion over a hash of the request (`generateAssertion`), checked against that public key, with the counter only ever rising, in place of or beside `Trackdown-Client-Key`.
-3. **Roll out softly**: log failed assertions first, refuse them only once every supported app version attests. App Attest needs iOS 14 and a real device; the simulator and older devices keep the client key.
+Both enrollment operations require the existing client headers, use the game's
+IP rate limit and answer JSON with `Cache-Control: no-store`:
 
-Open questions for its spike: where the per-device state lives on Vercel, the cost of an assertion check on every guess, and the fallback when Apple's service is down (`DCError.serverUnavailable`).
+- `POST /api/v1/attest/challenge`, body `{ "keyId": "<base64 key ID>" }`,
+  returns `{ "challenge": "<64 lowercase hex characters>" }`. Challenges expire
+  after 300 seconds and are bound to the key ID. Hash the UTF-8 challenge string
+  with SHA-256 for `attestKey` (do not hex-decode it).
+- `POST /api/v1/attest`, body `{ "keyId": "...", "challenge": "...",
+  "attestation": "<base64 Apple attestation>" }`, returns `{ "registered": true }`.
+  Challenges are consumed atomically before verification. A failed or lost call
+  needs a new challenge and key. Existing registrations never reset their counter.
+  Both endpoints answer `not_found` while App Attest is off.
+
+Every subsequent call sends `Trackdown-Attest-Key-Id`,
+`Trackdown-Attest-Assertion` (base64), and `Trackdown-Attest-Timestamp` (Unix
+seconds, decimal). Pass the SHA-256 hash of this exact UTF-8 string to
+`generateAssertion`, with LF separators and **no trailing LF**:
+
+```text
+trackdown-app-attest-v1
+<timestamp header>
+<uppercase HTTP method>
+<percent-encoded path and query, including ? when present>
+<lowercase hex SHA-256 of exact transmitted body bytes, or empty bytes>
+```
+
+No JSON reserialization or query sorting occurs. Timestamps must be within 300
+seconds of server time. Assertions verify against the stored public key and
+counter; an atomic Redis comparison rejects duplicate/concurrent replay. Serialize
+requests per key on the client to avoid out-of-order counters. A retry generates a
+new assertion. Proof failures answer `unknown_client` when enforced.
+
+Rollout and runtime configuration:
+
+1. Configure `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`,
+   `TRACKDOWN_ATTEST_TEAM_ID` and `TRACKDOWN_ATTEST_BUNDLE_ID` in the deployment.
+   Keep the Redis database durable; losing it requires clients to enroll new keys.
+2. Set `TRACKDOWN_ATTEST_MODE=observe`. Missing/invalid proofs and Redis outages
+   log a warning without blocking existing calls. Enrollment still requires a
+   working verifier and Redis. Logs contain no keys, assertions or body content.
+3. Ship and validate the iOS client on real devices. Development attestations
+   require `TRACKDOWN_ATTEST_ALLOW_DEVELOPMENT=true` and are always refused on
+   Vercel Production. App Store/TestFlight builds use production attestations.
+4. Set `TRACKDOWN_ATTEST_MODE=enforce` and list only attesting builds' client keys
+   in `TRACKDOWN_ATTEST_REQUIRED_CLIENT_KEYS` (comma-separated). Those keys fail
+   closed on invalid/missing proof or Redis outage. Enrollment remains exempt
+   from assertion checks. Older app versions and simulators need a separate
+   accepted key outside this list. A client-supplied "unsupported" flag cannot
+   bypass enforcement. Do not put the simulator key in distribution builds.
+5. App Attest off/unset preserves existing behavior. Roll back enforcement to
+   `observe` during an outage; never automatically bypass enforced proofs.
+
+In observe/enforce mode all client-protected responses disable browser and CDN
+caching so verification runs on every call; the public OpenAPI document keeps its
+cache policy. Before rollout, deploy to a fresh deployment and purge any existing
+CDN entries from earlier cacheable routes. Redis keys are scoped by Team ID and
+bundle ID; use separate Redis databases for preview and production. Registration
+records have no expiry because the installation's key must remain valid.
 
 ### Logs
 

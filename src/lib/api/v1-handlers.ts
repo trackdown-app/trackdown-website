@@ -1,6 +1,11 @@
 // Marks this module server-only: its handlers read the game data.
 import "@tanstack/react-start/server-only";
 import { ApiError } from "@/lib/api/api-error";
+import { issueAttestChallenge, registerAttestation } from "@/lib/api/app-attest";
+import {
+    challengeInputSchema,
+    attestInputSchema,
+} from "@/lib/api/app-attest-schemas";
 import { openApiDocument, openApiInputSchema } from "@/lib/api/openapi";
 import {
     errorResponse,
@@ -30,6 +35,14 @@ import { getTodayPuzzle } from "@/lib/game/today-puzzle";
 // The handlers of every REST route under `/api/v1` (docs/api.md). Each route
 // file in `src/routes/api/v1/` only hands its handlers to Start, so the tests
 // call these directly.
+
+export const attestChallengeHandlers = restHandlers({
+    POST: rateLimited(restPost(challengeInputSchema, issueAttestChallenge)),
+});
+
+export const attestHandlers = restHandlers({
+    POST: rateLimited(restPost(attestInputSchema, registerAttestation)),
+});
 
 /** `/api/v1/meta`: the `meta` operation for iOS; `getMetaFn` is the same for the web. */
 export const metaHandlers = restHandlers({

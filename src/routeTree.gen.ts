@@ -22,9 +22,11 @@ import { Route as NetworkIndexRouteImport } from './routes/$network/index'
 import { Route as NetworkArchiefIndexRouteImport } from './routes/$network/archief/index'
 import { Route as NetworkArchiefNumberRouteImport } from './routes/$network/archief/$number'
 import { Route as ApiV1SplatRouteImport } from './routes/api/v1/$'
+import { Route as ApiV1AttestRouteImport } from './routes/api/v1/attest'
 import { Route as ApiV1MetaRouteImport } from './routes/api/v1/meta'
 import { Route as ApiV1OpenapiDotjsonRouteImport } from './routes/api/v1/openapi[.]json'
 import { Route as ApiV1NetworkStationsRouteImport } from './routes/api/v1/$network/stations'
+import { Route as ApiV1AttestChallengeRouteImport } from './routes/api/v1/attest/challenge'
 import { Route as ApiV1NetworkPuzzlesIndexRouteImport } from './routes/api/v1/$network/puzzles/index'
 import { Route as ApiV1NetworkPuzzlesTodayRouteImport } from './routes/api/v1/$network/puzzles/today'
 import { Route as ApiV1NetworkPuzzlesNumberGuessesRouteImport } from './routes/api/v1/$network/puzzles/$number/guesses'
@@ -95,6 +97,11 @@ const ApiV1SplatRoute = ApiV1SplatRouteImport.update({
   path: '/api/v1/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiV1AttestRoute = ApiV1AttestRouteImport.update({
+  id: '/api/v1/attest',
+  path: '/api/v1/attest',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiV1MetaRoute = ApiV1MetaRouteImport.update({
   id: '/api/v1/meta',
   path: '/api/v1/meta',
@@ -109,6 +116,11 @@ const ApiV1NetworkStationsRoute = ApiV1NetworkStationsRouteImport.update({
   id: '/api/v1/$network/stations',
   path: '/api/v1/$network/stations',
   getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1AttestChallengeRoute = ApiV1AttestChallengeRouteImport.update({
+  id: '/challenge',
+  path: '/challenge',
+  getParentRoute: () => ApiV1AttestRoute,
 } as any)
 const ApiV1NetworkPuzzlesIndexRoute =
   ApiV1NetworkPuzzlesIndexRouteImport.update({
@@ -148,10 +160,12 @@ export interface FileRoutesByFullPath {
   '/$network/': typeof NetworkIndexRoute
   '/$network/archief/$number': typeof NetworkArchiefNumberRoute
   '/api/v1/$': typeof ApiV1SplatRoute
+  '/api/v1/attest': typeof ApiV1AttestRouteWithChildren
   '/api/v1/meta': typeof ApiV1MetaRoute
   '/api/v1/openapi.json': typeof ApiV1OpenapiDotjsonRoute
   '/$network/archief/': typeof NetworkArchiefIndexRoute
   '/api/v1/$network/stations': typeof ApiV1NetworkStationsRoute
+  '/api/v1/attest/challenge': typeof ApiV1AttestChallengeRoute
   '/api/v1/$network/puzzles/today': typeof ApiV1NetworkPuzzlesTodayRoute
   '/api/v1/$network/puzzles/': typeof ApiV1NetworkPuzzlesIndexRoute
   '/api/v1/$network/puzzles/$number/guesses': typeof ApiV1NetworkPuzzlesNumberGuessesRoute
@@ -169,10 +183,12 @@ export interface FileRoutesByTo {
   '/$network': typeof NetworkIndexRoute
   '/$network/archief/$number': typeof NetworkArchiefNumberRoute
   '/api/v1/$': typeof ApiV1SplatRoute
+  '/api/v1/attest': typeof ApiV1AttestRouteWithChildren
   '/api/v1/meta': typeof ApiV1MetaRoute
   '/api/v1/openapi.json': typeof ApiV1OpenapiDotjsonRoute
   '/$network/archief': typeof NetworkArchiefIndexRoute
   '/api/v1/$network/stations': typeof ApiV1NetworkStationsRoute
+  '/api/v1/attest/challenge': typeof ApiV1AttestChallengeRoute
   '/api/v1/$network/puzzles/today': typeof ApiV1NetworkPuzzlesTodayRoute
   '/api/v1/$network/puzzles': typeof ApiV1NetworkPuzzlesIndexRoute
   '/api/v1/$network/puzzles/$number/guesses': typeof ApiV1NetworkPuzzlesNumberGuessesRoute
@@ -192,10 +208,12 @@ export interface FileRoutesById {
   '/$network/': typeof NetworkIndexRoute
   '/$network/archief/$number': typeof NetworkArchiefNumberRoute
   '/api/v1/$': typeof ApiV1SplatRoute
+  '/api/v1/attest': typeof ApiV1AttestRouteWithChildren
   '/api/v1/meta': typeof ApiV1MetaRoute
   '/api/v1/openapi.json': typeof ApiV1OpenapiDotjsonRoute
   '/$network/archief/': typeof NetworkArchiefIndexRoute
   '/api/v1/$network/stations': typeof ApiV1NetworkStationsRoute
+  '/api/v1/attest/challenge': typeof ApiV1AttestChallengeRoute
   '/api/v1/$network/puzzles/today': typeof ApiV1NetworkPuzzlesTodayRoute
   '/api/v1/$network/puzzles/': typeof ApiV1NetworkPuzzlesIndexRoute
   '/api/v1/$network/puzzles/$number/guesses': typeof ApiV1NetworkPuzzlesNumberGuessesRoute
@@ -216,10 +234,12 @@ export interface FileRouteTypes {
     | '/$network/'
     | '/$network/archief/$number'
     | '/api/v1/$'
+    | '/api/v1/attest'
     | '/api/v1/meta'
     | '/api/v1/openapi.json'
     | '/$network/archief/'
     | '/api/v1/$network/stations'
+    | '/api/v1/attest/challenge'
     | '/api/v1/$network/puzzles/today'
     | '/api/v1/$network/puzzles/'
     | '/api/v1/$network/puzzles/$number/guesses'
@@ -237,10 +257,12 @@ export interface FileRouteTypes {
     | '/$network'
     | '/$network/archief/$number'
     | '/api/v1/$'
+    | '/api/v1/attest'
     | '/api/v1/meta'
     | '/api/v1/openapi.json'
     | '/$network/archief'
     | '/api/v1/$network/stations'
+    | '/api/v1/attest/challenge'
     | '/api/v1/$network/puzzles/today'
     | '/api/v1/$network/puzzles'
     | '/api/v1/$network/puzzles/$number/guesses'
@@ -259,10 +281,12 @@ export interface FileRouteTypes {
     | '/$network/'
     | '/$network/archief/$number'
     | '/api/v1/$'
+    | '/api/v1/attest'
     | '/api/v1/meta'
     | '/api/v1/openapi.json'
     | '/$network/archief/'
     | '/api/v1/$network/stations'
+    | '/api/v1/attest/challenge'
     | '/api/v1/$network/puzzles/today'
     | '/api/v1/$network/puzzles/'
     | '/api/v1/$network/puzzles/$number/guesses'
@@ -280,6 +304,7 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   VoorwaardenRoute: typeof VoorwaardenRoute
   ApiV1SplatRoute: typeof ApiV1SplatRoute
+  ApiV1AttestRoute: typeof ApiV1AttestRouteWithChildren
   ApiV1MetaRoute: typeof ApiV1MetaRoute
   ApiV1OpenapiDotjsonRoute: typeof ApiV1OpenapiDotjsonRoute
   ApiV1NetworkStationsRoute: typeof ApiV1NetworkStationsRoute
@@ -382,6 +407,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiV1SplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/v1/attest': {
+      id: '/api/v1/attest'
+      path: '/api/v1/attest'
+      fullPath: '/api/v1/attest'
+      preLoaderRoute: typeof ApiV1AttestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/v1/meta': {
       id: '/api/v1/meta'
       path: '/api/v1/meta'
@@ -402,6 +434,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/v1/$network/stations'
       preLoaderRoute: typeof ApiV1NetworkStationsRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/attest/challenge': {
+      id: '/api/v1/attest/challenge'
+      path: '/challenge'
+      fullPath: '/api/v1/attest/challenge'
+      preLoaderRoute: typeof ApiV1AttestChallengeRouteImport
+      parentRoute: typeof ApiV1AttestRoute
     }
     '/api/v1/$network/puzzles/': {
       id: '/api/v1/$network/puzzles/'
@@ -450,6 +489,18 @@ const NetworkRouteRouteWithChildren = NetworkRouteRoute._addFileChildren(
   NetworkRouteRouteChildren,
 )
 
+interface ApiV1AttestRouteChildren {
+  ApiV1AttestChallengeRoute: typeof ApiV1AttestChallengeRoute
+}
+
+const ApiV1AttestRouteChildren: ApiV1AttestRouteChildren = {
+  ApiV1AttestChallengeRoute: ApiV1AttestChallengeRoute,
+}
+
+const ApiV1AttestRouteWithChildren = ApiV1AttestRoute._addFileChildren(
+  ApiV1AttestRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   NetworkRouteRoute: NetworkRouteRouteWithChildren,
@@ -461,6 +512,7 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   VoorwaardenRoute: VoorwaardenRoute,
   ApiV1SplatRoute: ApiV1SplatRoute,
+  ApiV1AttestRoute: ApiV1AttestRouteWithChildren,
   ApiV1MetaRoute: ApiV1MetaRoute,
   ApiV1OpenapiDotjsonRoute: ApiV1OpenapiDotjsonRoute,
   ApiV1NetworkStationsRoute: ApiV1NetworkStationsRoute,

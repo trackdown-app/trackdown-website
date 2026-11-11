@@ -37,6 +37,11 @@ Retention in the copy: analytics data 12 months (PostHog's free plan keeps event
 
 A change to what the site stores or sends changes this page and its "Last updated" date (`privacy.updated`) in the same change. If the change needs new consent, raise `CONSENT_TEXT_VERSION` ([analytics.md](analytics.md#consent-cookie)).
 
+The policy also discloses iOS App Attest security records in Upstash Redis:
+installation public key, key ID and replay counter for the registration lifetime,
+and single-use challenges retained for five minutes. These records are separate
+from analytics consent and never sent to PostHog. See [api.md](api.md#app-attest).
+
 ## Terms of use
 
 The board's copy: free and as it is, a game and not a journey planner, play fair, who owns what, liability as far as Dutch law allows, a link to the privacy policy, and Dutch law. Its date is `terms.updated`.

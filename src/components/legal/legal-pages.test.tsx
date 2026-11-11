@@ -11,7 +11,7 @@ describe("PrivacyPage", () => {
 
         expect(html).toContain("<h1");
         expect(html).toContain("Privacybeleid");
-        expect(html).toContain("Laatst bijgewerkt op 7 november 2026");
+        expect(html).toContain("Laatst bijgewerkt op 11 november 2026");
         expect(html).toContain("Bram Gussekloo");
         expect(html).toContain('href="mailto:info@trackdown.nl"');
     });
@@ -28,6 +28,9 @@ describe("PrivacyPage", () => {
         expect(html).toContain("t.trackdown.nl");
         expect(html).toContain("Cloudflare");
         expect(html).toContain("Vercel");
+        expect(html).toContain("App Attest");
+        expect(html).toContain("Upstash Redis");
+        expect(html).toContain("five minutes");
         expect(html).toContain("Autoriteit Persoonsgegevens");
     });
 });
