@@ -1,0 +1,18 @@
+{
+    "applinks": {
+        "details": [
+            {
+                "appIDs": ["CN495B7KTS.nl.trackdown.Trackdown"],
+                "components": [
+                    { "/": "/nl" },
+                    { "/": "/gb" },
+                    { "/": "/en/*" },
+                    { "/": "/nl/archief" },
+                    { "/": "/nl/archief/*" },
+                    { "/": "/gb/archief" },
+                    { "/": "/gb/archief/*" }
+                ]
+            }
+        ]
+    }
+}
