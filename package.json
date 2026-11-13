@@ -51,7 +51,7 @@
     "lucide-react": "^1.67.0",
     "nitro": "^3.0.260903-beta",
     "node-app-attest": "^1.0.1",
-    "posthog-js": "^1.445.5",
+    "posthog-js": "^1.447.6",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
     "shadcn": "^4.21.1",
