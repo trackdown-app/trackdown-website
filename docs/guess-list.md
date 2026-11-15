@@ -9,7 +9,7 @@ The game page mounts it with the game's state, with the progress dots in its hea
 | Prop | What it is |
 | --- | --- |
 | `guesses` | The guesses so far, oldest first: each `guess` operation's answer ([api.md](api.md#a-guess)), or the `reveal` operation's guesses. Only `guess`, `correct`, `steps` and `totalMinutes` are read (`ListedGuess` in `src/lib/game/trip-line.ts`) |
-| `stations` | The network's stations (`code` and `name`), to name each guess and each known change. A code it does not know shows as the code |
+| `stations` | The network's stations (`code` and `name`), to name each guess and each known change. A change at a code it does not know is a station abroad and reads as one ([Changes abroad](#changes-abroad)) |
 | `progress` | Optional. What the header row shows at the left, opposite "Mystery station": the game page's progress dots |
 | `enteringGuess` | Optional. The station code of a guess just made on the page, whose row plays its arrival ([A new guess](#a-new-guess)) |
 | `revealed` | Optional. The finished game's list on the solved screen ([Revealed](#revealed)); `progress` is not shown |
@@ -38,6 +38,10 @@ The summary is the total time and how the trip changes trains: "2h 25m, change a
 A short ride has no room for its label, and a train code such as `SPR` means nothing to a player who does not know it. So every trip line is a button (`GuessTrack`, `src/components/game/guess-track.tsx`) named "Trip from Maastricht, ride by ride" / "Reis vanaf Maastricht, rit voor rit" that shows the trip in full. A correct guess has no line and no button.
 
 `TripDetails` (`src/components/game/trip-details.tsx`) draws it as the line turned on its side, top to bottom: the guessed station with the guess dot; each ride with its code in a chip of its line colour, the label spelled out (`trainName` in `src/lib/game/trip-text.ts`, from the `trains` messages): the train type in `nl` ("Sprinter", "Intercity direct", "Stopping train" / "Stoptrein"), the operator in `gb` ("LNER" for `GR`, "Lumo" for `LD`, "Thameslink" for `TL`; brand names, the same in both languages). Its map is a `Record` over `trainTypeSchema`, so a label added there fails the typecheck until it has a name and its time at the right; each change as a ring with its station and its wait ("6m to change" / "6m overstaptijd"); and the mystery station under a plain ink disc. A change the player has not found stays "Unknown station" / "Onbekend station" with a `?` ring, as on the line; the `?` only ever marks an unknown change, never the mystery station. `TripDetailsRail` draws each stop's piece of the vertical line, the arriving ride's colour above and the leaving one's below.
+
+### Changes abroad
+
+A trip may change trains at a station outside the network's `stations.json`: Luxembourg on a Belgian trip ([data.md](data.md#files)). No player can guess it, so while playing it stays an unknown change like any other. Once the reveal names it, the list has no name for its code, so it reads as abroad instead of showing the code: "change at a station abroad" / "overstap in het buitenland" in the summary and the spoken sentence, "Station abroad" / "Station in het buitenland" in the trip details (`changeStationName` in `src/lib/game/trip-text.ts`).
 
 Where it opens depends on the pointer (`useMediaQuery`, `src/lib/use-media-query.ts`, on `(hover: hover) and (pointer: fine)`):
 
@@ -88,6 +92,6 @@ Times in the sentence spell out their units, one and many ("1 hour 1 minute", "1
 ## Tests
 
 - `src/lib/game/trip-line.test.ts` covers the width and its limits, the board's scale and its grid labels, 29 minutes one width beside a 3-hour trip, where each ride and change sits, the same minutes drawn the same width with a change or without and whatever the wait after them, the labels that fit on a narrow and a wide track, close changes kept apart with the dot past them, unknown changes and the line colours.
-- `src/lib/game/trip-text.test.ts` covers the short and the spoken times, the summary and the sentence, in both languages.
+- `src/lib/game/trip-text.test.ts` covers the short and the spoken times, the summary and the sentence, and a change abroad, in both languages.
 - `src/components/game/guess-list.test.tsx` renders the design's four guesses in `happy-dom`: the order, each row's sentence, the drawing hidden and each line's button, the trip details opening in the row on a touch screen and in a popover with a mouse (in Dutch), the labels and `?`, the grid labels and their whole hours on a board widened by a 3-hour trip, Dutch, a correct guess, the entering row's class and timings, the revealed list's heading, its found row and no grid, in both languages, and the empty list.
 - `src/components/game/mystery-bar.test.tsx` supplies layout measurements to check the centred cap for a first-guess win, the wrapped example and its resize, and the span between endpoints when another row arrives.

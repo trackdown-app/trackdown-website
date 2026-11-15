@@ -87,10 +87,12 @@
         "changes": "{count} overstappen",
         "changeAt": "overstap in {station}",
         "changeUnknown": "overstap op een onbekend station",
+        "changeAbroad": "overstap in het buitenland",
         "summary": "{duration}, {changes}",
         "spokenRide": "{train}, {duration}",
         "spokenChangeAt": "overstap in {station}, {duration}",
-        "spokenChangeUnknown": "overstap op een onbekend station, {duration}"
+        "spokenChangeUnknown": "overstap op een onbekend station, {duration}",
+        "spokenChangeAbroad": "overstap in het buitenland, {duration}"
     },
     "tripDetails": {
         "open": "Reis vanaf {station}, rit voor rit",
@@ -98,6 +100,7 @@
         "total": "{duration} naar het mysteriestation",
         "wait": "{duration} overstaptijd",
         "unknownStation": "Onbekend station",
+        "stationAbroad": "Station in het buitenland",
         "mysteryStation": "Mysteriestation"
     },
     "trains": {
