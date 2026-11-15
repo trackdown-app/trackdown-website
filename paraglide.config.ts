@@ -36,6 +36,11 @@ export const paraglideCompilerOptions: CompilerOptions = {
     trailingSlash: "never",
     // Lets Vite tree-shake server-only runtime code out of the client bundle.
     isServer: "import.meta.env.SSR",
+    // A physical file per message. The Vite plugin would otherwise serve the
+    // messages as virtual modules, which only exist inside Vite: the output
+    // would then differ from `bun run paraglide:compile`'s, and Vitest, the
+    // typecheck and lint read the files from disk.
+    outputStructure: "message-modules",
     // The output is JavaScript; `.d.ts` files keep it typed without `allowJs`.
     emitTsDeclarations: true,
 };
