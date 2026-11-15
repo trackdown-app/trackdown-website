@@ -14,6 +14,15 @@ function nameOf(code: string, names: StationNames): string {
 }
 
 /**
+ * A change's station by name, or "Station abroad" for a code outside the
+ * network's stations: a trip may change trains abroad (Luxembourg on a
+ * Belgian trip), at a station no player can guess (docs/data.md#files).
+ */
+export function changeStationName(code: string, names: StationNames): string {
+    return names.get(code) ?? m["tripDetails.stationAbroad"]();
+}
+
+/**
  * Each ride label's message: a train type in `nl`, a train operator in `gb`.
  * A `Record`, so a label added to `trainTypeSchema` fails the typecheck
  * until it has a name.
@@ -112,9 +121,13 @@ function changesText(guess: ListedGuess, names: StationNames): string {
     if (changes.length > 1) {
         return m["trip.changes"]({ count: String(changes.length) });
     }
-    return only.station == null
-        ? m["trip.changeUnknown"]()
-        : m["trip.changeAt"]({ station: nameOf(only.station, names) });
+    if (only.station == null) {
+        return m["trip.changeUnknown"]();
+    }
+    const station = names.get(only.station);
+    return station == null
+        ? m["trip.changeAbroad"]()
+        : m["trip.changeAt"]({ station });
 }
 
 /** The row's summary: `2h 25m, change at Utrecht Centraal`. */
@@ -147,12 +160,13 @@ export function spokenGuess(
                 });
             }
             const duration = spokenMinutes(step.minutes);
-            return step.station == null
-                ? m["trip.spokenChangeUnknown"]({ duration })
-                : m["trip.spokenChangeAt"]({
-                      station: nameOf(step.station, names),
-                      duration,
-                  });
+            if (step.station == null) {
+                return m["trip.spokenChangeUnknown"]({ duration });
+            }
+            const changeStation = names.get(step.station);
+            return changeStation == null
+                ? m["trip.spokenChangeAbroad"]({ duration })
+                : m["trip.spokenChangeAt"]({ station: changeStation, duration });
         })
         .join(", ");
     return m["guessList.spokenGuess"]({

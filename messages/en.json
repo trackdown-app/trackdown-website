@@ -87,10 +87,12 @@
         "changes": "{count} changes",
         "changeAt": "change at {station}",
         "changeUnknown": "change at an unknown station",
+        "changeAbroad": "change at a station abroad",
         "summary": "{duration}, {changes}",
         "spokenRide": "{train}, {duration}",
         "spokenChangeAt": "change at {station}, {duration}",
-        "spokenChangeUnknown": "change at an unknown station, {duration}"
+        "spokenChangeUnknown": "change at an unknown station, {duration}",
+        "spokenChangeAbroad": "change at a station abroad, {duration}"
     },
     "tripDetails": {
         "open": "Trip from {station}, ride by ride",
@@ -98,6 +100,7 @@
         "total": "{duration} to the mystery station",
         "wait": "{duration} to change",
         "unknownStation": "Unknown station",
+        "stationAbroad": "Station abroad",
         "mysteryStation": "Mystery station"
     },
     "trains": {

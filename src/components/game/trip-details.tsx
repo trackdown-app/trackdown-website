@@ -3,7 +3,7 @@ import { lineBackgrounds } from "@/components/game/line-colours";
 import { TripDetailsRail } from "@/components/game/trip-details-rail";
 import { rideLine } from "@/lib/game/trip-line";
 import type { ListedGuess } from "@/lib/game/trip-line";
-import { formatMinutes, trainName } from "@/lib/game/trip-text";
+import { changeStationName, formatMinutes, trainName } from "@/lib/game/trip-text";
 import type { StationNames } from "@/lib/game/trip-text";
 
 const rowClasses = "flex min-h-9 gap-3";
@@ -91,7 +91,7 @@ export function TripDetails({
                         >
                             {step.station == null
                                 ? m["tripDetails.unknownStation"]()
-                                : (names.get(step.station) ?? step.station)}
+                                : changeStationName(step.station, names)}
                         </span>
                         <span className={timeClasses}>
                             {m["tripDetails.wait"]({

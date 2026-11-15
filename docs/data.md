@@ -30,7 +30,7 @@ A trip is stored as `[string, minutes]` entries that alternate between a ride an
 ];
 ```
 
-A ride's label (`trainTypeSchema`) is the train type in `nl` (`IC`, `ICD`, `SPR`, `ST`, `SNT`, `ICE`, `EC`) and the train operator's two-letter code in `gb` (`GW`, `SR`, `XC`…, named in trackdown-data's `gb/operators.json`). The two lists do not overlap, so one enum holds both; a new label in the data fails the check until it is added there. A change's station may be one outside the network's `stations.json` (Aachen, Antwerpen), so it is only checked to be a code.
+A ride's label (`trainTypeSchema`) is the train type in `nl` (`IC`, `ICD`, `SPR`, `ST`, `SNT`, `ICE`, `EC`) and the train operator's two-letter code in `gb` (`GW`, `SR`, `XC`…, named in trackdown-data's `gb/operators.json`). The two lists do not overlap, so one enum holds both; a new label in the data fails the check until it is added there. A change's station may be one outside the network's `stations.json` (Aachen, Antwerpen, Luxembourg), so it is only checked to be a code; the guess list calls it a station abroad ([guess-list.md](guess-list.md#changes-abroad)).
 
 The schemas hold no data, so `data-schema.ts` may be imported anywhere, the browser included.
 

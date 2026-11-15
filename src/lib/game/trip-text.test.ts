@@ -4,6 +4,7 @@ import type { getLocale } from "@/paraglide/runtime";
 import type { TrainType } from "@/lib/data/data-schema";
 import type { ListedGuess } from "@/lib/game/trip-line";
 import {
+    changeStationName,
     formatMinutes,
     spokenGuess,
     spokenMinutes,
@@ -25,6 +26,16 @@ const maastricht: ListedGuess = {
         { kind: "ride", train: "IC", minutes: 17 },
     ],
     totalMinutes: 145,
+};
+
+/** The same trip, changing at Aachen (`ac`): not a station of the network. */
+const viaAachen: ListedGuess = {
+    ...maastricht,
+    steps: [
+        { kind: "ride", train: "IC", minutes: 122 },
+        { kind: "change", station: "ac", minutes: 6 },
+        { kind: "ride", train: "IC", minutes: 17 },
+    ],
 };
 
 describe("trainName", () => {
@@ -124,6 +135,26 @@ describe("tripSummary", () => {
             "2u 25m, overstap in Utrecht Centraal",
         );
     });
+
+    it("says a change outside the network is abroad, not its code", () => {
+        expect(tripSummary(viaAachen, names)).toBe(
+            "2u 25m, overstap in het buitenland",
+        );
+        overwriteGetLocale(() => "en");
+        expect(tripSummary(viaAachen, names)).toBe(
+            "2h 25m, change at a station abroad",
+        );
+    });
+});
+
+describe("changeStationName", () => {
+    it("names a station of the network, else says it is abroad", () => {
+        overwriteGetLocale(() => "en");
+        expect(changeStationName("ut", names)).toBe("Utrecht Centraal");
+        expect(changeStationName("ac", names)).toBe("Station abroad");
+        overwriteGetLocale(() => "nl");
+        expect(changeStationName("ac", names)).toBe("Station in het buitenland");
+    });
 });
 
 describe("spokenGuess", () => {
@@ -143,5 +174,12 @@ describe("spokenGuess", () => {
                 names,
             ),
         ).toBe("Guess 5, Utrecht Centraal: the mystery station.");
+    });
+
+    it("reads a change outside the network as abroad", () => {
+        overwriteGetLocale(() => "en");
+        expect(spokenGuess(viaAachen, 2, names)).toBe(
+            "Guess 2, Maastricht: 2 hours 25 minutes to the mystery station. IC, 2 hours 2 minutes, change at a station abroad, 6 minutes, IC, 17 minutes.",
+        );
     });
 });
