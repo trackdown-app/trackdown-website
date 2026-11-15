@@ -87,10 +87,12 @@
         "changes": "{count} correspondances",
         "changeAt": "correspondance à {station}",
         "changeUnknown": "correspondance dans une gare inconnue",
+        "changeAbroad": "correspondance dans une gare à l’étranger",
         "summary": "{duration}, {changes}",
         "spokenRide": "{train}, {duration}",
         "spokenChangeAt": "correspondance à {station}, {duration}",
-        "spokenChangeUnknown": "correspondance dans une gare inconnue, {duration}"
+        "spokenChangeUnknown": "correspondance dans une gare inconnue, {duration}",
+        "spokenChangeAbroad": "correspondance dans une gare à l’étranger, {duration}"
     },
     "tripDetails": {
         "open": "Trajet depuis {station}, train par train",
@@ -98,6 +100,7 @@
         "total": "{duration} jusqu’à la gare mystère",
         "wait": "{duration} de correspondance",
         "unknownStation": "Gare inconnue",
+        "stationAbroad": "Gare à l’étranger",
         "mysteryStation": "Gare mystère"
     },
     "trains": {

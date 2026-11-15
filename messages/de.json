@@ -87,10 +87,12 @@
         "changes": "{count} Umstiege",
         "changeAt": "Umstieg in {station}",
         "changeUnknown": "Umstieg an einem unbekannten Bahnhof",
+        "changeAbroad": "Umstieg an einem Bahnhof im Ausland",
         "summary": "{duration}, {changes}",
         "spokenRide": "{train}, {duration}",
         "spokenChangeAt": "Umstieg in {station}, {duration}",
-        "spokenChangeUnknown": "Umstieg an einem unbekannten Bahnhof, {duration}"
+        "spokenChangeUnknown": "Umstieg an einem unbekannten Bahnhof, {duration}",
+        "spokenChangeAbroad": "Umstieg an einem Bahnhof im Ausland, {duration}"
     },
     "tripDetails": {
         "open": "Fahrt ab {station}, Abschnitt für Abschnitt",
@@ -98,6 +100,7 @@
         "total": "{duration} bis zum Rätselbahnhof",
         "wait": "{duration} Umstiegszeit",
         "unknownStation": "Unbekannter Bahnhof",
+        "stationAbroad": "Bahnhof im Ausland",
         "mysteryStation": "Rätselbahnhof"
     },
     "trains": {
