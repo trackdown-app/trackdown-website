@@ -70,11 +70,11 @@ The PNGs and the ICO are renders of `favicon.svg` (and of the share image's SVG)
 
 `public/.well-known/apple-app-site-association` associates `trackdown.nl` with
 `CN495B7KTS.nl.trackdown.Trackdown` (the iOS app's Team ID and bundle identifier).
-It allows `/nl`, `/gb`, `/en/*`, and both networks' archive indexes and puzzle
-paths. Other Dutch pages remain web links. The English wildcard includes English
-archive paths. German and French pages (`/de/*`, `/fr/*`) are not listed and stay
-web links: the app's link parser only strips the `/en` prefix, so it would read
-`de` or `fr` as a network. Add them here once the app understands them.
+It allows `/nl`, `/gb`, `/en/*`, `/de/*`, `/fr/*`, and both networks' archive
+indexes and puzzle paths. Other Dutch pages remain web links. The English, German
+and French wildcards include their archive paths. The app's link parser
+(`PuzzleLink`) must strip each of these locale prefixes before it reads the
+network, so a locale added here needs the app to know it too.
 
 Nitro's exact route rule in `vite.config.ts` sets `Content-Type: application/json`
 for this extensionless static file on Node and Vercel. Static serving bypasses
