@@ -83,6 +83,19 @@ export function AboutPage() {
                         </a>
                     </li>
                 </ul>
+                <p>{m["about.dataBeIntro"]()}</p>
+                <ul className="flex list-disc flex-col gap-2 pl-[22px]">
+                    <li>{m["about.dataBeTimetable"]()}</li>
+                    <li>
+                        {m["about.dataBeProvinces"]()}{" "}
+                        <a
+                            href="https://opendatacommons.org/licenses/odbl/1-0/"
+                            className={textLink}
+                        >
+                            ODbL 1.0
+                        </a>
+                    </li>
+                </ul>
             </LegalSection>
             <LegalSection
                 id="about-independent"

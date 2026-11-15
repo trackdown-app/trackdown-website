@@ -72,7 +72,9 @@ The PNGs and the ICO are renders of `favicon.svg` (and of the share image's SVG)
 `CN495B7KTS.nl.trackdown.Trackdown` (the iOS app's Team ID and bundle identifier).
 It allows `/nl`, `/gb`, `/en/*`, and both networks' archive indexes and puzzle
 paths. Other Dutch pages remain web links. The English wildcard includes English
-archive paths.
+archive paths. Belgium (`/be`, `/en/be/*`) stays a web link: the app does not know
+the `be` network yet, so its English paths are excluded before the wildcard. Add
+them when the app plays Belgium.
 
 Nitro's exact route rule in `vite.config.ts` sets `Content-Type: application/json`
 for this extensionless static file on Node and Vercel. Static serving bypasses

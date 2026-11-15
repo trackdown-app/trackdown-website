@@ -89,6 +89,15 @@ describe("provinceName", () => {
         expect(provinceName("Utrecht", "en")).toBe("Utrecht");
         expect(provinceName("Westmark", "en")).toBe("Westmark");
     });
+
+    it("names a Belgian province in Dutch and English, whatever language the data uses", () => {
+        expect(provinceName("Hainaut", "nl")).toBe("Henegouwen");
+        expect(provinceName("Bruxelles / Brussel", "nl")).toBe("Brussel");
+        expect(provinceName("Oost-Vlaanderen", "nl")).toBe("Oost-Vlaanderen");
+        expect(provinceName("Oost-Vlaanderen", "en")).toBe("East Flanders");
+        expect(provinceName("Bruxelles / Brussel", "en")).toBe("Brussels");
+        expect(provinceName("Liège", "en")).toBe("Liège");
+    });
 });
 
 describe("stationsInputSchema", () => {
