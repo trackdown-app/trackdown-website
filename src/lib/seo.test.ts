@@ -35,10 +35,12 @@ describe("pageUrl", () => {
 });
 
 describe("languageAlternates", () => {
-    it("lists Dutch, English and the Dutch page as x-default", () => {
+    it("lists Dutch, English, German, French and the Dutch page as x-default", () => {
         expect(languageAlternates("/nl")).toEqual([
             { hrefLang: "nl", href: "https://trackdown.nl/nl" },
             { hrefLang: "en", href: "https://trackdown.nl/en/nl" },
+            { hrefLang: "de", href: "https://trackdown.nl/de/nl" },
+            { hrefLang: "fr", href: "https://trackdown.nl/fr/nl" },
             { hrefLang: "x-default", href: "https://trackdown.nl/nl" },
         ]);
     });

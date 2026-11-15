@@ -124,6 +124,8 @@ describe("the site's router", () => {
     it.each([
         ["/", "nl", "/nl"],
         ["/en", "en", "/en/nl"],
+        ["/de", "de", "/de/nl"],
+        ["/fr", "fr", "/fr/nl"],
     ] as const)(
         "sends %s to the chosen network's game, the default one without a choice",
         async (pathname, locale, expected) => {

@@ -190,7 +190,9 @@
     "language": {
         "label": "Taal",
         "nl": "Nederlands",
-        "en": "Engels"
+        "en": "Engels",
+        "de": "Duits",
+        "fr": "Frans"
     },
     "header": {
         "skipToContent": "Naar de inhoud",

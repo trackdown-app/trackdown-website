@@ -89,6 +89,15 @@ describe("provinceName", () => {
         expect(provinceName("Utrecht", "en")).toBe("Utrecht");
         expect(provinceName("Westmark", "en")).toBe("Westmark");
     });
+
+    it("names provinces and regions in German and French", () => {
+        expect(provinceName("Noord-Holland", "de")).toBe("Nordholland");
+        expect(provinceName("Scotland", "de")).toBe("Schottland");
+        expect(provinceName("Gelderland", "de")).toBe("Gelderland");
+        expect(provinceName("Zuid-Holland", "fr")).toBe("Hollande-Méridionale");
+        expect(provinceName("Wales", "fr")).toBe("Pays de Galles");
+        expect(provinceName("West Midlands", "fr")).toBe("West Midlands");
+    });
 });
 
 describe("stationsInputSchema", () => {
@@ -105,7 +114,7 @@ describe("stationsInputSchema", () => {
 
     it("refuses a locale the site does not have", () => {
         expect(
-            stationsInputSchema.safeParse({ network: "nl", locale: "de" }).success,
+            stationsInputSchema.safeParse({ network: "nl", locale: "es" }).success,
         ).toBe(false);
     });
 });
