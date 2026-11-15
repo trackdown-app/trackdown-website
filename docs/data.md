@@ -11,7 +11,7 @@ Each network has a folder of its own in trackdown-data's `data/`:
 | `stations.json` | `stationsFileSchema` | Every station a player can guess: `code`, `name`, `province`, `lat`, `lon`. Codes are lower-case letters and digits and appear once. |
 | `puzzles.json` | `puzzlesFileSchema` | The daily schedule: `n`, `date` (`YYYY-MM-DD`), `station`. No number or date appears twice. |
 | `meta.json` | `metaFileSchema` | The feed, its service dates, the build parameters and when it was built. |
-| `to/<code>.json` | `tripsFileSchema` | The fastest trip to `<code>` from every other station, by origin code. Only the mystery stations, the ones a puzzle can be, have one: in `nl` all 395, in `gb` 455 of about 2,550. |
+| `to/<code>.json` | `tripsFileSchema` | The fastest trip to `<code>` from every other station, by origin code. Only the mystery stations, the ones a puzzle can be, have one: in `nl` all 395, in `gb` 455 of about 2,550, in `be` all 539. |
 
 `gb` also has `operators.json` (the operator codes' names) and `LICENSE.md`: its data is CC BY-SA 4.0, built from Network Rail's timetable, and the licence stays with the files. The site reads neither; the attribution is on the About page ([about-privacy-terms.md](about-privacy-terms.md)).
 
@@ -19,6 +19,9 @@ Each network has a folder of its own in trackdown-data's `data/`:
 | --- | --- | --- | --- |
 | `nl` | 395 | NS codes (`ut`, `amf`) | the province, in Dutch |
 | `gb` | 2,549 | CRS codes, lower case (`kgx`, `edb`) | the ITL1 region (London, Scotland, Wales…), in English |
+| `be` | 539 | 7-digit UIC codes (`8814001`) | the province (the Brussels-Capital Region counts as one), in its own language: Antwerpen, Hainaut, Bruxelles / Brussel |
+
+`be`'s station names follow the province's language too: Dutch in Flanders (Antwerpen-Centraal), French in Wallonia (Liège-Guillemins), both in Brussels (Bruxelles-Midi / Brussel-Zuid). Its timetable is NMBS/SNCB's, re-used under SNCB's licence for the re-use of timetable data, a contract signed with SNCB. It allows derived data such as these trips, but not passing on the raw timetable.
 
 A trip is stored as `[string, minutes]` entries that alternate between a ride and a change, starting and ending with a ride: `[["IC", 116], ["ut", 10], ["IC", 13]]`. `tripSchema` parses it into `TripStep`s, so code reading a trip never counts entries:
 
@@ -30,13 +33,13 @@ A trip is stored as `[string, minutes]` entries that alternate between a ride an
 ];
 ```
 
-A ride's label (`trainTypeSchema`) is the train type in `nl` (`IC`, `ICD`, `SPR`, `ST`, `SNT`, `ICE`, `EC`) and the train operator's two-letter code in `gb` (`GW`, `SR`, `XC`…, named in trackdown-data's `gb/operators.json`). The two lists do not overlap, so one enum holds both; a new label in the data fails the check until it is added there. A change's station may be one outside the network's `stations.json` (Aachen, Antwerpen, Luxembourg), so it is only checked to be a code; the guess list calls it a station abroad ([guess-list.md](guess-list.md#changes-abroad)).
+A ride's label (`trainTypeSchema`) is the train type in `nl` (`IC`, `ICD`, `SPR`, `ST`, `SNT`, `ICE`, `EC`) and `be` (`IC`, `L`, `S`, `P`, `EC`), and the train operator's two-letter code in `gb` (`GW`, `SR`, `XC`…, named in trackdown-data's `gb/operators.json`). The lists only share `IC` and `EC`, which mean the same in both countries, so one enum holds them all; a new label in the data fails the check until it is added there. A change's station may be one outside the network's `stations.json` (Aachen, Antwerpen, Luxembourg), so it is only checked to be a code; the guess list calls it a station abroad ([guess-list.md](guess-list.md#changes-abroad)).
 
 The schemas hold no data, so `data-schema.ts` may be imported anywhere, the browser included.
 
 ## Networks
 
-`src/lib/data/networks.ts` lists the networks: `networkIdSchema` (a zod enum: `nl`, `gb`) and `networks`, which gives each its folder in `data/` and its country (`region`, which names it). Adding a network adds its id to the enum and its entry to `networks`; TypeScript refuses the one without the other. The same file holds `defaultNetwork` and `upcomingNetworks`, the countries the network picker lists as coming later; a new network leaves that list ([network-picker.md](network-picker.md#adding-a-network)).
+`src/lib/data/networks.ts` lists the networks: `networkIdSchema` (a zod enum: `nl`, `gb`, `be`) and `networks`, which gives each its folder in `data/` and its country (`region`, which names it). Adding a network adds its id to the enum and its entry to `networks`; TypeScript refuses the one without the other. The same file holds `defaultNetwork` and `upcomingNetworks`, the countries the network picker lists as coming later; a new network leaves that list ([network-picker.md](network-picker.md#adding-a-network)).
 
 ## The loader
 
@@ -58,7 +61,7 @@ const trips = await gameData.tripsTo("nl", puzzle.station);
 
 ## The fixture
 
-`fixtures/trackdown-data/nl/` is a made-up network of five stations (Alfastad Centraal, Bravodorp, Charlieveen, Deltahaven, Echoburg) in the real files' format, with a trips file for every station. `fixtures/trackdown-data/gb/` is a made-up network of four (Foxtrot Abbey, Golf Lane, Hotel Junction, India Road) where only two have a trips file, as in the real `gb`, and rides are labelled by operator. Every network in `networkIdSchema` needs a fixture folder: a unit test runs `checkNetwork` on each. They hold no real data, so it is committed. The unit tests (`src/lib/data/*.test.ts`) run on it only, never on the real data, so CI needs no access to trackdown-data. A test that needs a broken file builds it in the test, over a `DataReader` of its own.
+`fixtures/trackdown-data/nl/` is a made-up network of five stations (Alfastad Centraal, Bravodorp, Charlieveen, Deltahaven, Echoburg) in the real files' format, with a trips file for every station. `fixtures/trackdown-data/gb/` is a made-up network of four (Foxtrot Abbey, Golf Lane, Hotel Junction, India Road) where only two have a trips file, as in the real `gb`, and rides are labelled by operator. `fixtures/trackdown-data/be/` is a made-up network of four (Juliet-Centraal, Kilo, Lima-Midi / Lima-Zuid, Mike) with UIC-style codes and a trips file for every station; one trip changes at `8299999`, a station abroad that is not in its `stations.json`. Every network in `networkIdSchema` needs a fixture folder: a unit test runs `checkNetwork` on each. They hold no real data, so it is committed. The unit tests (`src/lib/data/*.test.ts`) run on it only, never on the real data, so CI needs no access to trackdown-data. A test that needs a broken file builds it in the test, over a `DataReader` of its own.
 
 Pointing `TRACKDOWN_DATA_DIR` at `fixtures/trackdown-data` builds or runs the site with the fixture. The browser checks play it, with their clocks moved onto 20 June 2026, its middle puzzle (`e2e/clock.ts`); keep a puzzle on the day before and after it ([accessibility.md](accessibility.md#the-clock)).
 

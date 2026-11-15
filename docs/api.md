@@ -132,7 +132,7 @@ GET /api/v1/nl/stations?locale=en
 
 - **The stations** are the network's `stations.json`, in its order (by name), and nothing else. A station that only appears as a change in a trip (Aachen, Antwerpen) is not guessable and not in it.
 - **No trip data, no coordinates**: the service builds each station field by field, and `stationsOutputSchema` and its stations are strict, so its test fails on any field they do not name.
-- **The province** is named in `locale`. `nl`'s `stations.json` names it in Dutch and `gb`'s, an ITL1 region, in English; `provinceName` (`src/lib/game/province-names.ts`) gives the other language's name where it differs (Noord-Holland is North Holland, Fryslân is Friesland, Scotland is Schotland, London is Londen). A province without an entry keeps its data name, so a new one shows in Dutch until it is added there.
+- **The province** is named in `locale`. `nl`'s `stations.json` names it in Dutch, `gb`'s, an ITL1 region, in English, and `be`'s in the province's own language (Dutch, French, or both for Brussels); `provinceName` (`src/lib/game/province-names.ts`) gives the locale's name where it differs (Noord-Holland is North Holland, Fryslân is Friesland, Scotland is Schotland, London is Londen, Hainaut is Henegouwen, Oost-Vlaanderen is East Flanders, Bruxelles / Brussel is Brussel or Brussels). A province without an entry keeps its data name, so a new one shows in Dutch until it is added there.
 - **Cached for long** ([Caching](#caching)): the answer only changes with a deploy. `stationsQueryOptions` keeps it fresh for as long as the page is open.
 
 ## The OpenAPI document

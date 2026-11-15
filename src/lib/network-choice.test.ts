@@ -23,7 +23,7 @@ describe("parseNetworkCookie", () => {
     });
 
     it("ignores a network the game does not have", () => {
-        expect(parseNetworkCookie(`${networkCookieName}=be`)).toBeUndefined();
+        expect(parseNetworkCookie(`${networkCookieName}=de`)).toBeUndefined();
         expect(parseNetworkCookie(`${networkCookieName}=`)).toBeUndefined();
     });
 });

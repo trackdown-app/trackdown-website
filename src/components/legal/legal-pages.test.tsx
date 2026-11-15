@@ -83,4 +83,17 @@ describe("AboutPage", () => {
             'href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"',
         );
     });
+
+    it("credits Belgium's data to NMBS/SNCB's licence and geoBoundaries under the ODbL", async () => {
+        const html = await renderAt(AboutPage, "/over");
+
+        expect(html).toContain(
+            "GTFS-data van NMBS/SNCB, hergebruikt onder de licentie van de NMBS",
+        );
+        expect(html).toContain("geoBoundaries, uit open data van Statbel");
+        expect(html).toContain(
+            'href="https://opendatacommons.org/licenses/odbl/1-0/"',
+        );
+        expect(html).toContain("NS, NMBS/SNCB, Network Rail");
+    });
 });

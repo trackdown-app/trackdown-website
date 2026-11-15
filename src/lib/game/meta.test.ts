@@ -40,6 +40,6 @@ describe("metaInputSchema", () => {
     });
 
     it("refuses a network the game has no data for", () => {
-        expect(metaInputSchema.safeParse({ network: "be" }).success).toBe(false);
+        expect(metaInputSchema.safeParse({ network: "de" }).success).toBe(false);
     });
 });

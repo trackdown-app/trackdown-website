@@ -307,7 +307,7 @@ describe("the site's router", () => {
         ).toBe("/nl");
     });
 
-    it.each(["/be", "/be/archief", "/be/archief/1", "/NL"])(
+    it.each(["/de", "/de/archief", "/de/archief/1", "/NL"])(
         "answers %s, a network the game has no data for, with 404",
         async (pathname) => {
             const { status, html } = await respondAt(getRouter, pathname);

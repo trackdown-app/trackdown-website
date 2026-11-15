@@ -64,6 +64,7 @@ describe("NetworkPicker", () => {
         expect(links.map((each) => each.getAttribute("href"))).toEqual([
             "/en/nl",
             "/en/gb",
+            "/en/be",
         ]);
         const [link] = links;
         if (link == null) {
@@ -78,7 +79,6 @@ describe("NetworkPicker", () => {
                 .getAllByRole("listitem")
                 .map((row) => row.textContent),
         ).toEqual([
-            "BEBelgiumComing later",
             "DEGermanyComing later",
             "CHSwitzerlandComing later",
             "JPJapanComing later",

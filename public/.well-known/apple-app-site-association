@@ -6,6 +6,8 @@
                 "components": [
                     { "/": "/nl" },
                     { "/": "/gb" },
+                    { "/": "/en/be", "exclude": true },
+                    { "/": "/en/be/*", "exclude": true },
                     { "/": "/en/*" },
                     { "/": "/nl/archief" },
                     { "/": "/nl/archief/*" },
