@@ -19,20 +19,25 @@ describe("sitemapPaths", () => {
 describe("sitemapXml", () => {
     const xml = sitemapXml();
 
-    it("lists every page in both languages", () => {
+    it("lists every page in every language", () => {
         for (const url of [
             "https://trackdown.nl/nl",
             "https://trackdown.nl/en/nl",
+            "https://trackdown.nl/de/nl",
+            "https://trackdown.nl/fr/nl",
             "https://trackdown.nl/nl/archief",
             "https://trackdown.nl/en/nl/archief",
             "https://trackdown.nl/gb",
             "https://trackdown.nl/en/gb/archief",
+            "https://trackdown.nl/de/gb/archief",
             "https://trackdown.nl/hoe-te-spelen",
             "https://trackdown.nl/en/hoe-te-spelen",
+            "https://trackdown.nl/fr/hoe-te-spelen",
         ]) {
             expect(xml).toContain(`<loc>${url}</loc>`);
         }
-        expect(xml.match(/<url>/g)).toHaveLength(16);
+        // Eight pages, four languages each.
+        expect(xml.match(/<url>/g)).toHaveLength(32);
     });
 
     it("names each page's language versions, as its head does", () => {

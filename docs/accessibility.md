@@ -4,7 +4,7 @@ The game works with a keyboard and a screen reader and loads fast on a phone ([i
 
 ## The budgets
 
-- No axe violation of any impact (WCAG 2.2 A and AA rules) on the checked pages, in Dutch and English, in the light and the dark theme, on a phone and on a desktop. The cookie banner is up on every one of them, as on a first visit.
+- No axe violation of any impact (WCAG 2.2 A and AA rules) on the checked pages, in Dutch, English, German and French, in the light and the dark theme, on a phone and on a desktop. The cookie banner is up on every one of them, as on a first visit.
 - Today's puzzle can be played to the end with the keyboard alone.
 - Lighthouse on the game page (`/nl` and `/en/nl`), as a mid-range phone on slow 4G, median of three runs:
 
@@ -26,7 +26,7 @@ The byte budgets sit about a tenth above what the page downloads today, so a new
 
 ## The pages
 
-`e2e/pages.ts` names the pages axe checks, each at its Dutch path and under `/en`:
+`e2e/pages.ts` names the pages axe checks, each at its Dutch path and under `/en`, `/de` and `/fr` (`pageLocales`):
 
 - the game, `/nl`, while playing, and the same page once solved (`GameOver`, [game.md](game.md#solved-and-missed));
 - How to play, `/hoe-te-spelen`;
@@ -84,7 +84,7 @@ Lighthouse cannot move the browser's clock. On its runs the countdown has alread
 
 `bun run test:browser`: Playwright (`playwright.config.ts`) starts the shifted server on port 3100 and runs every spec twice, as a phone (Pixel 7, with touch) and as a desktop, with reduced motion. Locally a server already on port 3100 is reused, so stop it after a new build. The server gets no PostHog token, so its telemetry stays on the console ([logging.md](logging.md)); the browser's requests to PostHog's proxy (`t.trackdown.nl`) are blocked, so a check never counts as a visit. `openPage` waits until the network is idle, so the page has hydrated before a key is pressed, and until the cookie banner shows.
 
-- `e2e/accessibility.spec.ts` runs axe's WCAG 2.2 A and AA rules on every page in `e2e/pages.ts` in both languages, on the not-found page, and on the game once it is solved (a wrong guess, then the answer, both with the keyboard), each in the light and the dark theme. It fails on any violation.
+- `e2e/accessibility.spec.ts` runs axe's WCAG 2.2 A and AA rules on every page in `e2e/pages.ts` in every language (`pageLocales`), on the not-found page, and on the game once it is solved (a wrong guess, then the answer, both with the keyboard), each in the light and the dark theme. It fails on any violation.
 - `e2e/keyboard.spec.ts` plays today's puzzle with the keyboard alone: the first Tab reaches the skip link, which shows the focus ring, Enter follows it, the next Tab reaches the station search, a wrong guess lands in the guess list with focus still in the search, and the winning guess moves focus to the answer's heading. It also checks the skip link's Dutch name.
 
 ### Lighthouse

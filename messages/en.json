@@ -190,7 +190,9 @@
     "language": {
         "label": "Language",
         "nl": "Dutch",
-        "en": "English"
+        "en": "English",
+        "de": "German",
+        "fr": "French"
     },
     "header": {
         "skipToContent": "Skip to content",

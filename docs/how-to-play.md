@@ -1,6 +1,6 @@
 # How to play
 
-The rules page, at `/hoe-te-spelen` (`/en/hoe-te-spelen` in English). `src/routes/hoe-te-spelen.tsx` declares it; `HowToPlayPage` (`src/components/how-to-play/how-to-play-page.tsx`) draws it. The header's How to play link points at it on every page ([site-shell.md](site-shell.md#header)).
+The rules page, at `/hoe-te-spelen` (`/en/hoe-te-spelen`, `/de/hoe-te-spelen`, `/fr/hoe-te-spelen` in English, German, French). `src/routes/hoe-te-spelen.tsx` declares it; `HowToPlayPage` (`src/components/how-to-play/how-to-play-page.tsx`) draws it. The header's How to play link points at it on every page ([site-shell.md](site-shell.md#header)).
 
 The design draws How to play only for the iPhone, as a sheet over the game (the Trackdown design canvas's iOS · How to play board). The web page has the same content in the site's page layout instead: the shell's column, the playing board's condensed title, then:
 

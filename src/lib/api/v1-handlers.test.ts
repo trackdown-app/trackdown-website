@@ -503,7 +503,7 @@ describe("GET /api/v1/{network}/stations", () => {
     it("answers 400 invalid_input, never kept, for a locale the site does not have", async () => {
         const response = await call(
             stationsHandlers.GET,
-            `${path}?locale=de`,
+            `${path}?locale=es`,
             "GET",
             { network: "nl" },
         );

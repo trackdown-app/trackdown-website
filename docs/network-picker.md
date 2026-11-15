@@ -4,7 +4,7 @@ Trackdown is built for more rail networks than the Netherlands. Each network has
 
 ## Routes
 
-Every page of a network sits under its id, in both languages ([i18n.md](i18n.md#locale-routing)):
+Every page of a network sits under its id, in every language ([i18n.md](i18n.md#locale-routing)):
 
 | Path | Route | Page |
 | --- | --- | --- |
@@ -18,7 +18,7 @@ Every page of a network sits under its id, in both languages ([i18n.md](i18n.md#
 
 The API already carries the network in its paths, `/api/v1/{network}/…` ([api.md](api.md)).
 
-Paraglide's default URL patterns read a leading `/nl` as the Dutch locale's prefix and strip it, which would take the Dutch network's pages. `paraglide.config.ts` therefore lists the patterns itself: only `/en` is a locale prefix ([i18n.md](i18n.md#locale-routing)).
+Paraglide's default URL patterns read a leading `/nl` as the Dutch locale's prefix and strip it, which would take the Dutch network's pages. `paraglide.config.ts` therefore lists the patterns itself: only `/en`, `/de` and `/fr` are locale prefixes ([i18n.md](i18n.md#locale-routing)).
 
 ## Keeping the choice
 
@@ -42,7 +42,7 @@ A network's name is its country's, from the runtime's own region names (`regionN
 ## Adding a network
 
 1. Its data folder in trackdown-data ([data.md](data.md#files)).
-2. Its entry in `src/lib/data/networks.ts`: its id in `networkIdSchema`, its `networks` entry (`dataDir`, `region`), and its region out of `upcomingNetworks`.
+2. Its entry in `src/lib/data/networks.ts`: its id in `networkIdSchema`, its `networks` entry (`dataDir`, `region`), and its region out of `upcomingNetworks`. The id may not be a locale prefix (`en`, `de`, `fr`): `/de` is the German home, so Germany's network needs another id, such as `db`. `src/lib/data/networks.test.ts` fails on a clash ([i18n.md](i18n.md#locale-routing)).
 
 Nothing else: the routes, the picker, the API and the kept games all go by the registry.
 

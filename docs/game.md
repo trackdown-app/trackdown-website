@@ -1,6 +1,6 @@
 # The game page
 
-A network's game, `/{network}` (`/en/{network}` in English, `/nl` for the Dutch network), is today's puzzle on that network, after the design's Web · Playing board. `/` sends a visitor to the game of the network they chose ([network-picker.md](network-picker.md)). `src/routes/$network/index.tsx` loads it; `GamePage` (`src/components/game/game-page.tsx`) draws it. The archive plays an earlier puzzle with the same `GamePage`, given `archive` ([archive.md](archive.md#playing-an-earlier-puzzle)).
+A network's game, `/{network}` (`/en/{network}`, `/de/{network}`, `/fr/{network}` in English, German, French; `/nl` for the Dutch network), is today's puzzle on that network, after the design's Web · Playing board. `/` sends a visitor to the game of the network they chose ([network-picker.md](network-picker.md)). `src/routes/$network/index.tsx` loads it; `GamePage` (`src/components/game/game-page.tsx`) draws it. The archive plays an earlier puzzle with the same `GamePage`, given `archive` ([archive.md](archive.md#playing-an-earlier-puzzle)).
 
 ## The route
 

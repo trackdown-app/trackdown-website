@@ -1,6 +1,6 @@
 # About, privacy and terms
 
-Three text pages, implementing [issue #45](https://github.com/trackdown-app/trackdown-website/issues/45). The footer links all three on every page, in both languages ([site-shell.md](site-shell.md#footer)).
+Three text pages, implementing [issue #45](https://github.com/trackdown-app/trackdown-website/issues/45). The footer links all three on every page, in every language ([site-shell.md](site-shell.md#footer)).
 
 | Page | Route | Component | Messages |
 | --- | --- | --- | --- |
@@ -35,7 +35,7 @@ The policy must say what the site does. It describes:
 
 Retention in the copy: analytics data 12 months (PostHog's free plan keeps events a year), server logs and traces in PostHog 14 days (the Logs default), Vercel's runtime logs about an hour (the Hobby plan). Change the copy when a plan or setting changes.
 
-A change to what the site stores or sends changes this page and its "Last updated" date (`privacy.updated`) in the same change. If the change needs new consent, raise `CONSENT_TEXT_VERSION` ([analytics.md](analytics.md#consent-cookie)).
+A change to what the site stores or sends changes this page and its "Last updated" date (`privacy.updated`) in the same change, in all four message files (Dutch, English, German, French), so no language's policy lags behind. If the change needs new consent, raise `CONSENT_TEXT_VERSION` ([analytics.md](analytics.md#consent-cookie)).
 
 The policy also discloses iOS App Attest security records in Upstash Redis:
 installation public key, key ID and replay counter for the registration lifetime,
