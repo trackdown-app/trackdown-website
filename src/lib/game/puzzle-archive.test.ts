@@ -64,6 +64,23 @@ describe("getPuzzleArchive", () => {
         ]);
     });
 
+    it("starts a network added later at its own first puzzle, numbered as every network's", async () => {
+        // The fixture's `ret`, like the real one, starts a day after the
+        // other networks, at puzzle 2.
+        const archive = await getPuzzleArchive(
+            { network: "ret" },
+            at("2026-06-20T12:00:00.000Z"),
+        );
+
+        expect(archive).toEqual({
+            network: "ret",
+            puzzles: [
+                { number: 2, date: "2026-06-19" },
+                { number: 3, date: "2026-06-20" },
+            ],
+        });
+    });
+
     it("lists nothing before puzzle 1", async () => {
         const archive = await getPuzzleArchive(
             { network: "nl" },
