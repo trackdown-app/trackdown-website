@@ -28,7 +28,11 @@ const exampleStations = [{ code: "mt", name: "Maastricht" }];
 export function ExampleTrip() {
     return (
         <figure className="flex flex-col gap-4 rounded-3xl bg-surface p-5 sm:p-6">
-            <GuessList guesses={[exampleGuess]} stations={exampleStations} />
+            <GuessList
+                network="nl"
+                guesses={[exampleGuess]}
+                stations={exampleStations}
+            />
             <figcaption className="max-w-[36em] text-[15px] leading-[1.4] text-muted-foreground">
                 {m["howToPlay.exampleCaption"]()}
             </figcaption>

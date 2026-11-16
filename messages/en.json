@@ -71,9 +71,9 @@
         "revealedNote": "Newest first. Every change is revealed now.",
         "spokenGuess": "Guess {number}, {station}: {duration} to the mystery station. {steps}.",
         "spokenFound": "Guess {number}, {station}: the mystery station.",
-        "grid30": "30 min",
+        "gridMinutes": "{minutes} min",
         "gridHours": "{hours} h",
-        "gridHoursHalf": "{hours} h 30"
+        "gridHoursMinutes": "{hours} h {minutes}"
     },
     "trip": {
         "minutes": "{minutes}m",

@@ -72,7 +72,7 @@ function rows(): HTMLElement[] {
 describe("GuessList", () => {
     it("lists the guesses newest first, each read as one sentence", () => {
         overwriteGetLocale(() => "en");
-        render(<GuessList guesses={guesses} stations={stations} />);
+        render(<GuessList network="nl" guesses={guesses} stations={stations} />);
 
         const texts = rows().map(
             (row) => row.querySelector(".sr-only")?.textContent,
@@ -87,7 +87,7 @@ describe("GuessList", () => {
 
     it("hides the drawing from a screen reader", () => {
         overwriteGetLocale(() => "en");
-        render(<GuessList guesses={guesses} stations={stations} />);
+        render(<GuessList network="nl" guesses={guesses} stations={stations} />);
 
         for (const row of rows()) {
             const [text, track, ...rest] = [...row.children].filter(
@@ -121,7 +121,7 @@ describe("GuessList", () => {
     it("opens a trip's details in the row on a touch screen", () => {
         overwriteGetLocale(() => "en");
         stubHover(false);
-        render(<GuessList guesses={guesses} stations={stations} />);
+        render(<GuessList network="nl" guesses={guesses} stations={stations} />);
 
         const button = screen.getByRole("button", {
             name: "Trip from Den Helder, ride by ride",
@@ -152,7 +152,7 @@ describe("GuessList", () => {
     it("opens a trip's details in a popover with a mouse, in Dutch", async () => {
         overwriteGetLocale(() => "nl");
         stubHover(true);
-        render(<GuessList guesses={guesses} stations={stations} />);
+        render(<GuessList network="nl" guesses={guesses} stations={stations} />);
 
         fireEvent.click(
             screen.getByRole("button", {
@@ -168,7 +168,7 @@ describe("GuessList", () => {
 
     it("shows the summary, the ride labels that fit and a ? for an unknown change", () => {
         overwriteGetLocale(() => "en");
-        render(<GuessList guesses={guesses} stations={stations} />);
+        render(<GuessList network="nl" guesses={guesses} stations={stations} />);
 
         const [maastricht, denHelder] = rows();
         expect(maastricht?.textContent).toContain(
@@ -184,7 +184,7 @@ describe("GuessList", () => {
     it("labels the time grid and the mystery station", () => {
         overwriteGetLocale(() => "en");
         const { container } = render(
-            <GuessList guesses={guesses} stations={stations} />,
+            <GuessList network="nl" guesses={guesses} stations={stations} />,
         );
 
         expect(container.textContent).toContain("Mystery station");
@@ -196,6 +196,7 @@ describe("GuessList", () => {
     it("widens the grid for a trip past 2h 30, on one scale for every row", () => {
         render(
             <GuessList
+                network="nl"
                 guesses={[
                     ...guesses,
                     {
@@ -220,8 +221,35 @@ describe("GuessList", () => {
         ]);
     });
 
+    it("draws an Underground board on a 1 h track with quarter-hour labels", () => {
+        overwriteGetLocale(() => "en");
+        render(
+            <GuessList
+                network="lu"
+                guesses={[
+                    {
+                        guess: "ean",
+                        correct: false,
+                        steps: [{ kind: "ride", train: "CEN", minutes: 38 }],
+                        totalMinutes: 38,
+                    },
+                ]}
+                stations={[{ code: "ean", name: "Ealing Broadway" }]}
+            />,
+        );
+
+        const labels = [
+            ...document.querySelectorAll("[aria-hidden] .absolute.top-2"),
+        ];
+        expect(labels.map((label) => label.textContent)).toEqual([
+            "15 min",
+            "30 min",
+            "45 min",
+        ]);
+    });
+
     it("speaks Dutch by default", () => {
-        render(<GuessList guesses={guesses} stations={stations} />);
+        render(<GuessList network="nl" guesses={guesses} stations={stations} />);
 
         expect(screen.getByRole("list", { name: "Je gokken" })).toBeDefined();
         expect(screen.getByText("Mysteriestation")).toBeDefined();
@@ -231,6 +259,7 @@ describe("GuessList", () => {
         overwriteGetLocale(() => "en");
         render(
             <GuessList
+                network="nl"
                 guesses={[
                     ...guesses,
                     { guess: "ut2", correct: true, steps: [], totalMinutes: 0 },
@@ -252,7 +281,12 @@ describe("GuessList", () => {
     it("plays the arrival on the entering guess's row only, with its timings", () => {
         overwriteGetLocale(() => "en");
         render(
-            <GuessList guesses={guesses} stations={stations} enteringGuess="mt" />,
+            <GuessList
+                network="nl"
+                guesses={guesses}
+                stations={stations}
+                enteringGuess="mt"
+            />,
         );
 
         const [maastricht, ...older] = rows();
@@ -270,6 +304,7 @@ describe("GuessList", () => {
         overwriteGetLocale(() => "en");
         const { container } = render(
             <GuessList
+                network="nl"
                 guesses={[
                     ...guesses,
                     { guess: "amf", correct: true, steps: [], totalMinutes: 0 },
@@ -301,13 +336,22 @@ describe("GuessList", () => {
     });
 
     it("speaks Dutch in a revealed list", () => {
-        render(<GuessList guesses={guesses} stations={stations} revealed />);
+        render(
+            <GuessList
+                network="nl"
+                guesses={guesses}
+                stations={stations}
+                revealed
+            />,
+        );
 
         expect(screen.getByRole("heading", { name: "Zo kwam je er" })).toBeDefined();
     });
 
     it("renders nothing before the first guess", () => {
-        const { container } = render(<GuessList guesses={[]} stations={stations} />);
+        const { container } = render(
+            <GuessList network="nl" guesses={[]} stations={stations} />,
+        );
 
         expect(container.innerHTML).toBe("");
     });

@@ -71,9 +71,9 @@
         "revealedNote": "Nieuwste eerst. Elke overstap is nu onthuld.",
         "spokenGuess": "Gok {number}, {station}: {duration} naar het mysteriestation. {steps}.",
         "spokenFound": "Gok {number}, {station}: het mysteriestation.",
-        "grid30": "30 min",
+        "gridMinutes": "{minutes} min",
         "gridHours": "{hours} u",
-        "gridHoursHalf": "{hours} u 30"
+        "gridHoursMinutes": "{hours} u {minutes}"
     },
     "trip": {
         "minutes": "{minutes}m",

@@ -1,4 +1,5 @@
 import type { TrainType } from "@/lib/data/data-schema";
+import type { NetworkId } from "@/lib/data/networks";
 import type { GuessOutput } from "@/lib/game/schemas";
 
 // How a guess's trip is drawn as a line (docs/guess-list.md#the-trip-line):
@@ -15,30 +16,41 @@ export type ListedGuess = Pick<
     "guess" | "correct" | "steps" | "totalMinutes"
 >;
 
-/**
- * The fewest minutes the track spans: 2 h 30, five grid columns. A board
- * with a longer trip spans more (`boardMinutes`).
- */
-export const trackMinutes = 150;
+/** How a network's board measures time. */
+export type BoardScale = {
+    /** The fewest minutes the track spans. A board with a longer trip spans more (`boardMinutes`). */
+    trackMinutes: number;
+    /** The grid behind the line: the minutes of one column. */
+    gridMinutes: number;
+};
 
-/** The grid behind the line: one column per 30 minutes. */
-export const gridMinutes = 30;
+/**
+ * Each network's board (docs/guess-list.md#the-trip-line). Dutch and British trips
+ * run for hours: 2 h 30, five columns of 30 minutes. Underground trips are
+ * short, half of them under 40 minutes: 1 h, four columns of 15 minutes.
+ */
+export const boardScales: Record<NetworkId, BoardScale> = {
+    nl: { trackMinutes: 150, gridMinutes: 30 },
+    gb: { trackMinutes: 150, gridMinutes: 30 },
+    lu: { trackMinutes: 60, gridMinutes: 15 },
+};
 
 /** The shortest line, so a short trip's dot and a bit of line show beside the bar. */
 const minLinePx = 48;
 
-/** More columns than this, and only the whole hours are labelled, so labels never crowd at phone width. */
+/** More columns than this, and only every other rule is labelled, so labels never crowd at phone width. */
 const maxLabelledColumns = 6;
 
 /**
- * The grid's labelled rules on a track spanning `scaleMinutes`: every
- * half hour between the mystery bar and the track's far end, or only the
- * whole hours once the board has more than six columns. Each with its
- * minutes from the bar and its place, in percent of the track from the
- * right.
+ * The grid's labelled rules on a track spanning `scaleMinutes`, one column
+ * per `gridMinutes`: every rule between the mystery bar and the track's far
+ * end, or every other one once the board has more than six columns. Each
+ * with its minutes from the bar and its place, in percent of the track from
+ * the right.
  */
 export function gridMarks(
     scaleMinutes: number,
+    gridMinutes: number,
 ): { minutes: number; percent: number }[] {
     const columns = Math.round(scaleMinutes / gridMinutes);
     const step = columns > maxLabelledColumns ? 2 : 1;
@@ -53,12 +65,14 @@ export function gridMarks(
 }
 
 /**
- * The minutes the whole board's track spans: 2 h 30, or the longest trip
- * rounded up to the next half hour. Every row shares it, so the same
- * minutes take the same width on every row, however long the longest trip.
+ * The minutes the whole board's track spans: the network's `trackMinutes`
+ * (2 h 30 in the Netherlands), or the longest trip rounded up to the next
+ * grid column. Every row shares it, so the same minutes take the same width
+ * on every row, however long the longest trip.
  */
 export function boardMinutes(
     guesses: readonly Pick<ListedGuess, "totalMinutes">[],
+    { trackMinutes, gridMinutes }: BoardScale,
 ): number {
     const longest = guesses.reduce(
         (most, guess) => Math.max(most, guess.totalMinutes),
@@ -200,7 +214,7 @@ export function tripLineLayout(
     guess: Pick<ListedGuess, "steps" | "totalMinutes">,
     formatMinutes: (minutes: number) => string,
     trackPx: number = narrowTrackPx,
-    scaleMinutes: number = trackMinutes,
+    scaleMinutes: number = boardScales.nl.trackMinutes,
 ): TripLineLayout {
     // The line's width by its minutes, before the changes are kept apart.
     const scaledPercent = Math.min(

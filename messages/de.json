@@ -71,9 +71,9 @@
         "revealedNote": "Neueste zuerst. Jeder Umstieg ist jetzt aufgedeckt.",
         "spokenGuess": "Tipp {number}, {station}: {duration} bis zum Rätselbahnhof. {steps}.",
         "spokenFound": "Tipp {number}, {station}: der Rätselbahnhof.",
-        "grid30": "30 min",
+        "gridMinutes": "{minutes} min",
         "gridHours": "{hours} h",
-        "gridHoursHalf": "{hours} h 30"
+        "gridHoursMinutes": "{hours} h {minutes}"
     },
     "trip": {
         "minutes": "{minutes} min",

@@ -44,7 +44,9 @@ A network's name is its country's, from the runtime's own region names (`regionN
 1. Its data folder in trackdown-data ([data.md](data.md#files)).
 2. Its entry in `src/lib/data/networks.ts`: its id in `networkIdSchema`, its `networks` entry (`dataDir`, `code`, `region`), and its region out of `upcomingNetworks`. A network that is not a whole country takes `region: null` and its name in `ownNames` (`src/lib/game/network-name.ts`) and the `networks` messages; `src/lib/game/network-name.test.ts` fails on one left without a name. The id may not be a locale prefix (`en`, `de`, `fr`): `/de` is the German home, so Germany's network needs another id, such as `db`. `src/lib/data/networks.test.ts` fails on a clash ([i18n.md](i18n.md#locale-routing)).
 
-3. Any ride labels its trips use in `trainTypeSchema` and the `trains` messages, the attribution its licence asks for on the About page, and its paths in the iOS app's `apple-app-site-association` once the app plays it ([seo.md](seo.md#ios-universal-links)).
+3. Its board scale in `boardScales` (`src/lib/game/trip-line.ts`): the fewest minutes the guess list's track spans and its grid column, sized to how long its trips run ([guess-list.md](guess-list.md#the-trip-line)). Typecheck fails on one left out.
+
+4. Any ride labels its trips use in `trainTypeSchema` and the `trains` messages, the attribution its licence asks for on the About page, and its paths in the iOS app's `apple-app-site-association` once the app plays it ([seo.md](seo.md#ios-universal-links)).
 
 Nothing else: the routes, the picker, the API and the kept games all go by the registry.
 

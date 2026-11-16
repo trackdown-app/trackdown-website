@@ -71,9 +71,9 @@
         "revealedNote": "Les plus récents d’abord. Chaque correspondance est maintenant révélée.",
         "spokenGuess": "Essai {number}, {station} : {duration} jusqu’à la gare mystère. {steps}.",
         "spokenFound": "Essai {number}, {station} : la gare mystère.",
-        "grid30": "30 min",
+        "gridMinutes": "{minutes} min",
         "gridHours": "{hours} h",
-        "gridHoursHalf": "{hours} h 30"
+        "gridHoursMinutes": "{hours} h {minutes}"
     },
     "trip": {
         "minutes": "{minutes} min",
