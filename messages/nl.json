@@ -138,7 +138,21 @@
         "TP": "TransPennine Express",
         "VT": "Avanti West Coast",
         "XC": "CrossCountry",
-        "XR": "Elizabeth line"
+        "XR": "Elizabeth line",
+        "BAK": "Bakerloo line",
+        "CEN": "Central line",
+        "CIR": "Circle line",
+        "DIS": "District line",
+        "HAM": "Hammersmith & City line",
+        "JUB": "Jubilee line",
+        "MET": "Metropolitan line",
+        "NTN": "Northern line",
+        "PIC": "Piccadilly line",
+        "VIC": "Victoria line",
+        "WAC": "Waterloo & City line"
+    },
+    "networks": {
+        "lu": "Londense metro"
     },
     "share": {
         "header": "Trackdown {network} {number}, {score}/{total}",
@@ -242,8 +256,13 @@
         "dataGbTimetable": "Dienstregeling: Network Rail SCHEDULE-data, Network Rail Infrastructure Ltd,",
         "dataGbStations": "Locaties van stations: NaPTAN, Department for Transport,",
         "dataGbRegions": "Regio's: ITL1-grenzen, Office for National Statistics, contains OS data © Crown copyright and database right,",
+        "dataLuIntro": "Londense metro: de data van dit netwerk is gemaakt uit",
+        "dataLuTimetable": "Dienstregeling: TfL Journey Planner-dienstregelingen, Transport for London,",
+        "dataLuStations": "Locaties van stations: NaPTAN, Department for Transport,",
+        "dataLuBoroughs": "Boroughs en districten: Local Authority District-grenzen, Office for National Statistics, contains OS data © Crown copyright and database right,",
+        "dataLuAttribution": "Powered by TfL Open Data. Contains OS data © Crown copyright and database rights 2016 and Geomni UK Map data © and database rights [2019].",
         "independentTitle": "Niet verbonden aan een spoorbedrijf",
-        "independentBody": "Trackdown is niet verbonden aan, of goedgekeurd door, NS, Network Rail of een ander spoorbedrijf. Namen van stations en vervoerders zijn van hun eigenaars en worden alleen gebruikt om het echte netwerk te beschrijven.",
+        "independentBody": "Trackdown is niet verbonden aan, of goedgekeurd door, NS, Network Rail, Transport for London of een ander spoorbedrijf. Namen van stations en vervoerders zijn van hun eigenaars en worden alleen gebruikt om het echte netwerk te beschrijven.",
         "contactTitle": "Contact"
     },
     "privacy": {
@@ -289,7 +308,7 @@
         "freeTitle": "Gratis, en zoals het is",
         "freeBody": "Trackdown wordt gratis aangeboden, zoals het is. Ik doe mijn best om elke dag een nieuwe puzzel klaar te hebben, maar ik kan niet beloven dat de site altijd online is, zonder fouten werkt of dat je reeks elke update overleeft. Ik kan het spel op elk moment veranderen, pauzeren of stoppen.",
         "plannerTitle": "Een spel, geen reisplanner",
-        "plannerData": "De routes en reistijden zijn gemaakt uit open data, OVapi GTFS-NL (NDOV, CC0 1.0) en PDOK Bestuurlijke Gebieden (Kadaster, CC BY 4.0) voor Nederland, en Network Rail SCHEDULE-data (CC BY-SA 4.0), NaPTAN en ONS ITL1-grenzen (beide Open Government Licence v3.0) voor Groot-Brittannië, en vereenvoudigd voor de puzzel. Ze kunnen verouderd of fout zijn. Plan dus geen echte reis met Trackdown; kijk in de reisplanner van je vervoerder.",
+        "plannerData": "De routes en reistijden zijn gemaakt uit open data, OVapi GTFS-NL (NDOV, CC0 1.0) en PDOK Bestuurlijke Gebieden (Kadaster, CC BY 4.0) voor Nederland, en Network Rail SCHEDULE-data (CC BY-SA 4.0), NaPTAN en ONS ITL1-grenzen (beide Open Government Licence v3.0) voor Groot-Brittannië, en TfL Journey Planner-dienstregelingen (TfL Transport Data Service-licentie, Powered by TfL Open Data), NaPTAN en ONS Local Authority District-grenzen (beide Open Government Licence v3.0) voor de Londense metro, en vereenvoudigd voor de puzzel. Ze kunnen verouderd of fout zijn. Plan dus geen echte reis met Trackdown; kijk in de reisplanner van je vervoerder.",
         "plannerIndependent": "Trackdown is niet verbonden aan, of goedgekeurd door, een spoorbedrijf. Namen van stations en vervoerders zijn van hun eigenaars en worden alleen gebruikt om het echte netwerk te beschrijven.",
         "fairTitle": "Speel eerlijk",
         "fairBody": "Deel je uitslagen en discussieer zoveel je wilt over het antwoord. Scrape de site niet, overspoel hem niet met verzoeken, probeer niet in te breken of het antwoord vooraf met trucs te achterhalen, en plaats het antwoord van vandaag niet automatisch. Als iemand dat doet, kan ik diegene blokkeren.",

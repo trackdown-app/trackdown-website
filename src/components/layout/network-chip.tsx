@@ -1,20 +1,20 @@
 import { cn } from "@/lib/utils";
-import type { RegionCode } from "@/lib/data/networks";
 
 type NetworkChipProps = {
-    region: RegionCode;
+    /** The network's code (`NL`, `LU`), or a country's for one to come. */
+    code: string;
     /** A network not playable yet: soft instead of ink. */
     upcoming?: boolean;
     className?: string;
 };
 
 /**
- * A network's country code in a pill, as the design draws it on the header's
+ * A network's code in a pill, as the design draws it on the header's
  * network pill and the picker's rows. The name beside it says the same, so
  * a screen reader skips the code.
  */
 export function NetworkChip({
-    region,
+    code,
     upcoming = false,
     className,
 }: NetworkChipProps) {
@@ -27,7 +27,7 @@ export function NetworkChip({
                 className,
             )}
         >
-            {region}
+            {code}
         </span>
     );
 }

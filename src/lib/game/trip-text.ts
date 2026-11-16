@@ -23,7 +23,8 @@ export function changeStationName(code: string, names: StationNames): string {
 }
 
 /**
- * Each ride label's message: a train type in `nl`, a train operator in `gb`.
+ * Each ride label's message: a train type in `nl`, a train operator in `gb`,
+ * an Underground line in `lu`.
  * A `Record`, so a label added to `trainTypeSchema` fails the typecheck
  * until it has a name.
  */
@@ -63,11 +64,22 @@ const trainNames: Record<TrainType, () => string> = {
     VT: m["trains.VT"],
     XC: m["trains.XC"],
     XR: m["trains.XR"],
+    BAK: m["trains.BAK"],
+    CEN: m["trains.CEN"],
+    CIR: m["trains.CIR"],
+    DIS: m["trains.DIS"],
+    HAM: m["trains.HAM"],
+    JUB: m["trains.JUB"],
+    MET: m["trains.MET"],
+    NTN: m["trains.NTN"],
+    PIC: m["trains.PIC"],
+    VIC: m["trains.VIC"],
+    WAC: m["trains.WAC"],
 };
 
 /**
  * A ride label in words, for a player who does not know the code: `SPR` is
- * "Sprinter", `GR` is "LNER".
+ * "Sprinter", `GR` is "LNER", `NTN` is "Northern line".
  */
 export function trainName(train: TrainType): string {
     return trainNames[train]();

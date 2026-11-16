@@ -100,7 +100,8 @@ export type Meta = z.infer<typeof metaFileSchema>;
 /**
  * What a ride is labelled with (trackdown-data README, "Trip format"): in
  * `nl` the train type, in `gb` the train operator's code, which `gb`'s
- * `operators.json` names. The two lists do not overlap.
+ * `operators.json` names, in `lu` the Underground line's code, which `lu`'s
+ * `lines.json` names. The lists do not overlap.
  */
 export const trainTypeSchema = z.enum([
     // nl: train types.
@@ -140,6 +141,18 @@ export const trainTypeSchema = z.enum([
     "VT",
     "XC",
     "XR",
+    // lu: Underground lines.
+    "BAK",
+    "CEN",
+    "CIR",
+    "DIS",
+    "HAM",
+    "JUB",
+    "MET",
+    "NTN",
+    "PIC",
+    "VIC",
+    "WAC",
 ]);
 
 export type TrainType = z.infer<typeof trainTypeSchema>;

@@ -6,7 +6,7 @@ import { z } from "@/lib/zod";
  * a network adds its id here and its entry to `networks`, and takes it out
  * of `upcomingNetworks`.
  */
-export const networkIdSchema = z.enum(["nl", "gb"]);
+export const networkIdSchema = z.enum(["nl", "gb", "lu"]);
 
 export type NetworkId = z.infer<typeof networkIdSchema>;
 
@@ -17,13 +17,24 @@ export type Network = {
     id: NetworkId;
     /** The network's folder inside the data directory. */
     dataDir: string;
-    /** The country it covers, which names it in every language (`regionName`). */
-    region: RegionCode;
+    /**
+     * The code on its chip, beside its name: its country's (`NL`), or, for a
+     * network that is not a whole country, one of its own (`LU`).
+     */
+    code: string;
+    /**
+     * The country it covers, which names it in every language (`regionName`),
+     * or `null` for a network inside a country, such as the London
+     * Underground, which has a name of its own (`networkName`,
+     * `src/lib/game/network-name.ts`).
+     */
+    region: RegionCode | null;
 };
 
 export const networks: Record<NetworkId, Network> = {
-    nl: { id: "nl", dataDir: "nl", region: "NL" },
-    gb: { id: "gb", dataDir: "gb", region: "GB" },
+    nl: { id: "nl", dataDir: "nl", code: "NL", region: "NL" },
+    gb: { id: "gb", dataDir: "gb", code: "GB", region: "GB" },
+    lu: { id: "lu", dataDir: "lu", code: "LU", region: null },
 };
 
 export const networkIds: ReadonlyArray<NetworkId> = networkIdSchema.options;

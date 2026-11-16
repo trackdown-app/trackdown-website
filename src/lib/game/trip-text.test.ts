@@ -58,6 +58,19 @@ describe("trainName", () => {
             ]);
         }
     });
+
+    it("names an Underground line, the same in every language", () => {
+        const codes: TrainType[] = ["NTN", "HAM", "WAC"];
+        const locales: ReturnType<typeof getLocale>[] = ["en", "nl", "de", "fr"];
+        for (const locale of locales) {
+            overwriteGetLocale(() => locale);
+            expect(codes.map((code) => trainName(code))).toEqual([
+                "Northern line",
+                "Hammersmith & City line",
+                "Waterloo & City line",
+            ]);
+        }
+    });
 });
 
 describe("formatMinutes", () => {

@@ -83,4 +83,20 @@ describe("AboutPage", () => {
             'href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"',
         );
     });
+
+    it("credits the London Underground's data with TfL's attribution statements", async () => {
+        const html = await renderAt(AboutPage, "/over");
+
+        expect(html).toContain("TfL Journey Planner-dienstregelingen");
+        expect(html).toContain(
+            'href="https://tfl.gov.uk/corporate/terms-and-conditions/transport-data-service"',
+        );
+        expect(html).toContain("Local Authority District-grenzen");
+        // TfL's licence asks for these word for word, whatever the language.
+        expect(html).toContain("Powered by TfL Open Data.");
+        expect(html).toContain(
+            "Contains OS data © Crown copyright and database rights 2016 and Geomni UK Map data © and database rights [2019].",
+        );
+        expect(html).toContain("NS, Network Rail, Transport for London");
+    });
 });

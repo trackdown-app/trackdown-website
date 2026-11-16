@@ -1,0 +1,23 @@
+[
+    {
+        "code": "jlc",
+        "name": "Juliett Cross",
+        "province": "Eastborough",
+        "lat": 51.52,
+        "lon": -0.08
+    },
+    {
+        "code": "klp",
+        "name": "Kilo Park",
+        "province": "Westborough",
+        "lat": 51.51,
+        "lon": -0.2
+    },
+    {
+        "code": "lms",
+        "name": "Lima Street",
+        "province": "Eastborough",
+        "lat": 51.56,
+        "lon": -0.1
+    }
+]

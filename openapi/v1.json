@@ -118,7 +118,8 @@
               "type": "string",
               "enum": [
                 "nl",
-                "gb"
+                "gb",
+                "lu"
               ]
             }
           }
@@ -788,7 +789,8 @@
         "type": "string",
         "enum": [
           "nl",
-          "gb"
+          "gb",
+          "lu"
         ]
       },
       "PuzzleArchive": {
@@ -1037,7 +1039,18 @@
           "TP",
           "VT",
           "XC",
-          "XR"
+          "XR",
+          "BAK",
+          "CEN",
+          "CIR",
+          "DIS",
+          "HAM",
+          "JUB",
+          "MET",
+          "NTN",
+          "PIC",
+          "VIC",
+          "WAC"
         ]
       }
     },
