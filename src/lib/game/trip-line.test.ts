@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
     boardMinutes,
+    boardScales,
     gridMarks,
     trainReachesMs,
     tripLineLayout,
@@ -62,7 +63,10 @@ describe("tripLineLayout", () => {
 
     it("keeps 29 minutes one width on a board stretched by a long trip", () => {
         // The case from the design review: Vlissingen, 3h 03m, on the board.
-        const scale = boardMinutes([{ totalMinutes: 183 }, { totalMinutes: 29 }]);
+        const scale = boardMinutes(
+            [{ totalMinutes: 183 }, { totalMinutes: 29 }],
+            boardScales.nl,
+        );
         function lastRide(layout: ReturnType<typeof tripLineLayout>): number {
             const part = layout.parts.at(-1);
             return part?.kind === "ride" ? part.startPercent - part.endPercent : 0;
@@ -336,25 +340,47 @@ describe("a new guess's run", () => {
 });
 
 describe("the board's scale", () => {
+    const { nl, lu } = boardScales;
+
     it("spans 2h 30, or the longest trip rounded up to the half hour", () => {
-        expect(boardMinutes([])).toBe(150);
-        expect(boardMinutes([{ totalMinutes: 145 }])).toBe(150);
-        expect(boardMinutes([{ totalMinutes: 29 }, { totalMinutes: 183 }])).toBe(
+        expect(boardMinutes([], nl)).toBe(150);
+        expect(boardMinutes([{ totalMinutes: 145 }], nl)).toBe(150);
+        expect(boardMinutes([{ totalMinutes: 29 }, { totalMinutes: 183 }], nl)).toBe(
             210,
         );
-        expect(boardMinutes([{ totalMinutes: 240 }])).toBe(240);
+        expect(boardMinutes([{ totalMinutes: 240 }], nl)).toBe(240);
+    });
+
+    it("spans 1 h on the Underground, or the longest trip rounded up to the quarter hour", () => {
+        expect(boardMinutes([], lu)).toBe(60);
+        expect(boardMinutes([{ totalMinutes: 38 }], lu)).toBe(60);
+        expect(boardMinutes([{ totalMinutes: 61 }], lu)).toBe(75);
+        expect(boardMinutes([{ totalMinutes: 123 }], lu)).toBe(135);
     });
 
     it("labels every half hour on five columns, only whole hours past six", () => {
-        expect(gridMarks(150)).toEqual([
+        expect(gridMarks(150, 30)).toEqual([
             { minutes: 30, percent: 20 },
             { minutes: 60, percent: 40 },
             { minutes: 90, percent: 60 },
             { minutes: 120, percent: 80 },
         ]);
-        expect(gridMarks(180).map((mark) => mark.minutes)).toEqual([
+        expect(gridMarks(180, 30).map((mark) => mark.minutes)).toEqual([
             30, 60, 90, 120, 150,
         ]);
-        expect(gridMarks(210).map((mark) => mark.minutes)).toEqual([60, 120, 180]);
+        expect(gridMarks(210, 30).map((mark) => mark.minutes)).toEqual([
+            60, 120, 180,
+        ]);
+    });
+
+    it("labels every quarter hour on the Underground, only half hours past six", () => {
+        expect(gridMarks(60, 15)).toEqual([
+            { minutes: 15, percent: 25 },
+            { minutes: 30, percent: 50 },
+            { minutes: 45, percent: 75 },
+        ]);
+        expect(gridMarks(135, 15).map((mark) => mark.minutes)).toEqual([
+            30, 60, 90, 120,
+        ]);
     });
 });

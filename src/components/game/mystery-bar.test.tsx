@@ -66,7 +66,12 @@ describe("MysteryBar placement", () => {
     it("centres a short end cap on a first-guess win", () => {
         mockLayout([{ top: 100, height: 80 }]);
         const { container } = render(
-            <GuessList guesses={[correctGuess]} stations={[]} revealed />,
+            <GuessList
+                network="nl"
+                guesses={[correctGuess]}
+                stations={[]}
+                revealed
+            />,
         );
 
         expect(bar(container).style.top).toBe("25px");
@@ -77,7 +82,7 @@ describe("MysteryBar placement", () => {
         const ends = [{ top: 220, height: 72 }];
         const resize = mockLayout(ends);
         const { container } = render(
-            <GuessList guesses={[wrongGuess]} stations={[]} />,
+            <GuessList network="nl" guesses={[wrongGuess]} stations={[]} />,
         );
 
         expect(bar(container).style.top).toBe("141px");
@@ -94,12 +99,18 @@ describe("MysteryBar placement", () => {
         const ends = [{ top: 100, height: 80 }];
         mockLayout(ends);
         const { container, rerender } = render(
-            <GuessList guesses={[correctGuess]} stations={[]} revealed />,
+            <GuessList
+                network="nl"
+                guesses={[correctGuess]}
+                stations={[]}
+                revealed
+            />,
         );
 
         ends.push({ top: 200, height: 72 });
         rerender(
             <GuessList
+                network="nl"
                 guesses={[wrongGuess, correctGuess]}
                 stations={[]}
                 revealed

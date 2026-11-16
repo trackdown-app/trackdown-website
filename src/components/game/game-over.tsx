@@ -132,6 +132,7 @@ export function GameOver({
             </section>
             {reveal.data != null && (
                 <GuessList
+                    network={puzzle.network}
                     guesses={reveal.data.guesses}
                     stations={stations}
                     enteringGuess={enteringGuess}

@@ -3,22 +3,26 @@ import type { ReactNode } from "react";
 import { m } from "@/paraglide/messages";
 import { GuessRow } from "@/components/game/guess-row";
 import { MysteryBar } from "@/components/game/mystery-bar";
+import type { NetworkId } from "@/lib/data/networks";
 import type { GuessableStation } from "@/lib/game/schemas";
-import { boardMinutes, gridMarks } from "@/lib/game/trip-line";
+import { boardMinutes, boardScales, gridMarks } from "@/lib/game/trip-line";
 import type { ListedGuess } from "@/lib/game/trip-line";
 
-/** A grid rule's label: "30 min", "1 h", "1 h 30", "2 h", … */
+/** A grid rule's label: "15 min", "30 min", "1 h", "1 h 15", "1 h 30", … */
 function gridLabel(minutes: number): string {
     const hours = Math.floor(minutes / 60);
+    const rest = minutes % 60;
     if (hours === 0) {
-        return m["guessList.grid30"]();
+        return m["guessList.gridMinutes"]({ minutes: rest });
     }
-    return minutes % 60 === 0
+    return rest === 0
         ? m["guessList.gridHours"]({ hours })
-        : m["guessList.gridHoursHalf"]({ hours });
+        : m["guessList.gridHoursMinutes"]({ hours, minutes: rest });
 }
 
 type GuessListProps = {
+    /** The network played, whose board scale the track and its grid use (`boardScales`). */
+    network: NetworkId;
     /** The guesses so far, oldest first, as the `guess` operation answered them. */
     guesses: readonly ListedGuess[];
     /** The network's stations, to name the guesses and the known changes. */
@@ -42,10 +46,11 @@ type GuessListProps = {
 /**
  * The guesses with their trip lines, from the design's Web · Playing board
  * (docs/guess-list.md): newest first, each line running from the guess to
- * the mystery bar at the right, over a 30-minute time grid. Renders nothing
- * before the first guess.
+ * the mystery bar at the right, over the network's time grid. Renders
+ * nothing before the first guess.
  */
 export function GuessList({
+    network,
     guesses,
     stations,
     progress,
@@ -66,7 +71,8 @@ export function GuessList({
         .map((guess, index) => ({ guess, number: index + 1 }))
         .reverse();
     // One scale for every row: the same minutes, the same width.
-    const scaleMinutes = boardMinutes(guesses);
+    const scale = boardScales[network];
+    const scaleMinutes = boardMinutes(guesses, scale);
 
     const header = revealed ? (
         <div className="flex flex-wrap items-baseline justify-between gap-4 pb-3">
@@ -102,6 +108,7 @@ export function GuessList({
                             number={number}
                             names={names}
                             scaleMinutes={scaleMinutes}
+                            gridMinutes={scale.gridMinutes}
                             entering={guess.guess === enteringGuess}
                             revealed={revealed}
                         />
@@ -117,7 +124,7 @@ export function GuessList({
                 <div aria-hidden="true" className="flex flex-wrap gap-x-4">
                     <div className="max-w-[240px] flex-[1_1_240px]" />
                     <div className="relative mr-3 h-7 min-w-0 flex-[999_1_320px]">
-                        {gridMarks(scaleMinutes).map((mark) => (
+                        {gridMarks(scaleMinutes, scale.gridMinutes).map((mark) => (
                             <span
                                 key={mark.minutes}
                                 className="absolute top-2 translate-x-1/2 text-[13px] text-muted-foreground transition-[right] duration-500 motion-reduce:transition-none"
