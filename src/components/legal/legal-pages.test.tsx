@@ -97,6 +97,13 @@ describe("AboutPage", () => {
         expect(html).toContain(
             "Contains OS data © Crown copyright and database rights 2016 and Geomni UK Map data © and database rights [2019].",
         );
-        expect(html).toContain("NS, Network Rail, Transport for London");
+        expect(html).toContain("NS, Network Rail, Transport for London, RET");
+    });
+
+    it("credits Rotterdam's metro and tram data", async () => {
+        const html = await renderAt(AboutPage, "/over");
+
+        expect(html).toContain("de metro&#x27;s en trams van RET");
+        expect(html).toContain("CBS Wijken en Buurten 2025");
     });
 });

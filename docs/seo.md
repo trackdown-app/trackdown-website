@@ -75,9 +75,10 @@ indexes and puzzle paths. Other Dutch pages remain web links. The English, Germa
 and French wildcards include their archive paths. The app's link parser
 (`PuzzleLink`) must strip each of these locale prefixes before it reads the
 network, so a locale added here needs the app to know it too. The London
-Underground (`/lu`, `/en/lu/*`, `/de/lu/*`, `/fr/lu/*`) stays a web link: the app
-does not know the `lu` network yet, so its prefixed paths are excluded before the
-wildcards. Add them when the app plays the London Underground.
+Underground (`/lu`, `/en/lu/*`, `/de/lu/*`, `/fr/lu/*`) and Rotterdam's metro and
+tram (`/ret`, `/en/ret/*`, `/de/ret/*`, `/fr/ret/*`) stay web links: the app does
+not know the `lu` and `ret` networks yet, so their prefixed paths are excluded
+before the wildcards. Add each when the app plays it.
 
 Nitro's exact route rule in `vite.config.ts` sets `Content-Type: application/json`
 for this extensionless static file on Node and Vercel. Static serving bypasses

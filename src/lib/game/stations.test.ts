@@ -98,6 +98,16 @@ describe("provinceName", () => {
         expect(provinceName("Wales", "fr")).toBe("Pays de Galles");
         expect(provinceName("West Midlands", "fr")).toBe("West Midlands");
     });
+
+    it("names Rotterdam's districts as they are, and The Hague in each language", () => {
+        expect(provinceName("Kralingen-Crooswijk", "en")).toBe(
+            "Kralingen-Crooswijk",
+        );
+        expect(provinceName("Den Haag", "nl")).toBe("Den Haag");
+        expect(provinceName("Den Haag", "en")).toBe("The Hague");
+        expect(provinceName("Den Haag", "de")).toBe("Den Haag");
+        expect(provinceName("Den Haag", "fr")).toBe("La Haye");
+    });
 });
 
 describe("stationsInputSchema", () => {

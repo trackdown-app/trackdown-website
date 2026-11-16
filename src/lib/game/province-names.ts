@@ -2,7 +2,8 @@ import type { Locale } from "@/paraglide/runtime";
 
 /**
  * A province's name per locale, keyed by its name in `stations.json`: Dutch
- * for `nl`'s provinces, English for `gb`'s ITL1 regions. Only the names that
+ * for `nl`'s provinces, English for `gb`'s ITL1 regions, Dutch for `ret`'s
+ * districts and municipalities (Den Haag is The Hague). Only the names that
  * differ are listed: a province without an entry keeps its data name
  * (docs/api.md#stations). German and French keep the English names of the
  * Midlands, as their own atlases do.
@@ -23,6 +24,7 @@ const provinceNames: Record<Locale, Readonly<Record<string, string>>> = {
         "Noord-Brabant": "North Brabant",
         "Noord-Holland": "North Holland",
         "Zuid-Holland": "South Holland",
+        "Den Haag": "The Hague",
     },
     de: {
         Fryslân: "Friesland",
@@ -56,6 +58,7 @@ const provinceNames: Record<Locale, Readonly<Record<string, string>>> = {
         "South West": "Sud-Ouest de l’Angleterre",
         Wales: "Pays de Galles",
         "Yorkshire and The Humber": "Yorkshire-et-Humber",
+        "Den Haag": "La Haye",
     },
 };
 

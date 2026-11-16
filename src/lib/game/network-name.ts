@@ -5,10 +5,12 @@ import type { NetworkId } from "@/lib/data/networks";
 
 /**
  * The names of the networks without a region, which are not a whole
- * country: the London Underground is not "United Kingdom".
+ * country: the London Underground is not "United Kingdom", nor Rotterdam's
+ * metro and tram "Netherlands".
  */
 const ownNames: Partial<Record<NetworkId, () => string>> = {
     lu: m["networks.lu"],
+    ret: m["networks.ret"],
 };
 
 /**

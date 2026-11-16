@@ -28,6 +28,19 @@ describe("networkName", () => {
         ]);
     });
 
+    it("gives Rotterdam's metro and tram a name of its own in every language", () => {
+        const names = (["nl", "en", "de", "fr"] as const).map((locale) => {
+            overwriteGetLocale(() => locale);
+            return networkName("ret");
+        });
+        expect(names).toEqual([
+            "Rotterdamse metro en tram",
+            "Rotterdam metro and tram",
+            "Rotterdamer Metro und Tram",
+            "Métro et tram de Rotterdam",
+        ]);
+    });
+
     // Without a region and a name of its own, a network would fall back to
     // its id.
     it.each(networkIds)("names %s by more than its id", (network) => {
