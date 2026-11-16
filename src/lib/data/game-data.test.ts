@@ -29,6 +29,16 @@ describe("the fixture", () => {
             { kind: "ride", train: "EM", minutes: 125 },
         ]);
     });
+
+    it("reads an lu trip labelled with Underground lines", async () => {
+        const data = createGameData(readDataDir(fixtureDir));
+
+        expect((await data.tripsTo("lu", "klp"))["lms"]).toEqual([
+            { kind: "ride", train: "NTN", minutes: 15 },
+            { kind: "change", station: "jlc", minutes: 4 },
+            { kind: "ride", train: "CEN", minutes: 12 },
+        ]);
+    });
 });
 
 describe("createGameData", () => {

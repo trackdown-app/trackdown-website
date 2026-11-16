@@ -138,7 +138,21 @@
         "TP": "TransPennine Express",
         "VT": "Avanti West Coast",
         "XC": "CrossCountry",
-        "XR": "Elizabeth line"
+        "XR": "Elizabeth line",
+        "BAK": "Bakerloo line",
+        "CEN": "Central line",
+        "CIR": "Circle line",
+        "DIS": "District line",
+        "HAM": "Hammersmith & City line",
+        "JUB": "Jubilee line",
+        "MET": "Metropolitan line",
+        "NTN": "Northern line",
+        "PIC": "Piccadilly line",
+        "VIC": "Victoria line",
+        "WAC": "Waterloo & City line"
+    },
+    "networks": {
+        "lu": "Londoner U-Bahn"
     },
     "share": {
         "header": "Trackdown {network} {number}, {score}/{total}",
@@ -242,8 +256,13 @@
         "dataGbTimetable": "Fahrpläne: Network Rail SCHEDULE-Daten, Network Rail Infrastructure Ltd,",
         "dataGbStations": "Lage der Bahnhöfe: NaPTAN, Department for Transport,",
         "dataGbRegions": "Regionen: ITL1-Grenzen, Office for National Statistics, contains OS data © Crown copyright and database right,",
+        "dataLuIntro": "Londoner U-Bahn: Die Daten dieses Netzes wurden erstellt aus",
+        "dataLuTimetable": "Fahrpläne: TfL Journey Planner-Fahrpläne, Transport for London,",
+        "dataLuStations": "Lage der Stationen: NaPTAN, Department for Transport,",
+        "dataLuBoroughs": "Boroughs und Bezirke: Local Authority District-Grenzen, Office for National Statistics, contains OS data © Crown copyright and database right,",
+        "dataLuAttribution": "Powered by TfL Open Data. Contains OS data © Crown copyright and database rights 2016 and Geomni UK Map data © and database rights [2019].",
         "independentTitle": "Mit keiner Bahngesellschaft verbunden",
-        "independentBody": "Trackdown ist nicht mit NS, Network Rail oder einer anderen Bahngesellschaft verbunden oder von ihnen unterstützt. Namen von Bahnhöfen und Verkehrsunternehmen gehören ihren Inhabern und werden nur verwendet, um das echte Netz zu beschreiben.",
+        "independentBody": "Trackdown ist nicht mit NS, Network Rail, Transport for London oder einer anderen Bahngesellschaft verbunden oder von ihnen unterstützt. Namen von Bahnhöfen und Verkehrsunternehmen gehören ihren Inhabern und werden nur verwendet, um das echte Netz zu beschreiben.",
         "contactTitle": "Kontakt"
     },
     "privacy": {
@@ -289,7 +308,7 @@
         "freeTitle": "Kostenlos, und so wie es ist",
         "freeBody": "Trackdown wird kostenlos und so, wie es ist, angeboten. Ich gebe mir Mühe, jeden Tag ein neues Rätsel bereitzustellen, kann aber nicht versprechen, dass die Website immer online ist, fehlerfrei läuft oder deine Serie jedes Update übersteht. Ich kann das Spiel jederzeit ändern, pausieren oder beenden.",
         "plannerTitle": "Ein Spiel, kein Reiseplaner",
-        "plannerData": "Die Strecken und Fahrzeiten stammen aus offenen Daten, OVapi GTFS-NL (NDOV, CC0 1.0) und PDOK Bestuurlijke Gebieden (Kadaster, CC BY 4.0) für die Niederlande sowie Network Rail SCHEDULE-Daten (CC BY-SA 4.0), NaPTAN und ONS-ITL1-Grenzen (beide Open Government Licence v3.0) für Großbritannien, und sind für das Rätsel vereinfacht. Sie können veraltet oder falsch sein. Plane also keine echte Reise mit Trackdown; nutze stattdessen die Reiseauskunft deines Verkehrsunternehmens.",
+        "plannerData": "Die Strecken und Fahrzeiten stammen aus offenen Daten, OVapi GTFS-NL (NDOV, CC0 1.0) und PDOK Bestuurlijke Gebieden (Kadaster, CC BY 4.0) für die Niederlande sowie Network Rail SCHEDULE-Daten (CC BY-SA 4.0), NaPTAN und ONS-ITL1-Grenzen (beide Open Government Licence v3.0) für Großbritannien sowie TfL Journey Planner-Fahrplänen (TfL Transport Data Service-Lizenz, Powered by TfL Open Data), NaPTAN und ONS-Local-Authority-District-Grenzen (beide Open Government Licence v3.0) für die Londoner U-Bahn, und sind für das Rätsel vereinfacht. Sie können veraltet oder falsch sein. Plane also keine echte Reise mit Trackdown; nutze stattdessen die Reiseauskunft deines Verkehrsunternehmens.",
         "plannerIndependent": "Trackdown ist mit keiner Bahngesellschaft verbunden und wird von keiner unterstützt. Namen von Bahnhöfen und Verkehrsunternehmen gehören ihren Inhabern und werden nur verwendet, um das echte Netz zu beschreiben.",
         "fairTitle": "Spiel fair",
         "fairBody": "Teile deine Ergebnisse und diskutiere so viel du willst über die Lösung. Bitte scrape die Website nicht, überflute sie nicht mit Anfragen, versuche nicht einzubrechen oder die Lösung mit Tricks vorab herauszufinden, und veröffentliche die Lösung von heute nicht automatisch. Wenn jemand das tut, kann ich ihn sperren.",

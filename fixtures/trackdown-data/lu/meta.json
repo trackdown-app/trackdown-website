@@ -1,0 +1,13 @@
+{
+    "source": "Fixture data for tests, made up by hand",
+    "license": "TfL Transport Data Service licence (based on OGL v2.0)",
+    "feed": "fixture",
+    "serviceDates": ["20270112"],
+    "departureWindow": [540, 600],
+    "maxTripMinutes": 240,
+    "minChangeMinutes": 3,
+    "changePenaltyMinutes": 5,
+    "stations": 3,
+    "mysteryStations": 3,
+    "builtAt": "2026-11-16T12:00:00.000Z"
+}

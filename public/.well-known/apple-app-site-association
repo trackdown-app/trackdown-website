@@ -6,6 +6,12 @@
                 "components": [
                     { "/": "/nl" },
                     { "/": "/gb" },
+                    { "/": "/en/lu", "exclude": true },
+                    { "/": "/en/lu/*", "exclude": true },
+                    { "/": "/de/lu", "exclude": true },
+                    { "/": "/de/lu/*", "exclude": true },
+                    { "/": "/fr/lu", "exclude": true },
+                    { "/": "/fr/lu/*", "exclude": true },
                     { "/": "/en/*" },
                     { "/": "/de/*" },
                     { "/": "/fr/*" },

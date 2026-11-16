@@ -1,6 +1,6 @@
 # Network picker
 
-Trackdown is built for more rail networks than the Netherlands. Each network has its own pages, its own daily station and its own kept games; the header's network pill opens a picker to choose one, and the choice is kept for the next visit. Only the Netherlands (`nl`) has data now, so the picker lists the others as coming later.
+Trackdown is built for more rail networks than the Netherlands. Each network has its own pages, its own daily station and its own kept games; the header's network pill opens a picker to choose one, and the choice is kept for the next visit. The Netherlands (`nl`), Great Britain (`gb`) and the London Underground (`lu`) have data now; the picker lists the others as coming later.
 
 ## Routes
 
@@ -34,15 +34,17 @@ The choice lives in the `trackdown-network` cookie (`src/lib/network-choice.ts`)
 
 - **The pill** is a Base UI popover trigger: an ink-bordered pill, 44px high, with the network's code chip (`NetworkChip`), its name and a chevron. It is named by its own text: the name, then a visually hidden ". Kies een netwerk" / ". Change network", so screen readers hear "Nederland. Kies een netwerk" / "Netherlands. Change network", with the popover's `aria-expanded`, and the name starts with what the pill shows (WCAG 2.5.3, [accessibility.md](accessibility.md#names-that-match-what-is-shown)). The chip is hidden from screen readers.
 - **The popup** (`PopoverContent`, shadcn/ui's popover dressed as the design's plates: surface, ink border, 16px corners, the popover shadow) opens below the pill, at most 22rem wide and never wider than the screen less 16px on each side. Its title, "Netwerken" / "Networks", names the dialog; a lead says each network has its own daily station.
-- **To play** lists every network in `networks`: its chip in ink, its name in Barlow Condensed and, on the current one, the design's check in `line-1` with "Gekozen" / "Chosen" for screen readers. Each row links to the network's game; the router marks the current network's link `aria-current="page"`. Following one keeps it as the choice and closes the popup.
+- **To play** lists every network in `networks`: its chip (its `code`) in ink, its name (`networkName`) in Barlow Condensed and, on the current one, the design's check in `line-1` with "Gekozen" / "Chosen" for screen readers. Each row links to the network's game; the router marks the current network's link `aria-current="page"`. Following one keeps it as the choice and closes the popup.
 - **Coming next** lists `upcomingNetworks` with soft chips and "Komt later" / "Coming later". They are not links. The design's "Notify me" buttons, network search and "Suggest a network" link are left out: there is nothing behind them yet.
 
-A network's name is its country's, from the runtime's own region names (`regionName` in `src/lib/data/networks.ts`, `Intl.DisplayNames`; `networkName` in `src/lib/game/network-name.ts` for a network): "Nederland" and "Netherlands", "België" and "Belgium", so a new network needs no message. `gb`'s region is `GB`, which the runtime names "Verenigd Koninkrijk" / "United Kingdom", though its data covers Great Britain only (Northern Ireland's railway is not in Network Rail's timetable).
+A network's name is its country's, from the runtime's own region names (`regionName` in `src/lib/data/networks.ts`, `Intl.DisplayNames`; `networkName` in `src/lib/game/network-name.ts` for a network): "Nederland" and "Netherlands", "België" and "Belgium", so a new country's network needs no message. Its chip shows its `code`, the country's code. A network inside a country has `region: null`, a code of its own and a message under `networks` that `networkName` reads: the London Underground (`lu`) is "LU" on its chip and "Londense metro", "London Underground", "Londoner U-Bahn" or "Métro de Londres" beside it, not "United Kingdom". `gb`'s region is `GB`, which the runtime names "Verenigd Koninkrijk" / "United Kingdom", though its data covers Great Britain only (Northern Ireland's railway is not in Network Rail's timetable).
 
 ## Adding a network
 
 1. Its data folder in trackdown-data ([data.md](data.md#files)).
-2. Its entry in `src/lib/data/networks.ts`: its id in `networkIdSchema`, its `networks` entry (`dataDir`, `region`), and its region out of `upcomingNetworks`. The id may not be a locale prefix (`en`, `de`, `fr`): `/de` is the German home, so Germany's network needs another id, such as `db`. `src/lib/data/networks.test.ts` fails on a clash ([i18n.md](i18n.md#locale-routing)).
+2. Its entry in `src/lib/data/networks.ts`: its id in `networkIdSchema`, its `networks` entry (`dataDir`, `code`, `region`), and its region out of `upcomingNetworks`. A network that is not a whole country takes `region: null` and its name in `ownNames` (`src/lib/game/network-name.ts`) and the `networks` messages; `src/lib/game/network-name.test.ts` fails on one left without a name. The id may not be a locale prefix (`en`, `de`, `fr`): `/de` is the German home, so Germany's network needs another id, such as `db`. `src/lib/data/networks.test.ts` fails on a clash ([i18n.md](i18n.md#locale-routing)).
+
+3. Any ride labels its trips use in `trainTypeSchema` and the `trains` messages, the attribution its licence asks for on the About page, and its paths in the iOS app's `apple-app-site-association` once the app plays it ([seo.md](seo.md#ios-universal-links)).
 
 Nothing else: the routes, the picker, the API and the kept games all go by the registry.
 
