@@ -358,6 +358,10 @@ describe("the board's scale", () => {
         expect(boardMinutes([{ totalMinutes: 123 }], lu)).toBe(135);
     });
 
+    it("gives Rotterdam's metro and tram the Underground's board", () => {
+        expect(boardScales.ret).toEqual(lu);
+    });
+
     it("labels every half hour on five columns, only whole hours past six", () => {
         expect(gridMarks(150, 30)).toEqual([
             { minutes: 30, percent: 20 },

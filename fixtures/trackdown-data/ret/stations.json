@@ -1,0 +1,23 @@
+[
+    {
+        "code": "mike-centraal",
+        "name": "Mike Centraal",
+        "province": "Noordwijk",
+        "lat": 51.92,
+        "lon": 4.47
+    },
+    {
+        "code": "november-plein",
+        "name": "Novemberplein",
+        "province": "Zuidwijk",
+        "lat": 51.89,
+        "lon": 4.49
+    },
+    {
+        "code": "s-oscarkade",
+        "name": "'s-Oscarkade",
+        "province": "Noordwijk",
+        "lat": 51.91,
+        "lon": 4.44
+    }
+]

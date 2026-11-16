@@ -119,7 +119,8 @@
               "enum": [
                 "nl",
                 "gb",
-                "lu"
+                "lu",
+                "ret"
               ]
             }
           }
@@ -566,7 +567,7 @@
           },
           "station": {
             "type": "string",
-            "pattern": "^[a-z0-9]+$"
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
           },
           "minutes": {
             "type": "integer",
@@ -584,7 +585,7 @@
         "properties": {
           "guess": {
             "type": "string",
-            "pattern": "^[a-z0-9]+$"
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
           },
           "steps": {
             "type": "array",
@@ -617,14 +618,14 @@
         "properties": {
           "guess": {
             "type": "string",
-            "pattern": "^[a-z0-9]+$"
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
           },
           "earlierGuesses": {
             "default": [],
             "type": "array",
             "items": {
               "type": "string",
-              "pattern": "^[a-z0-9]+$"
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
             }
           }
         },
@@ -644,7 +645,7 @@
           },
           "guess": {
             "type": "string",
-            "pattern": "^[a-z0-9]+$"
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
           },
           "correct": {
             "type": "boolean"
@@ -702,7 +703,7 @@
               "string",
               "null"
             ],
-            "pattern": "^[a-z0-9]+$"
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
           },
           "minutes": {
             "type": "integer",
@@ -790,7 +791,8 @@
         "enum": [
           "nl",
           "gb",
-          "lu"
+          "lu",
+          "ret"
         ]
       },
       "PuzzleArchive": {
@@ -823,7 +825,7 @@
           },
           "station": {
             "type": "string",
-            "pattern": "^[a-z0-9]+$"
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
           },
           "solved": {
             "type": "boolean"
@@ -848,7 +850,7 @@
         "properties": {
           "guess": {
             "type": "string",
-            "pattern": "^[a-z0-9]+$"
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
           },
           "correct": {
             "type": "boolean"
@@ -892,7 +894,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "pattern": "^[a-z0-9]+$"
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
             }
           }
         },
@@ -926,7 +928,7 @@
         "properties": {
           "code": {
             "type": "string",
-            "pattern": "^[a-z0-9]+$"
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
           },
           "name": {
             "type": "string",
@@ -1005,6 +1007,15 @@
       "TrainType": {
         "type": "string",
         "enum": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "11",
           "IC",
           "ICD",
           "SPR",
@@ -1050,7 +1061,12 @@
           "NTN",
           "PIC",
           "VIC",
-          "WAC"
+          "WAC",
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
         ]
       }
     },

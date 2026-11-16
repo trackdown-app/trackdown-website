@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
     puzzlesFileSchema,
+    stationCodeSchema,
     stationsFileSchema,
     tripSchema,
 } from "@/lib/data/data-schema";
@@ -52,6 +53,40 @@ describe("tripSchema", () => {
     it("rejects minutes that are not whole and positive", () => {
         expect(tripSchema.safeParse([["IC", -1]]).success).toBe(false);
         expect(tripSchema.safeParse([["IC", 1.5]]).success).toBe(false);
+    });
+
+    it("reads Rotterdam's line labels and its station codes with dashes", () => {
+        expect(
+            tripSchema.parse([
+                ["11", 11],
+                ["1e-middellandstraat", 3],
+                ["A", 12],
+            ]),
+        ).toEqual([
+            { kind: "ride", train: "11", minutes: 11 },
+            { kind: "change", station: "1e-middellandstraat", minutes: 3 },
+            { kind: "ride", train: "A", minutes: 12 },
+        ]);
+    });
+});
+
+describe("stationCodeSchema", () => {
+    it.each(["ut", "kgx", "rotterdam-centraal", "s-gravendijkwal"])(
+        "takes %s",
+        (code) => {
+            expect(stationCodeSchema.safeParse(code).success).toBe(true);
+        },
+    );
+
+    it.each([
+        "",
+        "Ut",
+        "-beurs",
+        "beurs-",
+        "rotterdam--centraal",
+        "'s-gravendijkwal",
+    ])("rejects %j", (code) => {
+        expect(stationCodeSchema.safeParse(code).success).toBe(false);
     });
 });
 

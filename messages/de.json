@@ -149,10 +149,25 @@
         "NTN": "Northern line",
         "PIC": "Piccadilly line",
         "VIC": "Victoria line",
-        "WAC": "Waterloo & City line"
+        "WAC": "Waterloo & City line",
+        "A": "Metro A",
+        "B": "Metro B",
+        "C": "Metro C",
+        "D": "Metro D",
+        "E": "Metro E",
+        "1": "Tram 1",
+        "2": "Tram 2",
+        "3": "Tram 3",
+        "4": "Tram 4",
+        "5": "Tram 5",
+        "6": "Tram 6",
+        "7": "Tram 7",
+        "8": "Tram 8",
+        "11": "Tram 11"
     },
     "networks": {
-        "lu": "Londoner U-Bahn"
+        "lu": "Londoner U-Bahn",
+        "ret": "Rotterdamer Metro und Tram"
     },
     "share": {
         "header": "Trackdown {network} {number}, {score}/{total}",
@@ -261,8 +276,11 @@
         "dataLuStations": "Lage der Stationen: NaPTAN, Department for Transport,",
         "dataLuBoroughs": "Boroughs und Bezirke: Local Authority District-Grenzen, Office for National Statistics, contains OS data © Crown copyright and database right,",
         "dataLuAttribution": "Powered by TfL Open Data. Contains OS data © Crown copyright and database rights 2016 and Geomni UK Map data © and database rights [2019].",
+        "dataRetIntro": "Rotterdamer Metro und Tram: Die Daten dieses Netzes wurden erstellt aus",
+        "dataRetTimetable": "Fahrpläne: OVapi GTFS-NL, NDOV open data, die Metros und Trams der RET,",
+        "dataRetDistricts": "Bezirke und Gemeinden: CBS Wijken en Buurten 2025, Centraal Bureau voor de Statistiek, über PDOK,",
         "independentTitle": "Mit keiner Bahngesellschaft verbunden",
-        "independentBody": "Trackdown ist nicht mit NS, Network Rail, Transport for London oder einer anderen Bahngesellschaft verbunden oder von ihnen unterstützt. Namen von Bahnhöfen und Verkehrsunternehmen gehören ihren Inhabern und werden nur verwendet, um das echte Netz zu beschreiben.",
+        "independentBody": "Trackdown ist nicht mit NS, Network Rail, Transport for London, RET oder einer anderen Bahngesellschaft verbunden oder von ihnen unterstützt. Namen von Bahnhöfen und Verkehrsunternehmen gehören ihren Inhabern und werden nur verwendet, um das echte Netz zu beschreiben.",
         "contactTitle": "Kontakt"
     },
     "privacy": {
@@ -308,7 +326,7 @@
         "freeTitle": "Kostenlos, und so wie es ist",
         "freeBody": "Trackdown wird kostenlos und so, wie es ist, angeboten. Ich gebe mir Mühe, jeden Tag ein neues Rätsel bereitzustellen, kann aber nicht versprechen, dass die Website immer online ist, fehlerfrei läuft oder deine Serie jedes Update übersteht. Ich kann das Spiel jederzeit ändern, pausieren oder beenden.",
         "plannerTitle": "Ein Spiel, kein Reiseplaner",
-        "plannerData": "Die Strecken und Fahrzeiten stammen aus offenen Daten, OVapi GTFS-NL (NDOV, CC0 1.0) und PDOK Bestuurlijke Gebieden (Kadaster, CC BY 4.0) für die Niederlande sowie Network Rail SCHEDULE-Daten (CC BY-SA 4.0), NaPTAN und ONS-ITL1-Grenzen (beide Open Government Licence v3.0) für Großbritannien sowie TfL Journey Planner-Fahrplänen (TfL Transport Data Service-Lizenz, Powered by TfL Open Data), NaPTAN und ONS-Local-Authority-District-Grenzen (beide Open Government Licence v3.0) für die Londoner U-Bahn, und sind für das Rätsel vereinfacht. Sie können veraltet oder falsch sein. Plane also keine echte Reise mit Trackdown; nutze stattdessen die Reiseauskunft deines Verkehrsunternehmens.",
+        "plannerData": "Die Strecken und Fahrzeiten stammen aus offenen Daten, OVapi GTFS-NL (NDOV, CC0 1.0) und PDOK Bestuurlijke Gebieden (Kadaster, CC BY 4.0) für die Niederlande sowie Network Rail SCHEDULE-Daten (CC BY-SA 4.0), NaPTAN und ONS-ITL1-Grenzen (beide Open Government Licence v3.0) für Großbritannien sowie TfL Journey Planner-Fahrplänen (TfL Transport Data Service-Lizenz, Powered by TfL Open Data), NaPTAN und ONS-Local-Authority-District-Grenzen (beide Open Government Licence v3.0) für die Londoner U-Bahn sowie OVapi GTFS-NL (NDOV, CC0 1.0) und CBS Wijken en Buurten (CC0 1.0) für die Rotterdamer Metro und Tram, und sind für das Rätsel vereinfacht. Sie können veraltet oder falsch sein. Plane also keine echte Reise mit Trackdown; nutze stattdessen die Reiseauskunft deines Verkehrsunternehmens.",
         "plannerIndependent": "Trackdown ist mit keiner Bahngesellschaft verbunden und wird von keiner unterstützt. Namen von Bahnhöfen und Verkehrsunternehmen gehören ihren Inhabern und werden nur verwendet, um das echte Netz zu beschreiben.",
         "fairTitle": "Spiel fair",
         "fairBody": "Teile deine Ergebnisse und diskutiere so viel du willst über die Lösung. Bitte scrape die Website nicht, überflute sie nicht mit Anfragen, versuche nicht einzubrechen oder die Lösung mit Tricks vorab herauszufinden, und veröffentliche die Lösung von heute nicht automatisch. Wenn jemand das tut, kann ich ihn sperren.",

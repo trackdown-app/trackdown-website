@@ -51,6 +51,12 @@ describe("readTree", () => {
             "nl/to/chr.json",
             "nl/to/dlt.json",
             "nl/to/ech.json",
+            "ret/meta.json",
+            "ret/puzzles.json",
+            "ret/stations.json",
+            "ret/to/mike-centraal.json",
+            "ret/to/november-plein.json",
+            "ret/to/s-oscarkade.json",
         ]);
     });
 });

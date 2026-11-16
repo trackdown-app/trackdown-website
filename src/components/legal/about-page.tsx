@@ -5,6 +5,8 @@ import { LegalSection } from "@/components/legal/legal-section";
 import { MailLink } from "@/components/legal/mail-link";
 import { textLink } from "@/components/legal/text-link";
 
+const cc0 = "https://creativecommons.org/publicdomain/zero/1.0/";
+
 const openGovernmentLicence =
     "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/";
 
@@ -37,10 +39,7 @@ export function AboutPage() {
                 <ul className="flex list-disc flex-col gap-2 pl-[22px]">
                     <li>
                         {m["about.dataTimetable"]()}{" "}
-                        <a
-                            href="https://creativecommons.org/publicdomain/zero/1.0/"
-                            className={textLink}
-                        >
+                        <a href={cc0} className={textLink}>
                             CC0 1.0
                         </a>
                     </li>
@@ -110,6 +109,21 @@ export function AboutPage() {
                 {/* The statements TfL's licence asks for wherever its data
                     is used, word for word in every language. */}
                 <p>{m["about.dataLuAttribution"]()}</p>
+                <p>{m["about.dataRetIntro"]()}</p>
+                <ul className="flex list-disc flex-col gap-2 pl-[22px]">
+                    <li>
+                        {m["about.dataRetTimetable"]()}{" "}
+                        <a href={cc0} className={textLink}>
+                            CC0 1.0
+                        </a>
+                    </li>
+                    <li>
+                        {m["about.dataRetDistricts"]()}{" "}
+                        <a href={cc0} className={textLink}>
+                            CC0 1.0
+                        </a>
+                    </li>
+                </ul>
             </LegalSection>
             <LegalSection
                 id="about-independent"

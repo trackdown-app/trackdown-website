@@ -6,7 +6,7 @@ import { z } from "@/lib/zod";
  * a network adds its id here and its entry to `networks`, and takes it out
  * of `upcomingNetworks`.
  */
-export const networkIdSchema = z.enum(["nl", "gb", "lu"]);
+export const networkIdSchema = z.enum(["nl", "gb", "lu", "ret"]);
 
 export type NetworkId = z.infer<typeof networkIdSchema>;
 
@@ -19,7 +19,7 @@ export type Network = {
     dataDir: string;
     /**
      * The code on its chip, beside its name: its country's (`NL`), or, for a
-     * network that is not a whole country, one of its own (`LU`).
+     * network that is not a whole country, one of its own (`LU`, `RET`).
      */
     code: string;
     /**
@@ -35,6 +35,7 @@ export const networks: Record<NetworkId, Network> = {
     nl: { id: "nl", dataDir: "nl", code: "NL", region: "NL" },
     gb: { id: "gb", dataDir: "gb", code: "GB", region: "GB" },
     lu: { id: "lu", dataDir: "lu", code: "LU", region: null },
+    ret: { id: "ret", dataDir: "ret", code: "RET", region: null },
 };
 
 export const networkIds: ReadonlyArray<NetworkId> = networkIdSchema.options;
