@@ -70,15 +70,16 @@ The PNGs and the ICO are renders of `favicon.svg` (and of the share image's SVG)
 
 `public/.well-known/apple-app-site-association` associates `trackdown.nl` with
 `CN495B7KTS.nl.trackdown.Trackdown` (the iOS app's Team ID and bundle identifier).
-It allows `/nl`, `/gb`, `/en/*`, `/de/*`, `/fr/*`, and both networks' archive
-indexes and puzzle paths. Other Dutch pages remain web links. The English, German
-and French wildcards include their archive paths. The app's link parser
-(`PuzzleLink`) must strip each of these locale prefixes before it reads the
-network, so a locale added here needs the app to know it too. The London
-Underground (`/lu`, `/en/lu/*`, `/de/lu/*`, `/fr/lu/*`) and Rotterdam's metro and
-tram (`/ret`, `/en/ret/*`, `/de/ret/*`, `/fr/ret/*`) stay web links: the app does
-not know the `lu` and `ret` networks yet, so their prefixed paths are excluded
-before the wildcards. Add each when the app plays it.
+It allows every network's game (`/nl`, `/gb`, `/lu`, `/ret`), `/en/*`, `/de/*`,
+`/fr/*`, and every network's archive index and puzzle paths (`/{network}/archief`
+and `/{network}/archief/*`). Other Dutch pages remain web links. The English,
+German and French wildcards include every network's game and archive paths. The
+app's link parser (`PuzzleLink`) must strip each of these locale prefixes before
+it reads the network, so a locale added here needs the app to know it too. A
+network added to the site stays a web link until the app plays it: list its game
+and archive paths here then, and until then exclude its `/en/`, `/de/` and `/fr/`
+paths (`{ "/": "/en/{network}/*", "exclude": true }` and the bare path) before
+the wildcards.
 
 Nitro's exact route rule in `vite.config.ts` sets `Content-Type: application/json`
 for this extensionless static file on Node and Vercel. Static serving bypasses

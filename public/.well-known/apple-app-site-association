@@ -6,25 +6,19 @@
                 "components": [
                     { "/": "/nl" },
                     { "/": "/gb" },
-                    { "/": "/en/lu", "exclude": true },
-                    { "/": "/en/lu/*", "exclude": true },
-                    { "/": "/de/lu", "exclude": true },
-                    { "/": "/de/lu/*", "exclude": true },
-                    { "/": "/fr/lu", "exclude": true },
-                    { "/": "/fr/lu/*", "exclude": true },
-                    { "/": "/en/ret", "exclude": true },
-                    { "/": "/en/ret/*", "exclude": true },
-                    { "/": "/de/ret", "exclude": true },
-                    { "/": "/de/ret/*", "exclude": true },
-                    { "/": "/fr/ret", "exclude": true },
-                    { "/": "/fr/ret/*", "exclude": true },
+                    { "/": "/lu" },
+                    { "/": "/ret" },
                     { "/": "/en/*" },
                     { "/": "/de/*" },
                     { "/": "/fr/*" },
                     { "/": "/nl/archief" },
                     { "/": "/nl/archief/*" },
                     { "/": "/gb/archief" },
-                    { "/": "/gb/archief/*" }
+                    { "/": "/gb/archief/*" },
+                    { "/": "/lu/archief" },
+                    { "/": "/lu/archief/*" },
+                    { "/": "/ret/archief" },
+                    { "/": "/ret/archief/*" }
                 ]
             }
         ]
