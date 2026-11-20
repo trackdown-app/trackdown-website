@@ -48,7 +48,7 @@
     "cbor": "^10.0.12",
     "class-variance-authority": "^0.7.1",
     "cn": "^0.5.2",
-    "lucide-react": "^1.70.0",
+    "lucide-react": "^1.73.0",
     "nitro": "^3.0.261103-rc",
     "node-app-attest": "^1.0.1",
     "posthog-js": "^1.447.15",
