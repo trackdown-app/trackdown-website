@@ -44,7 +44,7 @@
     "@tanstack/react-start": "^1.169.5",
     "@tanstack/router-plugin": "^1.169.0",
     "@upstash/redis": "^1.41.0",
-    "@vercel/functions": "^3.11.2",
+    "@vercel/functions": "^3.11.3",
     "cbor": "^10.0.12",
     "class-variance-authority": "^0.7.1",
     "cn": "^0.5.2",
