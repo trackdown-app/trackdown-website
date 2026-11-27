@@ -71,9 +71,9 @@
         "revealedNote": "Nieuwste eerst. Elke overstap is nu onthuld.",
         "spokenGuess": "Gok {number}, {station}: {duration} naar het mysteriestation. {steps}.",
         "spokenFound": "Gok {number}, {station}: het mysteriestation.",
-        "grid30": "30 min",
+        "gridMinutes": "{minutes} min",
         "gridHours": "{hours} u",
-        "gridHoursHalf": "{hours} u 30"
+        "gridHoursMinutes": "{hours} u {minutes}"
     },
     "trip": {
         "minutes": "{minutes}m",
@@ -141,7 +141,36 @@
         "TP": "TransPennine Express",
         "VT": "Avanti West Coast",
         "XC": "CrossCountry",
-        "XR": "Elizabeth line"
+        "XR": "Elizabeth line",
+        "BAK": "Bakerloo line",
+        "CEN": "Central line",
+        "CIR": "Circle line",
+        "DIS": "District line",
+        "HAM": "Hammersmith & City line",
+        "JUB": "Jubilee line",
+        "MET": "Metropolitan line",
+        "NTN": "Northern line",
+        "PIC": "Piccadilly line",
+        "VIC": "Victoria line",
+        "WAC": "Waterloo & City line",
+        "A": "Metro A",
+        "B": "Metro B",
+        "C": "Metro C",
+        "D": "Metro D",
+        "E": "Metro E",
+        "1": "Tram 1",
+        "2": "Tram 2",
+        "3": "Tram 3",
+        "4": "Tram 4",
+        "5": "Tram 5",
+        "6": "Tram 6",
+        "7": "Tram 7",
+        "8": "Tram 8",
+        "11": "Tram 11"
+    },
+    "networks": {
+        "lu": "Londense metro",
+        "ret": "Rotterdamse metro en tram"
     },
     "share": {
         "header": "Trackdown {network} {number}, {score}/{total}",
@@ -193,7 +222,9 @@
     "language": {
         "label": "Taal",
         "nl": "Nederlands",
-        "en": "Engels"
+        "en": "Engels",
+        "de": "Duits",
+        "fr": "Frans"
     },
     "header": {
         "skipToContent": "Naar de inhoud",
@@ -243,11 +274,19 @@
         "dataGbTimetable": "Dienstregeling: Network Rail SCHEDULE-data, Network Rail Infrastructure Ltd,",
         "dataGbStations": "Locaties van stations: NaPTAN, Department for Transport,",
         "dataGbRegions": "Regio's: ITL1-grenzen, Office for National Statistics, contains OS data © Crown copyright and database right,",
+        "dataLuIntro": "Londense metro: de data van dit netwerk is gemaakt uit",
+        "dataLuTimetable": "Dienstregeling: TfL Journey Planner-dienstregelingen, Transport for London,",
+        "dataLuStations": "Locaties van stations: NaPTAN, Department for Transport,",
+        "dataLuBoroughs": "Boroughs en districten: Local Authority District-grenzen, Office for National Statistics, contains OS data © Crown copyright and database right,",
+        "dataLuAttribution": "Powered by TfL Open Data. Contains OS data © Crown copyright and database rights 2016 and Geomni UK Map data © and database rights [2019].",
+        "dataRetIntro": "Rotterdamse metro en tram: de data van dit netwerk is gemaakt uit",
+        "dataRetTimetable": "Dienstregeling: OVapi GTFS-NL, NDOV open data, de metro's en trams van RET,",
+        "dataRetDistricts": "Wijken en gemeenten: CBS Wijken en Buurten 2025, Centraal Bureau voor de Statistiek, via PDOK,",
         "dataBeIntro": "België: de data van dit netwerk is gemaakt uit",
-        "dataBeTimetable": "Dienstregeling: GTFS-data van NMBS/SNCB, hergebruikt onder de licentie van de NMBS voor het hergebruik van dienstregelingsdata",
+        "dataBeTimetable": "Dienstregeling: Source: NMBS-SNCB – Open Data – 26 november 2026, van het Belgian Mobility Open Data Portal. Bevat data oorspronkelijk gepubliceerd door NMBS-SNCB, aangepast door Trackdown,",
         "dataBeProvinces": "Provincies: geoBoundaries, uit open data van Statbel,",
         "independentTitle": "Niet verbonden aan een spoorbedrijf",
-        "independentBody": "Trackdown is niet verbonden aan, of goedgekeurd door, NS, NMBS/SNCB, Network Rail of een ander spoorbedrijf. Namen van stations en vervoerders zijn van hun eigenaars en worden alleen gebruikt om het echte netwerk te beschrijven.",
+        "independentBody": "Trackdown is niet verbonden aan, of goedgekeurd door, NS, NMBS/SNCB, Network Rail, Transport for London, RET of een ander spoorbedrijf. Namen van stations en vervoerders zijn van hun eigenaars en worden alleen gebruikt om het echte netwerk te beschrijven.",
         "contactTitle": "Contact"
     },
     "privacy": {
@@ -293,7 +332,7 @@
         "freeTitle": "Gratis, en zoals het is",
         "freeBody": "Trackdown wordt gratis aangeboden, zoals het is. Ik doe mijn best om elke dag een nieuwe puzzel klaar te hebben, maar ik kan niet beloven dat de site altijd online is, zonder fouten werkt of dat je reeks elke update overleeft. Ik kan het spel op elk moment veranderen, pauzeren of stoppen.",
         "plannerTitle": "Een spel, geen reisplanner",
-        "plannerData": "De routes en reistijden zijn gemaakt uit open data, OVapi GTFS-NL (NDOV, CC0 1.0) en PDOK Bestuurlijke Gebieden (Kadaster, CC BY 4.0) voor Nederland, en Network Rail SCHEDULE-data (CC BY-SA 4.0), NaPTAN en ONS ITL1-grenzen (beide Open Government Licence v3.0) voor Groot-Brittannië, GTFS-data van NMBS/SNCB (onder de hergebruiklicentie van de NMBS) en geoBoundaries (ODbL 1.0) voor België, en vereenvoudigd voor de puzzel. Ze kunnen verouderd of fout zijn. Plan dus geen echte reis met Trackdown; kijk in de reisplanner van je vervoerder.",
+        "plannerData": "De routes en reistijden zijn gemaakt uit open data, OVapi GTFS-NL (NDOV, CC0 1.0) en PDOK Bestuurlijke Gebieden (Kadaster, CC BY 4.0) voor Nederland, en Network Rail SCHEDULE-data (CC BY-SA 4.0), NaPTAN en ONS ITL1-grenzen (beide Open Government Licence v3.0) voor Groot-Brittannië, en TfL Journey Planner-dienstregelingen (TfL Transport Data Service-licentie, Powered by TfL Open Data), NaPTAN en ONS Local Authority District-grenzen (beide Open Government Licence v3.0) voor de Londense metro, en OVapi GTFS-NL (NDOV, CC0 1.0) en CBS Wijken en Buurten (CC0 1.0) voor de Rotterdamse metro en tram, en GTFS-data van NMBS-SNCB van het Belgian Mobility Open Data Portal (CC BY 4.0) en geoBoundaries (ODbL 1.0) voor België, en vereenvoudigd voor de puzzel. Ze kunnen verouderd of fout zijn. Plan dus geen echte reis met Trackdown; kijk in de reisplanner van je vervoerder.",
         "plannerIndependent": "Trackdown is niet verbonden aan, of goedgekeurd door, een spoorbedrijf. Namen van stations en vervoerders zijn van hun eigenaars en worden alleen gebruikt om het echte netwerk te beschrijven.",
         "fairTitle": "Speel eerlijk",
         "fairBody": "Deel je uitslagen en discussieer zoveel je wilt over het antwoord. Scrape de site niet, overspoel hem niet met verzoeken, probeer niet in te breken of het antwoord vooraf met trucs te achterhalen, en plaats het antwoord van vandaag niet automatisch. Als iemand dat doet, kan ik diegene blokkeren.",

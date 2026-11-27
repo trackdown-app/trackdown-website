@@ -14,6 +14,8 @@ import { cn } from "@/lib/utils";
 const languageNames: Record<Locale, () => string> = {
     nl: m["language.nl"],
     en: m["language.en"],
+    de: m["language.de"],
+    fr: m["language.fr"],
 };
 
 /**
@@ -27,7 +29,7 @@ function keepHash(event: MouseEvent<HTMLAnchorElement>) {
 }
 
 /**
- * The NL / EN switch: a link to the current page in each locale. Plain links
+ * The NL / EN / DE / FR switch: a link to the current page in each locale. Plain links
  * rather than router links, so the other language loads as a new document
  * and renders on the server in that language. Links rather than toggle
  * buttons, because switching navigates; the current language is marked with

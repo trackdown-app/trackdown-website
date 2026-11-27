@@ -33,7 +33,7 @@
   - `docs/data.md`: the game data's files and zod schemas, the network registry, the server-only loader and its cache, the fixture, `data:check`.
   - `docs/api.md`: the services in `src/lib/game/`, their server functions and REST routes under `/api/v1`, the shared schemas, the error format, versioning, the table of operations.
   - `docs/design-system.md`: the design's colour tokens in light and dark, the Barlow fonts, shape, the contrast test, defaults for what the design does not draw.
-  - `docs/i18n.md`: Paraglide, locale routing (`/` Dutch, `/en` English), the language switch, messages and their compile step.
+  - `docs/i18n.md`: Paraglide, locale routing (`/` Dutch, `/en` English, `/de` German, `/fr` French), the language switch, messages and their compile step.
   - `docs/site-shell.md`: the skip link, focus ring, header, footer and its legend slot, the shell's page paths, the not-found and error pages.
   - `docs/station-search.md`: the station search combobox, its matching, keyboard and screen reader behaviour, the combobox parts in `src/components/ui/`.
   - `docs/guess-list.md`: the guess list, its rows and summaries, the trip line's width, segments, change rings and labels, the time grid, the game legend, the screen reader text.

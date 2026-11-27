@@ -71,9 +71,9 @@
         "revealedNote": "Newest first. Every change is revealed now.",
         "spokenGuess": "Guess {number}, {station}: {duration} to the mystery station. {steps}.",
         "spokenFound": "Guess {number}, {station}: the mystery station.",
-        "grid30": "30 min",
+        "gridMinutes": "{minutes} min",
         "gridHours": "{hours} h",
-        "gridHoursHalf": "{hours} h 30"
+        "gridHoursMinutes": "{hours} h {minutes}"
     },
     "trip": {
         "minutes": "{minutes}m",
@@ -141,7 +141,36 @@
         "TP": "TransPennine Express",
         "VT": "Avanti West Coast",
         "XC": "CrossCountry",
-        "XR": "Elizabeth line"
+        "XR": "Elizabeth line",
+        "BAK": "Bakerloo line",
+        "CEN": "Central line",
+        "CIR": "Circle line",
+        "DIS": "District line",
+        "HAM": "Hammersmith & City line",
+        "JUB": "Jubilee line",
+        "MET": "Metropolitan line",
+        "NTN": "Northern line",
+        "PIC": "Piccadilly line",
+        "VIC": "Victoria line",
+        "WAC": "Waterloo & City line",
+        "A": "Metro A",
+        "B": "Metro B",
+        "C": "Metro C",
+        "D": "Metro D",
+        "E": "Metro E",
+        "1": "Tram 1",
+        "2": "Tram 2",
+        "3": "Tram 3",
+        "4": "Tram 4",
+        "5": "Tram 5",
+        "6": "Tram 6",
+        "7": "Tram 7",
+        "8": "Tram 8",
+        "11": "Tram 11"
+    },
+    "networks": {
+        "lu": "London Underground",
+        "ret": "Rotterdam metro and tram"
     },
     "share": {
         "header": "Trackdown {network} {number}, {score}/{total}",
@@ -193,7 +222,9 @@
     "language": {
         "label": "Language",
         "nl": "Dutch",
-        "en": "English"
+        "en": "English",
+        "de": "German",
+        "fr": "French"
     },
     "header": {
         "skipToContent": "Skip to content",
@@ -243,11 +274,19 @@
         "dataGbTimetable": "Timetables: Network Rail SCHEDULE data, Network Rail Infrastructure Ltd,",
         "dataGbStations": "Station locations: NaPTAN, Department for Transport,",
         "dataGbRegions": "Regions: ITL1 boundaries, Office for National Statistics, contains OS data © Crown copyright and database right,",
+        "dataLuIntro": "London Underground: the network's data is built from",
+        "dataLuTimetable": "Timetables: TfL Journey Planner timetables, Transport for London,",
+        "dataLuStations": "Station locations: NaPTAN, Department for Transport,",
+        "dataLuBoroughs": "Boroughs and districts: Local Authority District boundaries, Office for National Statistics, contains OS data © Crown copyright and database right,",
+        "dataLuAttribution": "Powered by TfL Open Data. Contains OS data © Crown copyright and database rights 2016 and Geomni UK Map data © and database rights [2019].",
+        "dataRetIntro": "Rotterdam metro and tram: the network's data is built from",
+        "dataRetTimetable": "Timetables: OVapi GTFS-NL, NDOV open data, RET's metros and trams,",
+        "dataRetDistricts": "Districts and municipalities: CBS Wijken en Buurten 2025, Statistics Netherlands, via PDOK,",
         "dataBeIntro": "Belgium: the network's data is built from",
-        "dataBeTimetable": "Timetables: NMBS/SNCB GTFS data, re-used under SNCB's licence for the re-use of timetable data",
+        "dataBeTimetable": "Timetables: Source: NMBS-SNCB – Open Data – 26 November 2026, from the Belgian Mobility Open Data Portal. Contains data originally published by NMBS-SNCB, modified by Trackdown,",
         "dataBeProvinces": "Provinces: geoBoundaries, from Statbel open data,",
         "independentTitle": "Not linked to any railway",
-        "independentBody": "Trackdown is not linked to, or endorsed by, NS, NMBS/SNCB, Network Rail or any other railway company. Station and operator names belong to their owners and are only used to describe the real network.",
+        "independentBody": "Trackdown is not linked to, or endorsed by, NS, NMBS/SNCB, Network Rail, Transport for London, RET or any other railway company. Station and operator names belong to their owners and are only used to describe the real network.",
         "contactTitle": "Contact"
     },
     "privacy": {
@@ -293,7 +332,7 @@
         "freeTitle": "Free, and as it is",
         "freeBody": "Trackdown is offered free of charge and as it is. I do my best to keep a new puzzle up every day, but I can't promise the site is always online, error-free or that your streak survives every update. I may change the game, pause it or stop it, at any time.",
         "plannerTitle": "A game, not a journey planner",
-        "plannerData": "The routes and travel times are built from open data, OVapi GTFS-NL (NDOV, CC0 1.0) and PDOK Bestuurlijke Gebieden (Kadaster, CC BY 4.0) for the Netherlands, and Network Rail SCHEDULE data (CC BY-SA 4.0), NaPTAN and ONS ITL1 boundaries (both Open Government Licence v3.0) for Great Britain, NMBS/SNCB GTFS data (under SNCB's re-use licence) and geoBoundaries (ODbL 1.0) for Belgium, and simplified for the puzzle. They may be out of date or wrong. Please don't plan a real trip with Trackdown; check your train operator's journey planner instead.",
+        "plannerData": "The routes and travel times are built from open data, OVapi GTFS-NL (NDOV, CC0 1.0) and PDOK Bestuurlijke Gebieden (Kadaster, CC BY 4.0) for the Netherlands, and Network Rail SCHEDULE data (CC BY-SA 4.0), NaPTAN and ONS ITL1 boundaries (both Open Government Licence v3.0) for Great Britain, and TfL Journey Planner timetables (TfL Transport Data Service licence, Powered by TfL Open Data), NaPTAN and ONS Local Authority District boundaries (both Open Government Licence v3.0) for the London Underground, and OVapi GTFS-NL (NDOV, CC0 1.0) and CBS Wijken en Buurten (CC0 1.0) for the Rotterdam metro and tram, and NMBS-SNCB GTFS data from the Belgian Mobility Open Data Portal (CC BY 4.0) and geoBoundaries (ODbL 1.0) for Belgium, and simplified for the puzzle. They may be out of date or wrong. Please don't plan a real trip with Trackdown; check your train operator's journey planner instead.",
         "plannerIndependent": "Trackdown is not linked to, or endorsed by, any railway company. Station and operator names belong to their owners and are only used to describe the real network.",
         "fairTitle": "Play fair",
         "fairBody": "Share your results and argue about the answer as much as you like. Please don't scrape the site, flood it with requests, try to break in or get the answer early with tricks, or post today's answer automatically. If someone does, I may block them.",

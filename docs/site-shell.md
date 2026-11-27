@@ -21,7 +21,7 @@ Every focusable element shows the site-wide `:focus-visible` outline from `src/s
 - **Archive and How to play** in a `<nav>` named `header.nav`. The current page carries `aria-current="page"` and shows underlined and semibold. Both have their route ([archive.md](archive.md), [how-to-play.md](how-to-play.md)), so both are a router `<Link>`. Archive is the current network's (`/{network}/archief`), and the current page on every puzzle of it too (`/{network}/archief/{number}`).
 - **The statistics button**, a 44px icon button (Lucide's `ChartNoAxesColumn`) named `header.statistics`. It opens the statistics dialog, the player's record at today's network (`StatisticsDialog`, [statistics.md](statistics.md#the-dialog)).
 - **The theme toggle** (`ThemeToggle`), a 44px shadcn icon button beside Statistics. Its stable accessible name is “Dark mode” / “Donkere modus”; `aria-pressed` tells whether dark mode is active. Moon and sun icons follow the resolved theme. Click, Enter or Space switches to the opposite theme and saves the override ([design-system.md](design-system.md#dark-mode)). The design does not draw this control, so it reuses the statistics button’s shape, spacing and tokens.
-- **The language switch** (`LanguageSwitch`, [i18n.md](i18n.md#language-switch)), which the design does not draw; it sits last.
+- **The language switch** (`LanguageSwitch`, [i18n.md](i18n.md#language-switch)), NL / EN / DE / FR, which the design does not draw; it sits last.
 
 Both halves of the header wrap. At phone width the language switch drops below the links, and below about 405px the network pill drops below the logo, so nothing scrolls sideways down to 320px. The logo and the pill sit 16px apart on a phone and 24px from `sm`, so the common 412px phone keeps them on one row whether Barlow or its fallback is drawn ([accessibility.md](accessibility.md#fonts)). Every control is at least 44px high.
 
@@ -47,7 +47,7 @@ export const Route = createFileRoute("/")({
 
 ## Page paths
 
-`src/lib/site-paths.ts` holds the path of every page the shell links to, without a locale: `/`, `/hoe-te-spelen`, `/over`, `/privacy` and `/voorwaarden`, and `networkArchivePath` for a network's archive (`/{network}/archief`), for a link outside a router, such as the sitemap's or the cookie banner's. Paths are the same in both languages ([i18n.md](i18n.md#locale-routing)), so they are Dutch; `localizeHref` adds `/en` on an English page.
+`src/lib/site-paths.ts` holds the path of every page the shell links to, without a locale: `/`, `/hoe-te-spelen`, `/over`, `/privacy` and `/voorwaarden`, and `networkArchivePath` for a network's archive (`/{network}/archief`), for a link outside a router, such as the sitemap's or the cookie banner's. Paths are the same in every language ([i18n.md](i18n.md#locale-routing)), so they are Dutch; `localizeHref` adds `/en`, `/de` or `/fr` on an English, German or French page.
 
 Every one of these pages has a route, and the header and footer link to it with a typed router `<Link>`, which marks the current page with `aria-current="page"`. About, Privacy and Terms are in [about-privacy-terms.md](about-privacy-terms.md).
 

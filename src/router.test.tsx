@@ -124,6 +124,8 @@ describe("the site's router", () => {
     it.each([
         ["/", "nl", "/nl"],
         ["/en", "en", "/en/nl"],
+        ["/de", "de", "/de/nl"],
+        ["/fr", "fr", "/fr/nl"],
     ] as const)(
         "sends %s to the chosen network's game, the default one without a choice",
         async (pathname, locale, expected) => {
@@ -307,7 +309,7 @@ describe("the site's router", () => {
         ).toBe("/nl");
     });
 
-    it.each(["/de", "/de/archief", "/de/archief/1", "/NL"])(
+    it.each(["/ch", "/ch/archief", "/ch/archief/1", "/NL"])(
         "answers %s, a network the game has no data for, with 404",
         async (pathname) => {
             const { status, html } = await respondAt(getRouter, pathname);

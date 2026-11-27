@@ -64,7 +64,16 @@ describe("NetworkPicker", () => {
         expect(links.map((each) => each.getAttribute("href"))).toEqual([
             "/en/nl",
             "/en/gb",
+            "/en/lu",
+            "/en/ret",
             "/en/be",
+        ]);
+        expect(links.map((each) => each.textContent)).toEqual([
+            "NLNetherlandsChosen",
+            "GBUnited Kingdom",
+            "LULondon Underground",
+            "RETRotterdam metro and tram",
+            "BEBelgium",
         ]);
         const [link] = links;
         if (link == null) {

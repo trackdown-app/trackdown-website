@@ -84,16 +84,40 @@ describe("AboutPage", () => {
         );
     });
 
-    it("credits Belgium's data to NMBS/SNCB's licence and geoBoundaries under the ODbL", async () => {
+    it("credits the London Underground's data with TfL's attribution statements", async () => {
         const html = await renderAt(AboutPage, "/over");
 
+        expect(html).toContain("TfL Journey Planner-dienstregelingen");
         expect(html).toContain(
-            "GTFS-data van NMBS/SNCB, hergebruikt onder de licentie van de NMBS",
+            'href="https://tfl.gov.uk/corporate/terms-and-conditions/transport-data-service"',
         );
+        expect(html).toContain("Local Authority District-grenzen");
+        // TfL's licence asks for these word for word, whatever the language.
+        expect(html).toContain("Powered by TfL Open Data.");
+        expect(html).toContain(
+            "Contains OS data © Crown copyright and database rights 2016 and Geomni UK Map data © and database rights [2019].",
+        );
+        expect(html).toContain(
+            "NS, NMBS/SNCB, Network Rail, Transport for London, RET",
+        );
+    });
+
+    it("credits Rotterdam's metro and tram data", async () => {
+        const html = await renderAt(AboutPage, "/over");
+
+        expect(html).toContain("de metro&#x27;s en trams van RET");
+        expect(html).toContain("CBS Wijken en Buurten 2025");
+    });
+
+    it("credits Belgium's data to NMBS-SNCB under CC BY 4.0 and geoBoundaries under the ODbL", async () => {
+        const html = await renderAt(AboutPage, "/over");
+
+        // The attribution the portal's terms ask for, with the dataset's date.
+        expect(html).toContain("Source: NMBS-SNCB – Open Data – 26 november 2026");
+        expect(html).toContain("aangepast door Trackdown");
         expect(html).toContain("geoBoundaries, uit open data van Statbel");
         expect(html).toContain(
             'href="https://opendatacommons.org/licenses/odbl/1-0/"',
         );
-        expect(html).toContain("NS, NMBS/SNCB, Network Rail");
     });
 });

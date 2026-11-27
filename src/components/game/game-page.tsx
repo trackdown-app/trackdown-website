@@ -107,6 +107,7 @@ export function GamePage({
                     </div>
                     <div className="mt-12">
                         <GuessList
+                            network={puzzle.network}
                             guesses={game.guesses}
                             stations={stations}
                             enteringGuess={game.lastAnswer?.guess}

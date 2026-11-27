@@ -17,7 +17,7 @@ Where the design draws something, the site draws the same. The defaults further 
 | `muted` | `#4C535A` | `#A3ABB3` | `text-muted-foreground` | Secondary text: the date, the lead, summaries, axis labels |
 | `soft` | `#EEF0EE` | `#262D35` | `bg-soft`, `bg-muted`, `bg-accent`, `bg-secondary` | The highlighted suggestion |
 | `empty` | `#C4C9C5` | `#4A535C` | `bg-empty`, `border-empty` | Guesses not yet made in the progress dots |
-| `grid` | `#E1E5E2` | `#262D35` | `bg-grid` | The 30-minute grid behind the trip lines |
+| `grid` | `#E1E5E2` | `#262D35` | `bg-grid` | The time grid behind the trip lines |
 | `line-1` | `#2F45D8` | `#8394FF` | `bg-line-1` | First train |
 | `line-2` | `#B8236F` | `#F27AB6` | `bg-line-2` | After the first change |
 | `line-3` | `#0B7F5A` | `#4FD3A0` | `bg-line-3` | After the second change |

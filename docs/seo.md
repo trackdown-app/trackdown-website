@@ -24,8 +24,8 @@ export const Route = createFileRoute("/hoe-te-spelen")({
 
 - **Title** (the document's whole title, such as "Archief · Trackdown") and the meta description.
 - **Canonical URL** on `https://trackdown.nl` in the page's language: `https://trackdown.nl/nl`, `https://trackdown.nl/en/nl`. It never carries the query string, and it points at that address whichever host serves the page (`siteOrigin`, `src/lib/site-origin.ts`).
-- **Language alternates**: a `<link rel="alternate" hreflang>` for `nl`, `en` and `x-default` (the Dutch page, the base locale's). Both language versions list the same three (`languageAlternates()`).
-- **Open Graph**: `og:site_name`, `og:type` `website`, `og:url`, `og:title`, `og:description`, `og:locale` (`nl_NL`, `en_GB`) with the other language as `og:locale:alternate`, and `og:image` with its alt text and size.
+- **Language alternates**: a `<link rel="alternate" hreflang>` for `nl`, `en`, `de`, `fr` and `x-default` (the Dutch page, the base locale's). Every language version lists the same five (`languageAlternates()`).
+- **Open Graph**: `og:site_name`, `og:type` `website`, `og:url`, `og:title`, `og:description`, `og:locale` (`nl_NL`, `en_GB`, `de_DE`, `fr_FR`) with the other languages as `og:locale:alternate`, and `og:image` with its alt text and size.
 - **Twitter**: a `summary_large_image` card with the same title, description and image.
 
 | Page | Title | Description |
@@ -70,11 +70,17 @@ The PNGs and the ICO are renders of `favicon.svg` (and of the share image's SVG)
 
 `public/.well-known/apple-app-site-association` associates `trackdown.nl` with
 `CN495B7KTS.nl.trackdown.Trackdown` (the iOS app's Team ID and bundle identifier).
-It allows `/nl`, `/gb`, `/en/*`, and both networks' archive indexes and puzzle
-paths. Other Dutch pages remain web links. The English wildcard includes English
-archive paths. Belgium (`/be`, `/en/be/*`) stays a web link: the app does not know
-the `be` network yet, so its English paths are excluded before the wildcard. Add
-them when the app plays Belgium.
+It allows every network's game (`/nl`, `/gb`, `/lu`, `/ret`), `/en/*`, `/de/*`,
+`/fr/*`, and every network's archive index and puzzle paths (`/{network}/archief`
+and `/{network}/archief/*`). Other Dutch pages remain web links. The English,
+German and French wildcards include every network's game and archive paths. The
+app's link parser (`PuzzleLink`) must strip each of these locale prefixes before
+it reads the network, so a locale added here needs the app to know it too. A
+network added to the site stays a web link until the app plays it: list its game
+and archive paths here then, and until then exclude its `/en/`, `/de/` and `/fr/`
+paths (`{ "/": "/en/{network}/*", "exclude": true }` and the bare path) before
+the wildcards. Belgium (`be`) is such a network for now: its `/en/`, `/de/` and
+`/fr/` paths are excluded until an app release plays it.
 
 Nitro's exact route rule in `vite.config.ts` sets `Content-Type: application/json`
 for this extensionless static file on Node and Vercel. Static serving bypasses
@@ -98,7 +104,7 @@ and [universal link debugging guide](https://developer.apple.com/documentation/t
 
 ### Sitemap
 
-`/sitemap.xml` (`src/routes/sitemap[.]xml.ts`, `src/lib/sitemap.ts`) lists every network's game and archive, How to play, About, Privacy and Terms, in Dutch and in English: one `<url>` per page and language. Each lists the page's language versions as `xhtml:link` alternates, the same `nl`, `en` and `x-default` its head lists, from the same `languageAlternates()`. An archive's puzzles are not listed; the archive links to each. A new network is listed as soon as it joins `networkIds` ([network-picker.md](network-picker.md)).
+`/sitemap.xml` (`src/routes/sitemap[.]xml.ts`, `src/lib/sitemap.ts`) lists every network's game and archive, How to play, About, Privacy and Terms, in Dutch, English, German and French: one `<url>` per page and language. Each lists the page's language versions as `xhtml:link` alternates, the same `nl`, `en`, `de`, `fr` and `x-default` its head lists, from the same `languageAlternates()`. An archive's puzzles are not listed; the archive links to each. A new network is listed as soon as it joins `networkIds` ([network-picker.md](network-picker.md)).
 
 ### robots.txt
 

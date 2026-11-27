@@ -1,7 +1,7 @@
 import { AxeBuilder } from "@axe-core/playwright";
 import type { Page } from "@playwright/test";
 import { expect, openPage, test } from "./fixtures";
-import { checkedPages, localizedPath, notFoundPath } from "./pages";
+import { checkedPages, localizedPath, notFoundPath, pageLocales } from "./pages";
 import { guessByKeyboard, todayStations } from "./play";
 
 /** The WCAG 2.2 A and AA rules axe knows. */
@@ -18,14 +18,12 @@ async function axeViolations(page: Page) {
     }));
 }
 
-const locales = ["nl", "en"] as const;
-
 // The theme follows the system's, so axe checks the colours of both.
 for (const colorScheme of ["light", "dark"] as const) {
     test.describe(`in the ${colorScheme} theme`, () => {
         test.use({ colorScheme });
 
-        for (const locale of locales) {
+        for (const locale of pageLocales) {
             for (const { name, path } of checkedPages) {
                 const url = localizedPath(path, locale);
                 // The cookie banner is up, so axe checks it on every page too.

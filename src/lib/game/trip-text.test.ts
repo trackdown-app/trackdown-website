@@ -58,6 +58,33 @@ describe("trainName", () => {
             ]);
         }
     });
+
+    it("names a Rotterdam metro or tram line, the same in every language", () => {
+        const codes: TrainType[] = ["A", "E", "4", "11"];
+        const locales: ReturnType<typeof getLocale>[] = ["en", "nl", "de", "fr"];
+        for (const locale of locales) {
+            overwriteGetLocale(() => locale);
+            expect(codes.map((code) => trainName(code))).toEqual([
+                "Metro A",
+                "Metro E",
+                "Tram 4",
+                "Tram 11",
+            ]);
+        }
+    });
+
+    it("names an Underground line, the same in every language", () => {
+        const codes: TrainType[] = ["NTN", "HAM", "WAC"];
+        const locales: ReturnType<typeof getLocale>[] = ["en", "nl", "de", "fr"];
+        for (const locale of locales) {
+            overwriteGetLocale(() => locale);
+            expect(codes.map((code) => trainName(code))).toEqual([
+                "Northern line",
+                "Hammersmith & City line",
+                "Waterloo & City line",
+            ]);
+        }
+    });
 });
 
 describe("formatMinutes", () => {

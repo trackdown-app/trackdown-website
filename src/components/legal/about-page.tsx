@@ -5,8 +5,13 @@ import { LegalSection } from "@/components/legal/legal-section";
 import { MailLink } from "@/components/legal/mail-link";
 import { textLink } from "@/components/legal/text-link";
 
+const cc0 = "https://creativecommons.org/publicdomain/zero/1.0/";
+
 const openGovernmentLicence =
     "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/";
+
+const tflLicence =
+    "https://tfl.gov.uk/corporate/terms-and-conditions/transport-data-service";
 
 /**
  * The About page (docs/about-privacy-terms.md): what Trackdown is, how its
@@ -34,10 +39,7 @@ export function AboutPage() {
                 <ul className="flex list-disc flex-col gap-2 pl-[22px]">
                     <li>
                         {m["about.dataTimetable"]()}{" "}
-                        <a
-                            href="https://creativecommons.org/publicdomain/zero/1.0/"
-                            className={textLink}
-                        >
+                        <a href={cc0} className={textLink}>
                             CC0 1.0
                         </a>
                     </li>
@@ -83,9 +85,56 @@ export function AboutPage() {
                         </a>
                     </li>
                 </ul>
+                <p>{m["about.dataLuIntro"]()}</p>
+                <ul className="flex list-disc flex-col gap-2 pl-[22px]">
+                    <li>
+                        {m["about.dataLuTimetable"]()}{" "}
+                        <a href={tflLicence} className={textLink}>
+                            TfL Transport Data Service
+                        </a>
+                    </li>
+                    <li>
+                        {m["about.dataLuStations"]()}{" "}
+                        <a href={openGovernmentLicence} className={textLink}>
+                            OGL v3.0
+                        </a>
+                    </li>
+                    <li>
+                        {m["about.dataLuBoroughs"]()}{" "}
+                        <a href={openGovernmentLicence} className={textLink}>
+                            OGL v3.0
+                        </a>
+                    </li>
+                </ul>
+                {/* The statements TfL's licence asks for wherever its data
+                    is used, word for word in every language. */}
+                <p>{m["about.dataLuAttribution"]()}</p>
+                <p>{m["about.dataRetIntro"]()}</p>
+                <ul className="flex list-disc flex-col gap-2 pl-[22px]">
+                    <li>
+                        {m["about.dataRetTimetable"]()}{" "}
+                        <a href={cc0} className={textLink}>
+                            CC0 1.0
+                        </a>
+                    </li>
+                    <li>
+                        {m["about.dataRetDistricts"]()}{" "}
+                        <a href={cc0} className={textLink}>
+                            CC0 1.0
+                        </a>
+                    </li>
+                </ul>
                 <p>{m["about.dataBeIntro"]()}</p>
                 <ul className="flex list-disc flex-col gap-2 pl-[22px]">
-                    <li>{m["about.dataBeTimetable"]()}</li>
+                    <li>
+                        {m["about.dataBeTimetable"]()}{" "}
+                        <a
+                            href="https://creativecommons.org/licenses/by/4.0/"
+                            className={textLink}
+                        >
+                            CC BY 4.0
+                        </a>
+                    </li>
                     <li>
                         {m["about.dataBeProvinces"]()}{" "}
                         <a

@@ -28,7 +28,10 @@ export { expect };
  */
 export async function openPage(page: Page, path: string): Promise<Response | null> {
     const response = await page.goto(path, { waitUntil: "networkidle" });
-    // The cookie banner, which a first visit always shows.
-    await expect(page.getByRole("region", { name: /^Cookies,/ })).toBeVisible();
+    // The cookie banner, which a first visit always shows. Its title starts
+    // with "Cookies," in Dutch, English and German, "Des cookies," in French.
+    await expect(
+        page.getByRole("region", { name: /^(Des )?cookies,/i }),
+    ).toBeVisible();
     return response;
 }

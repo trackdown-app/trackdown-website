@@ -8,6 +8,10 @@ describe("sitemapPaths", () => {
             "/nl/archief",
             "/gb",
             "/gb/archief",
+            "/lu",
+            "/lu/archief",
+            "/ret",
+            "/ret/archief",
             "/be",
             "/be/archief",
             "/hoe-te-spelen",
@@ -21,22 +25,31 @@ describe("sitemapPaths", () => {
 describe("sitemapXml", () => {
     const xml = sitemapXml();
 
-    it("lists every page in both languages", () => {
+    it("lists every page in every language", () => {
         for (const url of [
             "https://trackdown.nl/nl",
             "https://trackdown.nl/en/nl",
+            "https://trackdown.nl/de/nl",
+            "https://trackdown.nl/fr/nl",
             "https://trackdown.nl/nl/archief",
             "https://trackdown.nl/en/nl/archief",
             "https://trackdown.nl/gb",
             "https://trackdown.nl/en/gb/archief",
+            "https://trackdown.nl/de/gb/archief",
+            "https://trackdown.nl/lu",
+            "https://trackdown.nl/en/lu/archief",
+            "https://trackdown.nl/ret",
+            "https://trackdown.nl/fr/ret/archief",
             "https://trackdown.nl/be",
-            "https://trackdown.nl/en/be/archief",
+            "https://trackdown.nl/de/be/archief",
             "https://trackdown.nl/hoe-te-spelen",
             "https://trackdown.nl/en/hoe-te-spelen",
+            "https://trackdown.nl/fr/hoe-te-spelen",
         ]) {
             expect(xml).toContain(`<loc>${url}</loc>`);
         }
-        expect(xml.match(/<url>/g)).toHaveLength(20);
+        // Fourteen pages, four languages each.
+        expect(xml.match(/<url>/g)).toHaveLength(56);
     });
 
     it("names each page's language versions, as its head does", () => {

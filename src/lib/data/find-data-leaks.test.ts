@@ -44,6 +44,12 @@ describe("readTree", () => {
             "gb/stations.json",
             "gb/to/fxa.json",
             "gb/to/htl.json",
+            "lu/meta.json",
+            "lu/puzzles.json",
+            "lu/stations.json",
+            "lu/to/jlc.json",
+            "lu/to/klp.json",
+            "lu/to/lms.json",
             "nl/meta.json",
             "nl/puzzles.json",
             "nl/stations.json",
@@ -52,6 +58,12 @@ describe("readTree", () => {
             "nl/to/chr.json",
             "nl/to/dlt.json",
             "nl/to/ech.json",
+            "ret/meta.json",
+            "ret/puzzles.json",
+            "ret/stations.json",
+            "ret/to/mike-centraal.json",
+            "ret/to/november-plein.json",
+            "ret/to/s-oscarkade.json",
         ]);
     });
 });

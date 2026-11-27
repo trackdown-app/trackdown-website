@@ -213,6 +213,15 @@ describe("submitGuess", () => {
             await expectRejection(guess({ number: 99, guess: "dlt" }), "not_found");
         });
 
+        it("a puzzle before a network's schedule starts with not_found", async () => {
+            // The fixture's `ret` starts at puzzle 2, as the real one starts
+            // after the other networks.
+            await expectRejection(
+                guess({ network: "ret", number: 1, guess: "mike-centraal" }),
+                "not_found",
+            );
+        });
+
         it("a guess that is not a station", async () => {
             await expectRejection(guess({ guess: "xyz" }), "invalid_input");
         });

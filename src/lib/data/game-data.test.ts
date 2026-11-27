@@ -30,6 +30,28 @@ describe("the fixture", () => {
         ]);
     });
 
+    it("reads an lu trip labelled with Underground lines", async () => {
+        const data = createGameData(readDataDir(fixtureDir));
+
+        expect((await data.tripsTo("lu", "klp"))["lms"]).toEqual([
+            { kind: "ride", train: "NTN", minutes: 15 },
+            { kind: "change", station: "jlc", minutes: 4 },
+            { kind: "ride", train: "CEN", minutes: 12 },
+        ]);
+    });
+
+    it("reads a ret trip labelled with metro and tram lines", async () => {
+        const data = createGameData(readDataDir(fixtureDir));
+
+        expect((await data.tripsTo("ret", "s-oscarkade"))["november-plein"]).toEqual(
+            [
+                { kind: "ride", train: "D", minutes: 9 },
+                { kind: "change", station: "mike-centraal", minutes: 3 },
+                { kind: "ride", train: "4", minutes: 11 },
+            ],
+        );
+    });
+
     it("reads a be trip by UIC codes, changing at a station abroad", async () => {
         const data = createGameData(readDataDir(fixtureDir));
 

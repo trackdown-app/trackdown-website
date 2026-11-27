@@ -10,17 +10,23 @@ export const paraglideCompilerOptions: CompilerOptions = {
     project: "./project.inlang",
     outdir: "./src/paraglide",
     // The locale lives in the URL so every language has its own indexable
-    // address: Dutch at `/`, English under `/en`. See docs/i18n.md.
+    // address: Dutch at `/`, English, German and French under `/en`, `/de`
+    // and `/fr`. See docs/i18n.md.
     strategy: ["url", "baseLocale"],
-    // Only `/en` is a locale prefix. Paraglide's default patterns treat a
-    // leading `/nl` as the Dutch prefix too and strip it, which would take
-    // the Dutch network's pages at `/nl` (docs/network-picker.md#routes).
-    // Listing the patterns makes Paraglide match exactly these.
+    // Only `/en`, `/de` and `/fr` are locale prefixes. Paraglide's default
+    // patterns treat a leading `/nl` as the Dutch prefix too and strip it,
+    // which would take the Dutch network's pages at `/nl`
+    // (docs/network-picker.md#routes). Listing the patterns makes Paraglide
+    // match exactly these. A network id may never be one of these prefixes
+    // (`src/lib/data/networks.test.ts`). The base locale's pattern comes last:
+    // it matches every path.
     urlPatterns: [
         {
             pattern: ":protocol://:domain(.*)::port?/:path(.*)?",
             localized: [
                 ["en", ":protocol://:domain(.*)::port?/en/:path(.*)?"],
+                ["de", ":protocol://:domain(.*)::port?/de/:path(.*)?"],
+                ["fr", ":protocol://:domain(.*)::port?/fr/:path(.*)?"],
                 ["nl", ":protocol://:domain(.*)::port?/:path(.*)?"],
             ],
         },
@@ -30,6 +36,11 @@ export const paraglideCompilerOptions: CompilerOptions = {
     trailingSlash: "never",
     // Lets Vite tree-shake server-only runtime code out of the client bundle.
     isServer: "import.meta.env.SSR",
+    // A physical file per message. The Vite plugin would otherwise serve the
+    // messages as virtual modules, which only exist inside Vite: the output
+    // would then differ from `bun run paraglide:compile`'s, and Vitest, the
+    // typecheck and lint read the files from disk.
+    outputStructure: "message-modules",
     // The output is JavaScript; `.d.ts` files keep it typed without `allowJs`.
     emitTsDeclarations: true,
 };

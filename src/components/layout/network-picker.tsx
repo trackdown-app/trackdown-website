@@ -13,6 +13,7 @@ import {
     regionName,
     upcomingNetworks,
 } from "@/lib/data/networks";
+import { networkName } from "@/lib/game/network-name";
 import { keepNetworkChoice } from "@/lib/network-choice";
 import { useCurrentNetwork } from "@/lib/use-current-network";
 
@@ -30,7 +31,7 @@ export function NetworkPicker() {
     const locale = getLocale();
     const [open, setOpen] = useState(false);
     const upcomingId = useId();
-    const currentName = regionName(current.region, locale);
+    const currentName = networkName(current.id);
 
     return (
         <Popover open={open} onOpenChange={setOpen}>
@@ -39,7 +40,7 @@ export function NetworkPicker() {
                 (WCAG 2.5.3); the code chip is left out for screen readers. */}
             <PopoverTrigger className="flex h-11 cursor-pointer items-center gap-2 rounded-full border-[1.5px] border-input bg-transparent pr-3 pl-1.5 text-[15px] font-semibold whitespace-nowrap text-foreground hover:bg-muted">
                 <NetworkChip
-                    region={current.region}
+                    code={current.code}
                     className="px-[7px] py-[3px] text-xs"
                 />
                 {currentName}
@@ -84,11 +85,11 @@ export function NetworkPicker() {
                                     className="flex min-h-14 items-center gap-3.5 rounded-lg px-2 py-1.5 text-foreground no-underline hover:bg-soft"
                                 >
                                     <NetworkChip
-                                        region={network.region}
+                                        code={network.code}
                                         className="size-11 text-[15px]"
                                     />
                                     <span className={`flex-1 ${nameClasses}`}>
-                                        {regionName(network.region, locale)}
+                                        {networkName(id)}
                                     </span>
                                     {chosen && (
                                         <span className="flex size-6 items-center justify-center rounded-full bg-line-1 text-on-line">
@@ -125,7 +126,7 @@ export function NetworkPicker() {
                                     className="flex min-h-14 items-center gap-3.5 border-t border-rule px-2 py-1.5 first:border-t-0"
                                 >
                                     <NetworkChip
-                                        region={region}
+                                        code={region}
                                         upcoming
                                         className="size-11 text-[15px]"
                                     />

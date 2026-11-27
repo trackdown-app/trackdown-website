@@ -90,13 +90,36 @@ describe("provinceName", () => {
         expect(provinceName("Westmark", "en")).toBe("Westmark");
     });
 
-    it("names a Belgian province in Dutch and English, whatever language the data uses", () => {
+    it("names provinces and regions in German and French", () => {
+        expect(provinceName("Noord-Holland", "de")).toBe("Nordholland");
+        expect(provinceName("Scotland", "de")).toBe("Schottland");
+        expect(provinceName("Gelderland", "de")).toBe("Gelderland");
+        expect(provinceName("Zuid-Holland", "fr")).toBe("Hollande-Méridionale");
+        expect(provinceName("Wales", "fr")).toBe("Pays de Galles");
+        expect(provinceName("West Midlands", "fr")).toBe("West Midlands");
+    });
+
+    it("names Rotterdam's districts as they are, and The Hague in each language", () => {
+        expect(provinceName("Kralingen-Crooswijk", "en")).toBe(
+            "Kralingen-Crooswijk",
+        );
+        expect(provinceName("Den Haag", "nl")).toBe("Den Haag");
+        expect(provinceName("Den Haag", "en")).toBe("The Hague");
+        expect(provinceName("Den Haag", "de")).toBe("Den Haag");
+        expect(provinceName("Den Haag", "fr")).toBe("La Haye");
+    });
+
+    it("names a Belgian province in each language, whatever language the data uses", () => {
         expect(provinceName("Hainaut", "nl")).toBe("Henegouwen");
         expect(provinceName("Bruxelles / Brussel", "nl")).toBe("Brussel");
         expect(provinceName("Oost-Vlaanderen", "nl")).toBe("Oost-Vlaanderen");
         expect(provinceName("Oost-Vlaanderen", "en")).toBe("East Flanders");
         expect(provinceName("Bruxelles / Brussel", "en")).toBe("Brussels");
         expect(provinceName("Liège", "en")).toBe("Liège");
+        expect(provinceName("Liège", "de")).toBe("Lüttich");
+        expect(provinceName("West-Vlaanderen", "de")).toBe("Westflandern");
+        expect(provinceName("Antwerpen", "fr")).toBe("Anvers");
+        expect(provinceName("Hainaut", "fr")).toBe("Hainaut");
     });
 });
 
@@ -114,7 +137,7 @@ describe("stationsInputSchema", () => {
 
     it("refuses a locale the site does not have", () => {
         expect(
-            stationsInputSchema.safeParse({ network: "nl", locale: "de" }).success,
+            stationsInputSchema.safeParse({ network: "nl", locale: "es" }).success,
         ).toBe(false);
     });
 });

@@ -43,6 +43,8 @@ export const shareImage = {
 const openGraphLocales: Record<Locale, string> = {
     nl: "nl_NL",
     en: "en_GB",
+    de: "de_DE",
+    fr: "fr_FR",
 };
 
 /** `path` without a trailing slash, but for the root itself. */

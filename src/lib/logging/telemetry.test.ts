@@ -365,7 +365,7 @@ describe("privacy boundaries", () => {
             "trackdown.puzzle.number": 42,
         });
         expect(
-            requestAttributes(new Request("https://trackdown.test/de/archief/1"))[
+            requestAttributes(new Request("https://trackdown.test/ch/archief/1"))[
                 "http.route"
             ],
         ).toBe("unknown");

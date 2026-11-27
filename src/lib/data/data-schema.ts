@@ -4,10 +4,17 @@ import { z } from "@/lib/zod";
 // hold no data, so this module may be imported anywhere; only the loader
 // that reads the files is server-only.
 
-/** A station's NS code, such as `ut` or `amf`: lower-case letters and digits. */
+/**
+ * A station's code, such as `ut` or `amf`, or in `ret`, whose stops have no
+ * public codes, the name with dashes (`rotterdam-centraal`): lower-case
+ * letters and digits, in words joined by single dashes.
+ */
 export const stationCodeSchema = z
     .string()
-    .regex(/^[a-z0-9]+$/, "a station code is lower-case letters and digits");
+    .regex(
+        /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
+        "a station code is lower-case letters and digits, in words joined by dashes",
+    );
 
 export type StationCode = z.infer<typeof stationCodeSchema>;
 
@@ -100,8 +107,10 @@ export type Meta = z.infer<typeof metaFileSchema>;
 /**
  * What a ride is labelled with (trackdown-data README, "Trip format"): in
  * `nl` and `be` the train type, in `gb` the train operator's code, which
- * `gb`'s `operators.json` names. The lists do not overlap, except for the
- * train types `nl` and `be` share (`IC`, `EC`).
+ * `gb`'s `operators.json` names, in `lu` the Underground line's code, which
+ * `lu`'s `lines.json` names, in `ret` the metro line's letter or the tram
+ * line's number, which `ret`'s `lines.json` names. The lists do not overlap,
+ * except for the train types `nl` and `be` share (`IC`, `EC`).
  */
 export const trainTypeSchema = z.enum([
     // nl: train types.
@@ -145,6 +154,33 @@ export const trainTypeSchema = z.enum([
     "VT",
     "XC",
     "XR",
+    // lu: Underground lines.
+    "BAK",
+    "CEN",
+    "CIR",
+    "DIS",
+    "HAM",
+    "JUB",
+    "MET",
+    "NTN",
+    "PIC",
+    "VIC",
+    "WAC",
+    // ret: Rotterdam's metro and tram lines.
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "11",
 ]);
 
 export type TrainType = z.infer<typeof trainTypeSchema>;

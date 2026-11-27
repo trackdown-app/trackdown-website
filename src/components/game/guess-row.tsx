@@ -12,6 +12,8 @@ type GuessRowProps = {
     names: StationNames;
     /** The minutes the board's track spans, the same for every row (`boardMinutes`). */
     scaleMinutes: number;
+    /** The minutes of one column of the time grid behind the track (`boardScales`). */
+    gridMinutes: number;
     /** A guess just made on this page: the row plays its arrival (docs/guess-list.md#a-new-guess). */
     entering?: boolean;
     /**
@@ -31,6 +33,7 @@ export function GuessRow({
     number,
     names,
     scaleMinutes,
+    gridMinutes,
     entering = false,
     revealed = false,
 }: GuessRowProps) {
@@ -103,6 +106,7 @@ export function GuessRow({
                 guess={guess}
                 names={names}
                 scaleMinutes={scaleMinutes}
+                gridMinutes={gridMinutes}
                 revealed={revealed}
             />
         </li>
