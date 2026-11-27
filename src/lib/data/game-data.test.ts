@@ -51,6 +51,18 @@ describe("the fixture", () => {
             ],
         );
     });
+
+    it("reads a be trip by UIC codes, changing at a station abroad", async () => {
+        const data = createGameData(readDataDir(fixtureDir));
+
+        expect((await data.tripsTo("be", "8800002"))["8800004"]).toEqual([
+            { kind: "ride", train: "P", minutes: 48 },
+            { kind: "change", station: "8299999", minutes: 9 },
+            { kind: "ride", train: "IC", minutes: 30 },
+        ]);
+        const stations = await data.stations("be");
+        expect(stations.some((station) => station.code === "8299999")).toBe(false);
+    });
 });
 
 describe("createGameData", () => {

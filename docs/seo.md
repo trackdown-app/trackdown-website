@@ -79,7 +79,8 @@ it reads the network, so a locale added here needs the app to know it too. A
 network added to the site stays a web link until the app plays it: list its game
 and archive paths here then, and until then exclude its `/en/`, `/de/` and `/fr/`
 paths (`{ "/": "/en/{network}/*", "exclude": true }` and the bare path) before
-the wildcards.
+the wildcards. Belgium (`be`) is such a network for now: its `/en/`, `/de/` and
+`/fr/` paths are excluded until an app release plays it.
 
 Nitro's exact route rule in `vite.config.ts` sets `Content-Type: application/json`
 for this extensionless static file on Node and Vercel. Static serving bypasses

@@ -3,7 +3,10 @@ import type { Locale } from "@/paraglide/runtime";
 /**
  * A province's name per locale, keyed by its name in `stations.json`: Dutch
  * for `nl`'s provinces, English for `gb`'s ITL1 regions, Dutch for `ret`'s
- * districts and municipalities (Den Haag is The Hague). Only the names that
+ * districts and municipalities (Den Haag is The Hague), and for `be`'s the
+ * province's own language (Dutch in Flanders, French in Wallonia, both for
+ * Brussels). Limburg is a province in both countries, with the same name in
+ * every language but French, so one entry serves both. Only the names that
  * differ are listed: a province without an entry keeps its data name
  * (docs/api.md#stations). German and French keep the English names of the
  * Midlands, as their own atlases do.
@@ -18,6 +21,12 @@ const provinceNames: Record<Locale, Readonly<Record<string, string>>> = {
         "South East": "Zuidoost-Engeland",
         "South West": "Zuidwest-Engeland",
         "Yorkshire and The Humber": "Yorkshire en de Humber",
+        "Brabant wallon": "Waals-Brabant",
+        "Bruxelles / Brussel": "Brussel",
+        Hainaut: "Henegouwen",
+        Liège: "Luik",
+        Luxembourg: "Luxemburg",
+        Namur: "Namen",
     },
     en: {
         Fryslân: "Friesland",
@@ -25,6 +34,12 @@ const provinceNames: Record<Locale, Readonly<Record<string, string>>> = {
         "Noord-Holland": "North Holland",
         "Zuid-Holland": "South Holland",
         "Den Haag": "The Hague",
+        Antwerpen: "Antwerp",
+        "Brabant wallon": "Walloon Brabant",
+        "Bruxelles / Brussel": "Brussels",
+        "Oost-Vlaanderen": "East Flanders",
+        "Vlaams-Brabant": "Flemish Brabant",
+        "West-Vlaanderen": "West Flanders",
     },
     de: {
         Fryslân: "Friesland",
@@ -39,6 +54,14 @@ const provinceNames: Record<Locale, Readonly<Record<string, string>>> = {
         "South East": "Südostengland",
         "South West": "Südwestengland",
         "Yorkshire and The Humber": "Yorkshire und Humber",
+        "Brabant wallon": "Wallonisch-Brabant",
+        "Bruxelles / Brussel": "Brüssel",
+        Hainaut: "Hennegau",
+        Liège: "Lüttich",
+        Luxembourg: "Luxemburg",
+        "Oost-Vlaanderen": "Ostflandern",
+        "Vlaams-Brabant": "Flämisch-Brabant",
+        "West-Vlaanderen": "Westflandern",
     },
     fr: {
         Fryslân: "Frise",
@@ -59,6 +82,11 @@ const provinceNames: Record<Locale, Readonly<Record<string, string>>> = {
         Wales: "Pays de Galles",
         "Yorkshire and The Humber": "Yorkshire-et-Humber",
         "Den Haag": "La Haye",
+        Antwerpen: "Anvers",
+        "Bruxelles / Brussel": "Bruxelles",
+        "Oost-Vlaanderen": "Flandre-Orientale",
+        "Vlaams-Brabant": "Brabant flamand",
+        "West-Vlaanderen": "Flandre-Occidentale",
     },
 };
 

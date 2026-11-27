@@ -25,8 +25,9 @@ export type BoardScale = {
 };
 
 /**
- * Each network's board (docs/guess-list.md#the-trip-line). Dutch and British trips
- * run for hours: 2 h 30, five columns of 30 minutes. Underground trips are
+ * Each network's board (docs/guess-list.md#the-trip-line). Dutch, British and
+ * Belgian trips run for hours (half of the Belgian ones over 2 h, as in the
+ * Netherlands): 2 h 30, five columns of 30 minutes. Underground trips are
  * short, half of them under 40 minutes: 1 h, four columns of 15 minutes.
  * Rotterdam's metro and tram trips are shorter still (half under 35
  * minutes, nearly all under an hour), so they take the same board.
@@ -36,6 +37,7 @@ export const boardScales: Record<NetworkId, BoardScale> = {
     gb: { trackMinutes: 150, gridMinutes: 30 },
     lu: { trackMinutes: 60, gridMinutes: 15 },
     ret: { trackMinutes: 60, gridMinutes: 15 },
+    be: { trackMinutes: 150, gridMinutes: 30 },
 };
 
 /** The shortest line, so a short trip's dot and a bit of line show beside the bar. */

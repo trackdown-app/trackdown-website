@@ -12,6 +12,8 @@ describe("sitemapPaths", () => {
             "/lu/archief",
             "/ret",
             "/ret/archief",
+            "/be",
+            "/be/archief",
             "/hoe-te-spelen",
             "/over",
             "/privacy",
@@ -38,14 +40,16 @@ describe("sitemapXml", () => {
             "https://trackdown.nl/en/lu/archief",
             "https://trackdown.nl/ret",
             "https://trackdown.nl/fr/ret/archief",
+            "https://trackdown.nl/be",
+            "https://trackdown.nl/de/be/archief",
             "https://trackdown.nl/hoe-te-spelen",
             "https://trackdown.nl/en/hoe-te-spelen",
             "https://trackdown.nl/fr/hoe-te-spelen",
         ]) {
             expect(xml).toContain(`<loc>${url}</loc>`);
         }
-        // Twelve pages, four languages each.
-        expect(xml.match(/<url>/g)).toHaveLength(48);
+        // Fourteen pages, four languages each.
+        expect(xml.match(/<url>/g)).toHaveLength(56);
     });
 
     it("names each page's language versions, as its head does", () => {

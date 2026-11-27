@@ -23,8 +23,8 @@ export function changeStationName(code: string, names: StationNames): string {
 }
 
 /**
- * Each ride label's message: a train type in `nl`, a train operator in `gb`,
- * an Underground line in `lu`, a metro or tram line in `ret`.
+ * Each ride label's message: a train type in `nl` and `be`, a train operator
+ * in `gb`, an Underground line in `lu`, a metro or tram line in `ret`.
  * A `Record`, so a label added to `trainTypeSchema` fails the typecheck
  * until it has a name.
  */
@@ -36,6 +36,9 @@ const trainNames: Record<TrainType, () => string> = {
     SNT: m["trains.SNT"],
     ICE: m["trains.ICE"],
     EC: m["trains.EC"],
+    L: m["trains.L"],
+    S: m["trains.S"],
+    P: m["trains.P"],
     AW: m["trains.AW"],
     CC: m["trains.CC"],
     CH: m["trains.CH"],

@@ -151,7 +151,7 @@ describe("GET /api/v1/meta", () => {
     });
 
     it("answers 400 invalid_input for a network the game has no data for", async () => {
-        const response = await call(metaHandlers.GET, "/api/v1/meta?network=be");
+        const response = await call(metaHandlers.GET, "/api/v1/meta?network=de");
 
         expect(response.status).toBe(400);
         const body = apiErrorBodySchema.parse(await response.json());
@@ -220,9 +220,9 @@ describe("GET /api/v1/{network}/puzzles/today", () => {
     it("answers 400 invalid_input for a network the game has no data for", async () => {
         const response = await call(
             todayPuzzleHandlers.GET,
-            "/api/v1/be/puzzles/today",
+            "/api/v1/de/puzzles/today",
             "GET",
-            { network: "be" },
+            { network: "de" },
         );
 
         expect(response.status).toBe(400);
@@ -294,9 +294,9 @@ describe("GET /api/v1/{network}/puzzles", () => {
     it("answers 400 invalid_input for a network the game has no data for", async () => {
         const response = await call(
             puzzleArchiveHandlers.GET,
-            "/api/v1/be/puzzles",
+            "/api/v1/de/puzzles",
             "GET",
-            { network: "be" },
+            { network: "de" },
         );
 
         expect(response.status).toBe(400);

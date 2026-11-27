@@ -1,0 +1,30 @@
+[
+    {
+        "code": "8800001",
+        "name": "Juliet-Centraal",
+        "province": "Antwerpen",
+        "lat": 51.2,
+        "lon": 4.4
+    },
+    {
+        "code": "8800002",
+        "name": "Kilo",
+        "province": "Antwerpen",
+        "lat": 51.3,
+        "lon": 4.5
+    },
+    {
+        "code": "8800003",
+        "name": "Lima-Midi / Lima-Zuid",
+        "province": "Bruxelles / Brussel",
+        "lat": 50.8,
+        "lon": 4.3
+    },
+    {
+        "code": "8800004",
+        "name": "Mike",
+        "province": "Hainaut",
+        "lat": 50.4,
+        "lon": 4.0
+    }
+]

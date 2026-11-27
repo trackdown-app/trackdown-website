@@ -32,6 +32,13 @@ const cleanChunk = file(
 describe("readTree", () => {
     it("lists the fixture by paths inside it", () => {
         expect(data.map((entry) => entry.path).sort()).toEqual([
+            "be/meta.json",
+            "be/puzzles.json",
+            "be/stations.json",
+            "be/to/8800001.json",
+            "be/to/8800002.json",
+            "be/to/8800003.json",
+            "be/to/8800004.json",
             "gb/meta.json",
             "gb/puzzles.json",
             "gb/stations.json",
@@ -85,7 +92,7 @@ describe("findDataLeaks", () => {
             "data/nl/to/brv.json has the name of nl/to/brv.json",
         ]);
         expect(findDataLeaks(data, [file("stations.json", "[]")])).toEqual([
-            "stations.json has the name of gb/stations.json",
+            "stations.json has the name of be/stations.json",
         ]);
     });
 

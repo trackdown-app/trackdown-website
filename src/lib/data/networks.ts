@@ -6,7 +6,7 @@ import { z } from "@/lib/zod";
  * a network adds its id here and its entry to `networks`, and takes it out
  * of `upcomingNetworks`.
  */
-export const networkIdSchema = z.enum(["nl", "gb", "lu", "ret"]);
+export const networkIdSchema = z.enum(["nl", "gb", "lu", "ret", "be"]);
 
 export type NetworkId = z.infer<typeof networkIdSchema>;
 
@@ -36,6 +36,7 @@ export const networks: Record<NetworkId, Network> = {
     gb: { id: "gb", dataDir: "gb", code: "GB", region: "GB" },
     lu: { id: "lu", dataDir: "lu", code: "LU", region: null },
     ret: { id: "ret", dataDir: "ret", code: "RET", region: null },
+    be: { id: "be", dataDir: "be", code: "BE", region: "BE" },
 };
 
 export const networkIds: ReadonlyArray<NetworkId> = networkIdSchema.options;
@@ -47,7 +48,7 @@ export const defaultNetwork: NetworkId = "nl";
  * The networks the picker shows as coming later, in its order: no data yet,
  * so nothing to play. A network leaves this list when it joins `networks`.
  */
-export const upcomingNetworks: ReadonlyArray<RegionCode> = ["BE", "DE", "CH", "JP"];
+export const upcomingNetworks: ReadonlyArray<RegionCode> = ["DE", "CH", "JP"];
 
 /**
  * The name of `region` in `locale`, the country's name from the runtime's

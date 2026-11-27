@@ -108,6 +108,19 @@ describe("provinceName", () => {
         expect(provinceName("Den Haag", "de")).toBe("Den Haag");
         expect(provinceName("Den Haag", "fr")).toBe("La Haye");
     });
+
+    it("names a Belgian province in each language, whatever language the data uses", () => {
+        expect(provinceName("Hainaut", "nl")).toBe("Henegouwen");
+        expect(provinceName("Bruxelles / Brussel", "nl")).toBe("Brussel");
+        expect(provinceName("Oost-Vlaanderen", "nl")).toBe("Oost-Vlaanderen");
+        expect(provinceName("Oost-Vlaanderen", "en")).toBe("East Flanders");
+        expect(provinceName("Bruxelles / Brussel", "en")).toBe("Brussels");
+        expect(provinceName("Liège", "en")).toBe("Liège");
+        expect(provinceName("Liège", "de")).toBe("Lüttich");
+        expect(provinceName("West-Vlaanderen", "de")).toBe("Westflandern");
+        expect(provinceName("Antwerpen", "fr")).toBe("Anvers");
+        expect(provinceName("Hainaut", "fr")).toBe("Hainaut");
+    });
 });
 
 describe("stationsInputSchema", () => {
